@@ -1051,7 +1051,21 @@ function game_end_alive() {
             update_top_gamers(score + hero.money);
         }
     }
-    wait_for_key();
+    GotoXY(1, 0x18);
+    current_color = 0x0E;
+    write(aNajmiLubuuKlav);
+    current_color = 7;
+    //if (ReadKey() == 0) {
+
+    while (1) {
+        const key = ReadKey();
+        switch (key) {
+            case "Enter":
+            case " ": {
+                return;
+            }
+        }
+    }
 } // end function 1081D
 
 
