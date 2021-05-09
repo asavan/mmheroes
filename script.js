@@ -629,7 +629,8 @@ function dialog_run(x, y) {
                     --current_selection;
                 }
                 break;
-            case "Enter": {
+            case "Enter":
+            case " ": {
                 current_color = 7;
                 var result = dialog[current_selection].num;
                 Replay.record_dialog(result);
