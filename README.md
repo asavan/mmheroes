@@ -1,8 +1,8 @@
 # mmheroes
-This is clone of https://github.com/sharpden/mmheroes
-Changes: 
-    - remove jquery
-    - separate js file
+This is clone of https://github.com/sharpden/mmheroes  
+Changes:  
+    - remove jquery  
+    - separate js file  
 
 ---- original ---------------
 
