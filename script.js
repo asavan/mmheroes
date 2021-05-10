@@ -1051,21 +1051,7 @@ function game_end_alive() {
             update_top_gamers(score + hero.money);
         }
     }
-    GotoXY(1, 0x18);
-    current_color = 0x0E;
-    write(aNajmiLubuuKlav);
-    current_color = 7;
-    //if (ReadKey() == 0) {
-
-    while (1) {
-        const key = ReadKey();
-        switch (key) {
-            case "Enter":
-            case " ": {
-                return;
-            }
-        }
-    }
+    wait_for_key();
 } // end function 1081D
 
 
@@ -6418,5 +6404,13 @@ function dev_replay() {
 }
 
 
-document.onkeydown = (e) => _update_key(e.key);
+document.onkeydown = (e) => {
+    const ignoredMeta = ["Control", "Alt", "Meta", "Tab", "Shift"];
+    const ignoredKeys = ["KeyC", "KeyS"];
+    if (!ignoredMeta.includes(e.key)) {
+        if (!ignoredKeys.includes(e.code)) {
+            _update_key(e.key);
+        }
+    }
+};
 Main();
