@@ -4337,7 +4337,7 @@ var aUDubcovaInogda = '"У Дубцова иногда бывает халява
 var aSerjUxoditKuda = 'Серж уходит куда-то по своим делам ...';
 
 
-function sub_1B09A() {
+function serg_talk() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4435,7 +4435,7 @@ var aPasaVoodusevlq = 'Паша воодушевляет тебя на вели�
 var aVmesteSAtimOnN = 'Вместе с этим он немного достает тебя.';
 
 
-function sub_1B526() {
+function pawa_talk() {
     ClrScr();
     show_header_stats();
 
@@ -4476,7 +4476,7 @@ var aDaUMenqSSoboiA = '"Да, у меня с собой этот конспек�
 var aOxIzviniKtoToD = '"Ох, извини, кто-то другой уже позаимствовал ..."';
 
 
-function sub_1B6B7() {
+function sasha_talk() {
     var var_2;
 
     ClrScr();
@@ -4537,7 +4537,7 @@ var aTebePoploxelo_ = 'Тебе поплохело.';
 var aObsenieSNilOka = 'Общение с NiL оказалось выше человеческих сил.';
 
 
-function sub_1B986() {
+function nil_talk() {
     ClrScr();
     show_header_stats();
 
@@ -5048,15 +5048,15 @@ function talk_with_classmate(arg_0) {
     } else if (arg_0 == 3) {
         sub_1A0A2();
     } else if (arg_0 == 1) {
-        sub_1B526();
+        pawa_talk();
     } else if (arg_0 == 4) {
         sub_1A70A();
     } else if (arg_0 == 5) {
-        sub_1B09A();
+        serg_talk();
     } else if (arg_0 == 6) {
-        sub_1B6B7();
+        sasha_talk();
     } else if (arg_0 == 7) {
-        sub_1B986();
+        nil_talk();
     } else if (arg_0 == 8) {
         sub_1C02B();
     } else if (arg_0 == 9) {
@@ -5517,6 +5517,7 @@ function is_professor_here_today(subj) {
 
 
 function time_between_9_and_19() {
+    console.log("time_of_day", time_of_day);
     return time_of_day > 8 && time_of_day < 20;
 } // end function 1EC75
 
