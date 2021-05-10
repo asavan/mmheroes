@@ -118,7 +118,7 @@ var word_2559A, word_256CE, word_256D0, asc_256D2, byte_2549F, byte_254A4;
 
 
 function _init_vars() {
-    var init_subjects = function (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) {
+    const init_subjects = function (a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) {
         subjects.push({
             professor: {name: a1, sex: a11},
             title: a2,
@@ -142,7 +142,7 @@ function _init_vars() {
     init_subjects('Альбинский Е.Г.', 'Физ-ра', 7, 0x14, 1, 1, 2, 1, 1, [1, 1, 1], 1);
 
     timesheet = [];
-    for (var i = 0; i < 6; ++i) {
+    for (let i = 0; i < 6; ++i) {
         timesheet.push([]);
         for (var j = 0; j < 6; ++j) {
             timesheet[i].push({from: 0, to: 0, where: 0});
@@ -150,12 +150,12 @@ function _init_vars() {
     }
 
     synopsis = [];
-    for (var i = 0; i < 3; ++i) {
+    for (let i = 0; i < 3; ++i) {
         synopsis.push({sasha_has: 1, hero_has: 0});
     }
 
     hero.subject = [];
-    for (var i = 0; i < 6; ++i) {
+    for (let i = 0; i < 6; ++i) {
         hero.subject.push({knowledge: 0, passed: 0, pass_day: -1, tasks_done: 0});
     }
 
@@ -165,7 +165,7 @@ function _init_vars() {
 	}*/
 
     classmates = [];
-    for (var i = 0; i < 12; ++i) {
+    for (let i = 0; i < 12; ++i) {
         classmates.push({
             current_subject: -1, place: 0,
             member0x32C: [0, 0, 0, 4, 2, 0, 0, 6, 0, 0, 0, 0][i],
@@ -175,20 +175,20 @@ function _init_vars() {
 }
 
 // [i * 0x11 + 2] // four_letters_places
-var places = [{title: '----'}, {title: 'ПУНК '}, {title: 'ПОМИ '}, {title: 'Компы'}, {title: 'Общага'}, {title: 'Мавзолей'}];
+const places = [{title: '----'}, {title: 'ПУНК '}, {title: 'ПОМИ '}, {title: 'Компы'}, {title: 'Общага'}, {title: 'Мавзолей'}];
 
 
 // 0x74, size 7
-var days = ['22.5', '23.5', '24.5', '25.5', '26.5', '27.5'];
+const days = ['22.5', '23.5', '24.5', '25.5', '26.5', '27.5'];
 // 0x260, size 0x11
-var classmate_names = ['Коля', 'Паша', 'Diamond', 'RAI', 'Миша', 'Серж', 'Саша', 'NiL', 'Кузьменко В.Г.', 'DJuG', 'Эндрю', 'Гриша'];
+const classmate_names = ['Коля', 'Паша', 'Diamond', 'RAI', 'Миша', 'Серж', 'Саша', 'NiL', 'Кузьменко В.Г.', 'DJuG', 'Эндрю', 'Гриша'];
 
-var Kolya = 0, Pasha = 1, Diamond = 2, Rai = 3, Misha = 4, Serzg = 5, Sasha = 6, Nil = 7, Kuzmenko = 8, Djug = 9,
+const Kolya = 0, Pasha = 1, Diamond = 2, Rai = 3, Misha = 4, Serzg = 5, Sasha = 6, Nil = 7, Kuzmenko = 8, Djug = 9,
     Endryu = 10, Grisha = 11;
 
 
 // 0x9E, size 7
-var subject_short_titles = ['АиТЧ', 'МатАн', 'ГиТ', 'Инф', 'ИнЯз', 'Физ-ра'];
+const subject_short_titles = ['АиТЧ', 'МатАн', 'ГиТ', 'Инф', 'ИнЯз', 'Физ-ра'];
 
 var dialog_case_count;
 var current_color;
@@ -201,7 +201,7 @@ var current_subject;
 var last_subject;
 
 
-var Algebra = 0, Matan = 1, GiT = 2, Infa = 3, English = 4, Fizra = 5;
+const Algebra = 0, Matan = 1, GiT = 2, Infa = 3, English = 4, Fizra = 5;
 
 
 // My little and buggy implementation of utilities like STL
@@ -338,12 +338,8 @@ var Replay = {
     },
 
     next_key: function () {
-        //console.log('next_key');
-
-        var result = this.data.keys_i >= this.data.keys_count - this.data.keys.length ?
-            this.data.keys[this.data.keys_i - (this.data.keys_count - this.data.keys.length)] :
-            32;
-
+        const key_index = this.data.keys_i - (this.data.keys_count - this.data.keys.length);
+        const result =  key_index >= 0 ? this.data.keys[key_index] : " ";
         ++this.data.keys_i;
         return result;
     },
@@ -507,13 +503,13 @@ function Random(up) {
 
         //console.log('replay ' + Replay.data.rnds_i + ', hero.health = ' + hero.health + '; from ' + get_stack_before('Random'));
 
-        var res = Replay.next_rnd();
-        if (rec_up != up || up && res >= up || !up && res > 0) {
+        const res = Replay.next_rnd();
+        if (rec_up !== up || up && res >= up || !up && res > 0) {
             alyarme('Replay: Random(' + up + ') = rnds[' + (Replay.data.rnds_i - 1) + '] = ' + res + ', rec_up = ' + rec_up /*+ ', rec_stack = ' + rec_stack*/);
         }
         return res;
     } else {
-        var res = Math.floor(Math.random() * up);
+        const res = Math.floor(Math.random() * up);
         if (up && res >= up || !up && res > 0) {
             alyarme('Random(' + up + ') = ' + res);
         }
@@ -530,7 +526,7 @@ function Random(up) {
 
 function ReadKey_on() {
     // Возвращаем последний нажатый кей, в следующий раз снова придется прерываться
-    var result = false;
+    let result = false;
     if (Replay.keys_remains()) {
         result = Replay.next_key();
     }
@@ -651,8 +647,10 @@ function Main() {
             console.dir(e);
             alert(e + '\r\n' + e.stack);
         }
+        console.log(e);
         return;
     }
+    console.log("before stop");
     Replay.stop();
 }
 
@@ -1578,15 +1576,15 @@ function botva() {
     writeln(aKCemuGotovitSq);
 
     dialog_start();
-    for (var i = 0; i <= 5; ++i) {
+    for (let i = 0; i <= 5; ++i) {
         dialog_case(subjects[i].title + (i <= 2 && synopsis[i].hero_has ? aK : ''), i);
     }
     dialog_case(aNiKCemu, -1);
 
     show_short_today_timesheet(0x0A);
 
-    var subj = dialog_run(1, 0x0A);
-    if (subj == -1) {
+    const subj = dialog_run(1, 0x0A);
+    if (subj === -1) {
         return;
     }
 
@@ -1598,7 +1596,7 @@ function botva() {
         use_synopsis = dialog_run(1, 0x12) == -1;
     }
 
-    var var_6 = subj == 5 ? hero.stamina : hero.brain;
+    var var_6 = subj === Fizra ? hero.stamina : hero.brain;
     if (var_6 <= 0) {
         return;
     }
@@ -4445,7 +4443,7 @@ function sub_1B526() {
         hero.got_stipend = 1
         GotoXY(1, 8);
         output_with_highlighted_num(7, aPasaVrucaetTeb, 0x0F, 0x32, aRub__2);
-        hero.money += 0x32;
+        hero.money += 50;
     } else {
 
         GotoXY(1, 8);
@@ -4455,7 +4453,7 @@ function sub_1B526() {
         writeln(aVmesteSAtimOnN);
         ++hero.stamina;
 
-        for (var var_2 = 0; var_2 <= 5; ++var_2) {
+        for (let var_2 = 0; var_2 <= 5; ++var_2) {
             if (hero.subject[var_2].knowledge > 3) {
                 hero.subject[var_2].knowledge -= Random(3);
             }
@@ -6019,14 +6017,14 @@ var aZacetov_ = ' зачетов.';
 
 
 function show_timesheet() {
-    for (var subj = 0; subj <= 5; ++subj) {
+    for (let subj = 0; subj <= 5; ++subj) {
         TextColor(7);
         GotoXY(1, subj * 3 + 2);
         colored_output(0xA, subjects[subj].professor.name);
         GotoXY(1, subj * 3 + 3);
         colored_output(0xB, subjects[subj].title);
 
-        for (var day = 0; day <= 5; ++day) {
+        for (let day = 0; day <= 5; ++day) {
             show_timesheet_day(day == day_of_week ? 0xE : 7, day, subj);
         }
     }
@@ -6286,7 +6284,7 @@ function check_exams_left_count() {
 
 
 function init_knowledge_synopsis_classmate() {
-    for (var subj = 0; subj <= 5; ++subj) {
+    for (let subj = 0; subj <= 5; ++subj) {
         hero.subject[subj] = {
             tasks_done: 0,
             pass_day: -1,
