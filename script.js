@@ -1682,10 +1682,7 @@ function goto_obschaga_to_pomi() {
         if (hero.charizma < Random(0x0A)) {
             writeln(aTebqZalovili_0);
             writeln(aVisadiliVKra_0);
-            hero.health -= 0xA;
-            if (hero.health <= 0) {
-                death_cause = aKontroleriJi_0;
-            }
+            decrease_health(0x0A, aKontroleriJi_0);
             hour_pass();
         } else {
             writeln(aUfDoexal_0);
@@ -1703,6 +1700,7 @@ function goto_obschaga_to_pomi() {
                 GotoXY(1, 0x0F);
                 writeln(aTebqZalovili_0);
                 writeln(aVisadiliVKra_0);
+                decrease_health(0x0A, aKontroleriJi_0);
                 hour_pass();
             } else {
                 GotoXY(1, 0x0F);
@@ -2174,11 +2172,7 @@ function goto_punk_or_mausoleum_to_pomi() {
         if (hero.charizma < Random(0x0A)) {
             writeln(aTebqZalovili_1);
             writeln(aVisadiliVKra_1);
-            hero.health -= 0xA;
-            if (hero.health <= 0) {
-                is_end = 1;
-                death_cause = aKontroleriJi_1;
-            }
+            decrease_health(0x0A, aKontroleriJi_1);
             hour_pass();
         } else {
             writeln(aUfDoexal_1);
@@ -2196,6 +2190,7 @@ function goto_punk_or_mausoleum_to_pomi() {
                 GotoXY(1, 0x0F);
                 writeln(aTebqZalovili_1);
                 writeln(aVisadiliVKra_1);
+                decrease_health(0x0A, aKontroleriJi_1);
                 hour_pass();
             } else {
                 GotoXY(1, 0x0F);
@@ -2937,11 +2932,9 @@ function sub_16914() {
         if (hero.charizma < Random(0x0A)) {
             writeln(aKontroleriPoim);
             decrease_health(0x0A, aKontroleriJi_2);
+            hour_pass();
         }
-
         wait_for_key();
-        hour_pass();
-        // #warning return here?
     }
 
     hour_pass();
@@ -3204,7 +3197,6 @@ function sub_173B6() {
             writeln(aVisadiliVKra_2);
             decrease_health(0x0A, aKontroleriJi_3);
             hour_pass();
-            current_place = 1;
             wait_for_key();
             ClrScr();
         } else {
