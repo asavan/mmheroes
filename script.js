@@ -256,9 +256,9 @@ function TextColor(col) {
     current_color = current_color & 0xF0 | col;
 }
 
-function Delay(pause) { /*var start = new Date().getTime(); while (new Date().getTime - start < pause);*/
+async function Delay(pause) { /*var start = new Date().getTime(); while (new Date().getTime - start < pause);*/
+    return new Promise(resolve => setTimeout(resolve, pause));
 }
-
 
 function alyarme(str) {
     var d = Replay.data;
@@ -425,26 +425,10 @@ var Replay = {
     }
 };
 
-function _update_key(code) {
-    if (Replay.is_on() && Replay.is_start()) {
-        Replay.record_key(code);
-        if (!Replay.is_end()) {
-            Main();
-        }
-    }
-}
 
 function ClrScr() {
     PositionC = 0;
     PositionR = 0;
-
-    if (Replay.is_on()) {
-        if (!Replay.check_last_cls()) {
-            return;
-        }
-    } else {
-        Replay.record_cls();
-    }
 
     for (var i = 0; i < 25; ++i) {
         for (var j = 0; j < 80; ++j) {
@@ -483,7 +467,7 @@ function write(str) {
         ScreenColor[PositionR][PositionC] = current_color;
         ++PositionC;
     }
-    //_update_screen();
+    _update_screen();
 }
 
 function Random(up) {
@@ -525,35 +509,31 @@ function Random(up) {
 }
 
 function ReadKey_on() {
-    // Возвращаем последний нажатый кей, в следующий раз снова придется прерываться
-    let result = false;
-    if (Replay.keys_remains()) {
-        result = Replay.next_key();
-    }
-    if (Replay.last()) {
-        Replay.turn_off();
-    }
-    //if (result !== false) {
-    return result;
-    //}
+    return new Promise((resolve, reject) => {
+        document.onkeydown = (e) => {
+            const ignoredMeta = ["Control", "Alt", "Meta", "Tab", "Shift"];
+            const ignoredKeys = ["KeyC", "KeyS"];
+            if (!ignoredMeta.includes(e.key)) {
+                if (!ignoredKeys.includes(e.code)) {
+                    resolve(e.key);
+                }
+            }
+        };
+    });
 }
 
 function ReadKey_off() {
     // Апдейтим экран только когда уходим в режим ожидания
     _update_screen();
     // Когда в следующий раз вызовется Main, он будет работать в режиме реплея, пока не кончатся клавиши
-    Replay.turn_on();
-    throw 42;
+    // Replay.turn_on();
+    // throw 42;
 }
 
-function ReadKey() {
-    if (Replay.is_on()) {
-        var result = ReadKey_on();
-        if (result !== false) {
-            return result;
-        }
-    }
+async function ReadKey() {
+    const key = await ReadKey_on();
     ReadKey_off();
+    return key;
 }
 
 function readln() {
@@ -578,7 +558,7 @@ function readln() {
     return res;
 }
 
-function dialog_run(x, y) {
+async function dialog_run(x, y) {
     if (Replay.is_on()) {
         var result = false;
         if (Replay.dialogs_remains()) {
@@ -603,9 +583,7 @@ function dialog_run(x, y) {
         current_color = 0x70;
         GotoXY(x, y + current_selection);
         write(dialog[current_selection].str);
-        var key = ReadKey();
-
-        //console.log('dialog_run rcvd ' + key);
+        const key = await ReadKey();
 
         current_color = dialog[current_selection].color;
         GotoXY(x, y + current_selection);
@@ -630,7 +608,6 @@ function dialog_run(x, y) {
                 current_color = 7;
                 var result = dialog[current_selection].num;
                 Replay.record_dialog(result);
-                Replay.wait_dialog(false);
                 return result;
             }
         }
@@ -638,10 +615,10 @@ function dialog_run(x, y) {
 } // end function 20B87
 
 
-function Main() {
+async function Main() {
     Replay.start();
     try {
-        PROGRAM();
+        await PROGRAM();
     } catch (e) {
         if (e !== 42) {
             console.dir(e);
@@ -775,13 +752,14 @@ var aDaDaDa = 'ДА!!! ДА!!! ДА!!!';
 var aNet___Net___Ne = 'Нет... Нет... Не-э-эт...';
 
 
-function prompt_for_new_game() {
+async function prompt_for_new_game() {
     ClrScr();
     writeln(aXocesPoprobova);
     dialog_start();
     dialog_case(aDaDaDa, -1);
     dialog_case(aNet___Net___Ne, -2);
-    var result = dialog_run(1, 4) == -2;
+    const ax = await dialog_run(1, 4);
+    const result =  ax === -2;
     ClrScr();
     return result;
 }
@@ -790,7 +768,7 @@ function prompt_for_new_game() {
 var a3decHappyBirth = '-3dec-happy-birthday-Diamond';
 
 
-function PROGRAM() {
+async function PROGRAM() {
     _init_vars();
 
     __CrtInit();
@@ -810,21 +788,21 @@ function PROGRAM() {
 
         //_init_vars();
         if (first_run) {
-            show_intro_screen();
+            await show_intro_screen();
             first_run = false;
         }
 
-        init_game();
-        show_dzin_and_timesheet();
+        await init_game();
+        await show_dzin_and_timesheet();
 
         do {
-            scene_router();
-            check_exams_left_count();
+            await scene_router();
+            await check_exams_left_count();
         } while (is_end == 0);
 
-        game_end();
-    } while (prompt_for_new_game() == 0);
-    show_disclaimer();
+        await game_end();
+    } while (await prompt_for_new_game() == 0);
+    await show_disclaimer();
     write_top_gamers();
 }
 
@@ -841,17 +819,17 @@ var aTiVsmatrivaesS = 'ты всматриваешься в заботливо �
 var aRaspisanieKogd = 'расписание: когда и где можно найти искомого препода ?';
 
 
-function show_dzin_and_timesheet() {
+async function show_dzin_and_timesheet() {
     ClrScr();
     TextColor(0x0A);
     writeln(aDzin);
-    Delay(0x1F4);
+    await Delay(0x1F4);
     TextColor(0x0E);
     writeln(aDddzzzzziiiiii);
-    Delay(0x2BC);
+    await Delay(0x2BC);
     TextColor(0x0C);
     writeln(aDdddddzzzzzzzz);
-    Delay(0x3E8);
+    await Delay(0x3E8);
     TextColor(7);
     write(aTiProsipaesSqO);
     write(0x16);
@@ -861,10 +839,10 @@ function show_dzin_and_timesheet() {
     writeln(aNatqgivaqNaSeb);
     writeln(aTiVsmatrivaesS);
     writeln(aRaspisanieKogd);
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
     show_timesheet();
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 102EF
 
@@ -872,31 +850,31 @@ function show_dzin_and_timesheet() {
 var aNowhere_at_tur = 'nowhere_at_turn';
 
 
-function scene_router() {
+async function scene_router() {
     if (current_place == 2) {
         if (current_subject != -1) {
-            scene_exam();
+            await scene_exam();
         } else {
-            scene_pomi();
+            await scene_pomi();
         }
     } else if (current_place == 1) {
         if (current_subject != -1) {
-            scene_exam();
+            await scene_exam();
         } else {
-            scene_punk();
+            await scene_punk();
         }
     } else if (current_place == 5) {
-        scene_mausoleum();
+        await scene_mausoleum();
     } else if (current_place == 4) {
-        scene_obschaga();
+        await scene_obschaga();
     } else if (current_place == 3) {
         if (current_subject != -1) {
-            scene_exam();
+            await scene_exam();
         } else {
-            scene_kompy();
+            await scene_kompy();
         }
     } else if (current_place == 0) {
-        bug_report(aNowhere_at_tur);
+        await bug_report(aNowhere_at_tur);
     }
 } // end function 10433
 
@@ -905,14 +883,14 @@ var aLegceLbomKolot = 'Легче лбом колоть орехи,';
 var aCemUcitSqNaMat = 'чем учиться на МАТ-МЕХе.';
 
 
-function game_end_death() {
+async function game_end_death() {
     send_replay({death_cause: death_cause});
     current_color = 0x0C;
     writeln(aLegceLbomKolot);
     writeln(aCemUcitSqNaMat);
     current_color = 0x0D;
     writeln(death_cause);
-    wait_for_key();
+    await wait_for_key();
 } // end function 104DC
 
 
@@ -943,7 +921,7 @@ var aDaTiEseIGodNet = 'Да ты еще и GOD! Нет, тебе в таблиц
 var aTebqOstaviliBe = 'Тебя оставили без стипухи.';
 
 
-function game_end_alive() {
+async function game_end_alive() {
     if (hero.exams_left > 0) {
         colored_output(0x0D, aUfffffVoVsqkom);
     } else {
@@ -962,7 +940,7 @@ function game_end_alive() {
 
         send_replay();
 
-        wait_for_key();
+        await wait_for_key();
         return;
     } else if (hero.exams_left == 2) {
         colored_output_ln(0x0E, aNetDvuxZacetov);
@@ -1049,7 +1027,7 @@ function game_end_alive() {
             update_top_gamers(score + hero.money);
         }
     }
-    wait_for_key();
+    await wait_for_key();
 } // end function 1081D
 
 
@@ -1067,7 +1045,7 @@ var aVersiq = 'Версия ';
 var aZaglqniteNaNas = 'Загляните на нашу страничку: mmheroes.chat.ru !';
 
 
-function show_intro_screen() {
+async function show_intro_screen() {
     ClrScr();
     TextColor(8);
     writeln(aNamPonqtenAtot);
@@ -1094,17 +1072,17 @@ function show_intro_screen() {
     write(aGamma3_14);
     writeln('.');
     writeln(aZaglqniteNaNas);
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 10E96
 
 
-function game_end() {
+async function game_end() {
     ClrScr();
     if (hero.health <= 0) {
-        game_end_death();
+        await game_end_death();
     } else {
-        game_end_alive();
+        await game_end_alive();
     }
 } // end function 11029
 
@@ -1123,7 +1101,7 @@ var aVasiKommentari = '    Ваши комментарии будут очень
 var aAvtorNeNesetOt = 'Автор не несет ответственность за психическое состояние игрока.';
 
 
-function show_disclaimer() {
+async function show_disclaimer() {
     ClrScr();
     TextColor(0x0A);
     writeln(aDisclaimer);
@@ -1147,12 +1125,12 @@ function show_disclaimer() {
     writeln();
     TextColor(8);
     writeln(aAvtorNeNesetOt);
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 112D0
 
 
-function goto_kompy_to_obschaga() {
+async function goto_kompy_to_obschaga() {
     current_subject = -1;
     current_place = 4;
 } // end function 11450
@@ -1161,7 +1139,7 @@ function goto_kompy_to_obschaga() {
 var aNeSmogRasstatS = 'Не смог расстаться с компьютером.';
 
 
-function goto_kompy_to_punk() {
+async function goto_kompy_to_punk() {
     current_place = 1;
     current_subject = -1;
     decrease_health(2, aNeSmogRasstatS);
@@ -1181,7 +1159,7 @@ var aExatZaicem = 'Ехать зайцем';
 var aCestnoZaplatit = 'Честно заплатить 10 руб. за билет в оба конца';
 
 
-function goto_kompy_to_pomi() {
+async function goto_kompy_to_pomi() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -1189,7 +1167,7 @@ function goto_kompy_to_pomi() {
         writeln(aZdraviiSmislPo);
         writeln(aTiTamNikogoUje);
         writeln(aNeBudemZrqTrat);
-        wait_for_key();
+        await wait_for_key();
         return;
     }
 
@@ -1207,7 +1185,7 @@ function goto_kompy_to_pomi() {
                 is_end = 1;
                 death_cause = aKontroleriJizn;
             }
-            hour_pass();
+            await hour_pass();
         } else {
             writeln(aUfDoexal);
         }
@@ -1217,13 +1195,13 @@ function goto_kompy_to_pomi() {
         dialog_start();
         dialog_case(aExatZaicem, -1);
         dialog_case(aCestnoZaplatit, -2);
-        var result = dialog_run(1, 0x0C);
+        var result = await dialog_run(1, 0x0C);
         if (result == -1) {
             if (hero.charizma < Random(0x0A)) {
                 GotoXY(1, 0x0F);
                 writeln(aTebqZaloviliKo);
                 writeln(aVisadiliVKrasn);
-                hour_pass();
+                await hour_pass();
             } else {
                 GotoXY(1, 0x0F);
                 writeln(aUfDoexal);
@@ -1234,8 +1212,8 @@ function goto_kompy_to_pomi() {
         }
     }
 
-    wait_for_key();
-    hour_pass();
+    await wait_for_key();
+    await hour_pass();
 } // end function 1160A
 
 
@@ -1243,13 +1221,13 @@ var aKlimovA_a_Sidi = 'Климов А.А. сидит и тоскует по х�
 var a___ = '...';
 
 
-function goto_klimov() {
+async function goto_klimov() {
     if (Random(2) == 0) {
         ClrScr();
         TextColor(7);
         writeln(aKlimovA_a_Sidi);
         writeln(a___);
-        ReadKey();
+        await ReadKey();
         ClrScr();
     }
     current_subject = 3;
@@ -1259,7 +1237,7 @@ function goto_klimov() {
 var aUmerPoPutiVMav = 'Умер по пути в мавзолей.';
 
 
-function goto_kompy_to_mausoleum() {
+async function goto_kompy_to_mausoleum() {
     current_subject = -1;
     current_place = 5;
     decrease_health(2, aUmerPoPutiVMav);
@@ -1291,25 +1269,25 @@ var aPravdaMirVokru = 'Правда, мир вокруг тебя, похоже,
 var aNejeliOnBilCas = 'нежели он был час минут назад...';
 
 
-function play_mmheroes() {
+async function play_mmheroes() {
     ++hero.inception;
     ClrScr();
     TextColor(0x0A);
     writeln(aDzin_0);
-    Delay(0x1F4);
+    await Delay(0x1F4);
     TextColor(0x0E);
     writeln(aDddzzzzziiii_0);
-    Delay(0x2BC);
+    await Delay(0x2BC);
     TextColor(0x0C);
     writeln(aDdddddzzzzzz_0);
-    Delay(0x3E8);
+    await Delay(0x3E8);
     TextColor(7);
     writeln(aNeojidannoTi_0);
     writeln(aATvoqGotovno_0);
     writeln(aNatqgivaqNaS_0);
     writeln(aTiVsmatrivae_0);
     writeln(aRaspisanieKo_0);
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
     TextColor(0x0F);
     writeln(aStop);
@@ -1319,13 +1297,13 @@ function play_mmheroes() {
     writeln(aAkstraordinarn);
     writeln(aIgruNeSamogoLu);
     writeln(aSigratVAtuSamu);
-    ReadKey();
+    await ReadKey();
 
     if (hero.stamina + hero.brain - hero.inception * 5 < 8) {
         decrease_health(0x64, aRazdvoenieLojn);
     }
 
-    hour_pass();
+    await hour_pass();
 
     if (hero.health <= 0) {
         return;
@@ -1342,14 +1320,14 @@ function play_mmheroes() {
     writeln(aPravdaMirVokru);
     writeln(aNejeliOnBilCas);
     inception_reinit_timesheet();
-    wait_for_key();
+    await wait_for_key();
 } // end function 11CD5
 
 
 var aUxTiTiNaselPro = 'Ух ты! Ты нашел програмку, которая нужна для Климова!';
 
 
-function surf_inet() {
+async function surf_inet() {
     if (is_god_mode || Random(hero.brain) > 6 && hero.subject[Infa].tasks_done < hero.subject[Infa].tasks) {
         GotoXY(1, 0x14);
         TextColor(0x0B);
@@ -1358,8 +1336,8 @@ function surf_inet() {
     } else if (Random(3) == 0 && hero.brain < 5) {
         ++hero.brain;
     }
-    wait_for_key();
-    hour_pass();
+    await wait_for_key();
+    await hour_pass();
 } // end function 11FA2
 
 
@@ -1376,14 +1354,14 @@ var aPoigratVMmhero = 'Поиграть в MMHEROES';
 var aSMenqXvatit = 'С меня хватит!';
 
 
-function scene_kompy() {
+async function scene_kompy() {
     show_header_stats();
     TextColor(7);
     GotoXY(1, 8);
 
     if (time_of_day > 20) {
         writeln(aKlassZakrivaet);
-        wait_for_key();
+        await wait_for_key();
         current_subject = -1;
         current_place = 4;
         decrease_health(Random(5), aUmerPoPutiDomo);
@@ -1415,7 +1393,7 @@ function scene_kompy() {
 
     show_short_today_timesheet(0x0A);
 
-    var res = dialog_run(1, 0x0A);
+    var res = await dialog_run(1, 0x0A);
     var arr = {
         1: goto_klimov,
         2: goto_kompy_to_obschaga,
@@ -1427,9 +1405,9 @@ function scene_kompy() {
         11: surf_inet
     };
     if (arr[-res] !== undefined) {
-        arr[-res]();
+        await arr[-res]();
     } else if (res >= 0 && res <= 0xB) {
-        talk_with_classmate(res);
+        await talk_with_classmate(res);
     }
 } // end function 120F8
 
@@ -1459,7 +1437,7 @@ var aNetOtdixatAtoQ = 'Нет, отдыхать - это я зря сказал.
 var aPivnoiAlkogoli = 'Пивной алкоголизм, батенька...';
 
 
-function rest_in_mausoleum() {
+async function rest_in_mausoleum() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -1478,7 +1456,7 @@ function rest_in_mausoleum() {
     }
     dialog_case(aRasslablqtSqBu, -4);
     dialog_case(aNetOtdixatAtoQ, 0);
-    var res = dialog_run(1, 0x0B);
+    var res = await dialog_run(1, 0x0B);
 
     if (res == -1) {
         hero.money -= 8;
@@ -1509,7 +1487,7 @@ function rest_in_mausoleum() {
         return;
     }
 
-    hour_pass();
+    await hour_pass();
 } // end function 123E4
 
 
@@ -1521,7 +1499,7 @@ var aOtdixat = 'Отдыхать';
 var aSMenqXvatit_0 = 'С меня хватит!';
 
 
-function scene_mausoleum() {
+async function scene_mausoleum() {
     show_header_stats();
     TextColor(7);
     GotoXY(1, 8);
@@ -1541,19 +1519,19 @@ function scene_mausoleum() {
 
     show_short_today_timesheet(0x0A);
 
-    var res = dialog_run(1, 0x0A);
+    var res = await dialog_run(1, 0x0A);
     if (res == -1) {
-        goto_mausoleum_to_punk();
+        await goto_mausoleum_to_punk();
     } else if (res == -2) {
-        goto_mausoleum_to_obschaga();
+        await goto_mausoleum_to_obschaga();
     } else if (res == -3) {
-        rest_in_mausoleum();
+        await rest_in_mausoleum();
     } else if (res == -4) {
-        request_exit();
+        await request_exit();
     } else if (res == -5) {
-        goto_punk_or_mausoleum_to_pomi();
+        await goto_punk_or_mausoleum_to_pomi();
     } else if (res >= 0 && res <= 0xB) {
-        talk_with_classmate(res);
+        await talk_with_classmate(res);
     }
 
 } // end function 12595
@@ -1568,7 +1546,7 @@ var aZaucilsq_ = 'Заучился.';
 var aZubrejkaDoDobr = 'Зубрежка до добра не доводит!';
 
 
-function botva() {
+async function botva() {
     ClrScr();
     show_header_stats();
     TextColor(7);
@@ -1583,7 +1561,7 @@ function botva() {
 
     show_short_today_timesheet(0x0A);
 
-    const subj = dialog_run(1, 0x0A);
+    const subj = await dialog_run(1, 0x0A);
     if (subj === -1) {
         return;
     }
@@ -1593,7 +1571,7 @@ function botva() {
         dialog_start();
         dialog_case(aVospolZuusKons, -1);
         dialog_case(aBuduUcitSqKakU, -2);
-        use_synopsis = dialog_run(1, 0x12) == -1;
+        use_synopsis = await dialog_run(1, 0x12) == -1;
     }
 
     var var_6 = subj === Fizra ? hero.stamina : hero.brain;
@@ -1631,7 +1609,7 @@ function botva() {
     }
 
     if (!is_end) {
-        hour_pass();
+        await hour_pass();
     }
 } // end function 12719
 
@@ -1659,7 +1637,7 @@ var aExatZaicem_0 = 'Ехать зайцем';
 var aCestnoZaplat_0 = 'Честно заплатить 10 руб. за билет в оба конца';
 
 
-function goto_obschaga_to_pomi() {
+async function goto_obschaga_to_pomi() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -1669,7 +1647,7 @@ function goto_obschaga_to_pomi() {
         writeln(aZdraviiSmisl_0);
         writeln(aTiTamNikogoU_0);
         writeln(aNeBudemZrqTr_0);
-        wait_for_key();
+        await wait_for_key();
         return;
     }
 
@@ -1683,7 +1661,7 @@ function goto_obschaga_to_pomi() {
             writeln(aTebqZalovili_0);
             writeln(aVisadiliVKra_0);
             decrease_health(0x0A, aKontroleriJi_0);
-            hour_pass();
+            await hour_pass();
         } else {
             writeln(aUfDoexal_0);
         }
@@ -1693,7 +1671,7 @@ function goto_obschaga_to_pomi() {
         dialog_start();
         dialog_case(aExatZaicem_0, -1);
         dialog_case(aCestnoZaplat_0, -2);
-        var res = dialog_run(1, 0x0C);
+        var res = await dialog_run(1, 0x0C);
 
         if (!jnz(res, -1)) {
             if (hero.charizma < Random(0x0A)) {
@@ -1701,7 +1679,7 @@ function goto_obschaga_to_pomi() {
                 writeln(aTebqZalovili_0);
                 writeln(aVisadiliVKra_0);
                 decrease_health(0x0A, aKontroleriJi_0);
-                hour_pass();
+                await hour_pass();
             } else {
                 GotoXY(1, 0x0F);
                 writeln(aUfDoexal_0);
@@ -1713,8 +1691,8 @@ function goto_obschaga_to_pomi() {
 
     }
 
-    wait_for_key();
-    hour_pass();
+    await wait_for_key();
+    await hour_pass();
 } // end function 12B1E
 
 
@@ -1728,10 +1706,10 @@ function goto_obschaga_to_mausoleum() {
 } // end function 12D2A
 
 
-function see_timesheet() {
+async function see_timesheet() {
     ClrScr();
     show_timesheet();
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 12D46
 
@@ -1739,13 +1717,13 @@ function see_timesheet() {
 var aTebqCegoToNeTq = 'Тебя чего-то не тянет по-спать...';
 
 
-function try_sleep() {
+async function try_sleep() {
     if (time_of_day > 3 && time_of_day < 20) {
         GotoXY(1, 0x16);
         writeln(aTebqCegoToNeTq);
-        wait_for_key();
+        await wait_for_key();
     } else {
-        goto_sleep();
+        await goto_sleep();
     }
 } // end function 12D81
 
@@ -1766,14 +1744,14 @@ var aPosliOttqgivat = '"Пошли оттягиваться!"';
 var aNuIZrq = '"Ну и зря!"';
 
 
-function invite_from_neighbor() {
+async function invite_from_neighbor() {
     write(aKTebeLomitsqSo);
     writeln([aNaSvoiDenRojde, aNaDiskotekuVSa, aPoigratVMafiu_, aPoQuakat_][Random(4)]);
 
     dialog_start();
     dialog_case(aUguQSeicas, -1);
     dialog_case(aNeIzviniMneGot, -2);
-    var res = dialog_run(1, 0x0A);
+    var res = await dialog_run(1, 0x0A);
 
     if (res == -1) {
 
@@ -1781,7 +1759,7 @@ function invite_from_neighbor() {
         writeln(aPosliOttqgivat);
 
         for (var var_2 = 2, var_6 = Random(3) + 4; var_2 <= var_6; ++var_2) {
-            hour_pass();
+            await hour_pass();
             var subj = random_from_to(0, 5);
             hero.subject[subj].knowledge -=
                 Random(Math.round(Math.sqrt(hero.subject[subj].knowledge * 2.0)));
@@ -1808,7 +1786,7 @@ function invite_from_neighbor() {
         hero.charizma -= Random(2) + 1;
     }
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 12EB2
 
@@ -1826,19 +1804,19 @@ var aSMenqXvatit_1 = 'С меня хватит!';
 var aCtoDelat = 'ЧТО ДЕЛАТЬ ???';
 
 
-function scene_obschaga() {
+async function scene_obschaga() {
     show_header_stats();
     TextColor(7);
     GotoXY(1, 8);
 
     if (23 - idiv(clamp0(0x32 - hero.health), 0xC) < time_of_day || time_of_day < 4) {
         writeln(aTebqNeumolimoK);
-        wait_for_key();
-        goto_sleep();
+        await wait_for_key();
+        await goto_sleep();
         return;
     } else if (time_of_day > 0x11 && Random(0x0A) < 3 && !hero.is_invited) {
         hero.is_invited = 1;
-        invite_from_neighbor();
+        await invite_from_neighbor();
         return;
     }
 
@@ -1855,25 +1833,25 @@ function scene_obschaga() {
     dialog_case_colored(aCtoDelat, -9, 9);
     show_short_today_timesheet(0x0A);
 
-    var res = dialog_run(1, 0x0A);
+    var res = await dialog_run(1, 0x0A);
     if (res == -1) {
-        botva();
+        await botva();
     } else if (res == -2) {
-        see_timesheet();
+        await see_timesheet();
     } else if (res == -3) {
-        rest_in_obschaga();
+        await rest_in_obschaga();
     } else if (res == -4) {
-        try_sleep();
+        await try_sleep();
     } else if (res == -5) {
-        goto_obschaga_to_punk();
+        await goto_obschaga_to_punk();
     } else if (res == -6) {
-        goto_obschaga_to_pomi();
+        await goto_obschaga_to_pomi();
     } else if (res == -7) {
         goto_obschaga_to_mausoleum();
     } else if (res == -8) {
-        request_exit();
+        await request_exit();
     } else if (res == -9) {
-        request_help(1);
+        await request_help(1);
     }
 } // end function 1312F
 
@@ -1909,7 +1887,7 @@ var aSpasiboNicego = ' Спасибо, ничего      ';
 var aCtoTebqInteres = 'Что тебя интересует?';
 
 
-function select_help_page() {
+async function select_help_page() {
     dialog_start();
     dialog_case(aACtoVoobseDela, -1);
     dialog_case(aObAkrane, -10);
@@ -1923,7 +1901,7 @@ function select_help_page() {
     TextColor(7);
     writeln(aCtoTebqInteres);
 
-    var res = dialog_run(1, 0x0F);
+    var res = await dialog_run(1, 0x0F);
     if (res == -1) {
         help_page = 1;
     } else if (res == -2) {
@@ -2116,12 +2094,12 @@ function help_about() {
 } // end function 1442E
 
 
-function request_help(page) {
+async function request_help(page) {
     help_page = page;
     while (help_page) {
         ClrScr();
         [help_overview, help_screen, help_places, help_professors, help_characters, help_about][help_page - 1]();
-        select_help_page();
+        await select_help_page();
     }
 } // end function 144A1
 
@@ -2145,7 +2123,7 @@ var aExatZaicem_1 = 'Ехать зайцем';
 var aCestnoZaplat_1 = 'Честно заплатить 10 руб. за билет в оба конца';
 
 
-function goto_punk_or_mausoleum_to_pomi() {
+async function goto_punk_or_mausoleum_to_pomi() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -2154,7 +2132,7 @@ function goto_punk_or_mausoleum_to_pomi() {
         writeln(aZdraviiSmisl_1);
         writeln(aTiTamNikogoU_1);
         writeln(aNeBudemZrqTr_1);
-        wait_for_key();
+        await wait_for_key();
         return;
     }
 
@@ -2173,7 +2151,7 @@ function goto_punk_or_mausoleum_to_pomi() {
             writeln(aTebqZalovili_1);
             writeln(aVisadiliVKra_1);
             decrease_health(0x0A, aKontroleriJi_1);
-            hour_pass();
+            await hour_pass();
         } else {
             writeln(aUfDoexal_1);
         }
@@ -2183,7 +2161,7 @@ function goto_punk_or_mausoleum_to_pomi() {
         dialog_start();
         dialog_case(aExatZaicem_1, -1);
         dialog_case(aCestnoZaplat_1, -2);
-        var res = dialog_run(1, 0x0C);
+        var res = await dialog_run(1, 0x0C);
 
         if (res == -1) {
             if (hero.charizma < Random(0x0A)) {
@@ -2191,7 +2169,7 @@ function goto_punk_or_mausoleum_to_pomi() {
                 writeln(aTebqZalovili_1);
                 writeln(aVisadiliVKra_1);
                 decrease_health(0x0A, aKontroleriJi_1);
-                hour_pass();
+                await hour_pass();
             } else {
                 GotoXY(1, 0x0F);
                 writeln(aUfDoexal_1);
@@ -2203,8 +2181,8 @@ function goto_punk_or_mausoleum_to_pomi() {
 
     }
 
-    wait_for_key();
-    hour_pass();
+    await wait_for_key();
+    await hour_pass();
 
 } // end function 1467C
 
@@ -2225,7 +2203,7 @@ var aPoxojeTiNeTuda = 'Похоже, ты не туда попал. Ты изв�
 var a____0 = '...';
 
 
-function show_intro_algebra() {
+async function show_intro_algebra() {
     ClrScr();
     TextColor(0x0A);
 
@@ -2247,7 +2225,7 @@ function show_intro_algebra() {
     }
 
     writeln(a____0);
-    ReadKey();
+    await ReadKey();
     ClrScr();
 } // end function 14B36
 
@@ -2259,7 +2237,7 @@ var aTiPolucaesZada = 'Ты получаешь задание и садишьс�
 var a____1 = '...';
 
 
-function show_intro_matan() {
+async function show_intro_matan() {
     ClrScr();
     TextColor(0x0B);
     writeln(aVObicnoiGruppo);
@@ -2267,7 +2245,7 @@ function show_intro_matan() {
     writeln(aPrinimausiiZac);
     writeln(aTiPolucaesZada);
     writeln(a____1);
-    ReadKey();
+    await ReadKey();
     ClrScr();
 } // end function 14D55
 
@@ -2282,7 +2260,7 @@ var aTiRaduesSqCtoS = 'Ты радуешься, что смог застать �
 var a____2 = '...';
 
 
-function show_intro_git() {
+async function show_intro_git() {
     ClrScr();
     TextColor(9);
     writeln(aNebolSaqPolupu);
@@ -2294,7 +2272,7 @@ function show_intro_git() {
     writeln(aTiRaduesSqCtoS);
     writeln(a____2);
     hero.health += 5
-    ReadKey();
+    await ReadKey();
     ClrScr();
 } // end function 14EEF
 
@@ -2310,7 +2288,7 @@ var aPoxojeSeicasTi = 'Похоже, сейчас ты будешь сдават
 var a____3 = '...';
 
 
-function show_intro_english() {
+async function show_intro_english() {
     ClrScr();
     TextColor(0x0E);
     writeln(aNaTretEmAtajeU);
@@ -2322,7 +2300,7 @@ function show_intro_english() {
     writeln(aObladauseeNepo);
     writeln(aPoxojeSeicasTi);
     writeln(a____3);
-    ReadKey();
+    await ReadKey();
     ClrScr();
 } // end function 1513F
 
@@ -2338,7 +2316,7 @@ var aPoxojeOnKakVse = 'Похоже, он, как всегда, немного �
 var aNemnogoVNasemS = 'Немного в нашем случае - 1 час.';
 
 
-function show_intro_fizra_lecture() {
+async function show_intro_fizra_lecture() {
     writeln(aAlBinskiiProvo);
     writeln([aDlqNarodnogoXo, aDlqLicnoiJizni, aDlqNaucnoiRabo, aDlqKommunistic, aDlqUcebiIDosug, aDlqSpaseniqOtK][Random(6)]);
     ++timesheet[day_of_week][Fizra].to;
@@ -2346,7 +2324,7 @@ function show_intro_fizra_lecture() {
     writeln(aPoxojeOnKakVse);
     writeln(aNemnogoVNasemS);
     writeln();
-    hour_pass();
+    await hour_pass();
 } // end function 1532A
 
 
@@ -2357,33 +2335,33 @@ var aVKotoromVoobse = 'в котором, вообще-то, "запрещены
 var a____4 = '...';
 
 
-function show_intro_fizra() {
+async function show_intro_fizra() {
     ClrScr();
     TextColor(0x0F);
     if (Random(3) == 0) {
-        show_intro_fizra_lecture();
+        await show_intro_fizra_lecture();
     }
     writeln(aAlBinskiiProsi);
     writeln(aNazvavPervoePr);
     writeln(aTiOtpravlqesSq);
     writeln(aVKotoromVoobse);
     writeln(a____4);
-    ReadKey();
+    await ReadKey();
     ClrScr();
 } // end function 15514
 
 
-function goto_exam_with_intro(exam) {
+async function goto_exam_with_intro(exam) {
     if (exam == 0) {
-        show_intro_algebra();
+        await show_intro_algebra();
     } else if (exam == 1) {
-        show_intro_matan();
+        await show_intro_matan();
     } else if (exam == 2) {
-        show_intro_git();
+        await show_intro_git();
     } else if (exam == 4) {
-        show_intro_english();
+        await show_intro_english();
     } else if (exam == 5) {
-        show_intro_fizra();
+        await show_intro_fizra();
     }
 } // end function 155AF
 
@@ -2392,7 +2370,7 @@ var aTiSeicasNaFaku = 'Ты сейчас на факультете. К кому 
 var aNiKKomu = 'Ни к кому';
 
 
-function select_professor_punk() {
+async function select_professor_punk() {
     show_header_stats();
     TextColor(7);
     GotoXY(1, 8);
@@ -2405,16 +2383,16 @@ function select_professor_punk() {
         }
     }
     dialog_case(aNiKKomu, -1);
-    current_subject = dialog_run(1, 0x0A);
+    current_subject = await dialog_run(1, 0x0A);
 
     if (Random(2) == 0) {
-        goto_exam_with_intro(current_subject);
+        await goto_exam_with_intro(current_subject);
     }
 } // end function 15623
 
 
-function look_baobab_punk() {
-    show_top_gamers();
+async function look_baobab_punk() {
+    await show_top_gamers();
 } // end function 156B8
 
 
@@ -2490,7 +2468,7 @@ var aRabociiDenZako = 'Рабочий день закончился, все по
 // =============================================================================
 
 
-function sub_15B3A() {
+async function sub_15B3A() {
     var var_2;
 
     if (!jnz(terkom_has_places, 0)) {
@@ -2500,7 +2478,7 @@ function sub_15B3A() {
         TextColor(0x0B);
         output_ik_string(aSkazanoJeNetSv);
         writeln();
-        wait_for_key();
+        await wait_for_key();
         ClrScr();
         return;
     }
@@ -2515,7 +2493,7 @@ function sub_15B3A() {
         output_ik_string(aPoidiPoucisPok);
         writeln();
         terkom_has_places = 0;
-        wait_for_key();
+        await wait_for_key();
         ClrScr();
         return;
     }
@@ -2543,7 +2521,7 @@ function sub_15B3A() {
         dialog_case(aViitiOtsudaNaS, -2);
         show_short_today_timesheet(8);
 
-        var ax = dialog_run(1, 0x0C);
+        var ax = await dialog_run(1, 0x0C);
         if (jz(ax, -1)) {
 
             var_2 = Random(Random(hero.charizma + hero.brain)) + 1;
@@ -2564,14 +2542,14 @@ function sub_15B3A() {
 
             hero.money += var_2;
             decrease_health(Random(var_2 * 2), aSgorelNaRabote);
-            wait_for_key();
-            hour_pass();
+            await wait_for_key();
+            await hour_pass();
 
         } else if (!jnz(ax, -2)) {
             GotoXY(1, 0x11);
             output_ik_string(aUxodim___);
             writeln();
-            wait_for_key();
+            await wait_for_key();
             ClrScr();
             return;
         } else if (jz(ax, -10)) {
@@ -2583,7 +2561,7 @@ function sub_15B3A() {
             writeln();
             output_ik_string(aNaOkrujausiiMi);
             writeln();
-            ReadKey();
+            await ReadKey();
             output_ik_string(aOglqdevsisVo_0);
             writeln();
             output_ik_string(aCtoVseTovarisi);
@@ -2596,7 +2574,7 @@ function sub_15B3A() {
             output_ik_string(aKotoriiSrabati);
             writeln();
             writeln();
-            wait_for_key();
+            await wait_for_key();
             ClrScr();
         } else if (jz(ax, -11)) {
 
@@ -2617,8 +2595,8 @@ function sub_15B3A() {
             TextColor(7);
             writeln(aRub__0);
             hero.money += var_2;
-            wait_for_key();
-            hour_pass();
+            await wait_for_key();
+            await hour_pass();
 
         }
 
@@ -2626,7 +2604,7 @@ function sub_15B3A() {
 
     GotoXY(1, 0x14);
     output_ik_string(aRabociiDenZako);
-    wait_for_key();
+    await wait_for_key();
 
 } // end function 15B3A
 
@@ -2639,7 +2617,7 @@ var aProstoPosijuSP = 'Просто посижу с приятелями.';
 var aQVoobseZrqSuda = 'Я вообще зря сюда зашел.';
 
 
-function sub_15F9B() {
+async function sub_15F9B() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -2661,7 +2639,7 @@ function sub_15F9B() {
 
     dialog_case(aProstoPosijuSP, -4);
     dialog_case(aQVoobseZrqSuda, 0);
-    var ax = dialog_run(1, 0x0B);
+    var ax = await dialog_run(1, 0x0B);
 
     if (!jnz(ax, -1)) {
         hero.money -= 2;
@@ -2678,7 +2656,7 @@ function sub_15F9B() {
         return;
     }
 
-    hour_pass();
+    await hour_pass();
 } // end function 15F9B
 
 
@@ -2694,7 +2672,7 @@ var aPoitiVTerkomPo = 'Пойти в ТЕРКОМ, поработать';
 var aSMenqXvatit_2 = 'С меня хватит!';
 
 
-function scene_punk() {
+async function scene_punk() {
     show_header_stats();
     TextColor(7);
     show_short_today_timesheet(0x0A);
@@ -2732,28 +2710,28 @@ function scene_punk() {
 
     dialog_case_colored(aSMenqXvatit_2, -6, 9);
 
-    var res = dialog_run(1, 0x0A);
+    var res = await dialog_run(1, 0x0A);
 
     if (res == -1) {
-        select_professor_punk();
+        await select_professor_punk();
     } else if (res == -2) {
-        look_baobab_punk();
+        await look_baobab_punk();
     } else if (res == -3) {
-        goto_punk_to_obschaga();
+        await goto_punk_to_obschaga();
     } else if (res == -4) {
-        goto_punk_or_mausoleum_to_pomi();
+        await goto_punk_or_mausoleum_to_pomi();
     } else if (res == -5) {
-        goto_punk_to_mausoleum();
+        await goto_punk_to_mausoleum();
     } else if (res == -6) {
-        request_exit();
+        await request_exit();
     } else if (res == -7) {
-        goto_punk_to_kompy();
+        await goto_punk_to_kompy();
     } else if (res == -10) {
-        sub_15B3A();
+        await sub_15B3A();
     } else if (res == -12) {
-        sub_15F9B();
+        await sub_15F9B();
     } else if (!jl(res, 0) && !jg(res, 0x0B)) {
-        talk_with_classmate(res);
+        await talk_with_classmate(res);
     }
 
 } // end function 16167
@@ -2766,7 +2744,7 @@ var aRazdelatSqNako = 'РАЗДЕЛАТЬСЯ НАКОНЕЦ С ЗАЧЕТОМ �
 var a____5 = '...';
 
 
-function sub_163B7() {
+async function sub_163B7() {
     ClrScr();
     TextColor(0x0C);
     writeln(aMalenKiiKabine);
@@ -2774,7 +2752,7 @@ function sub_163B7() {
     writeln(aPoxojeTiTojeXo);
     writeln(aRazdelatSqNako);
     writeln(a____5);
-    ReadKey();
+    await ReadKey();
     ClrScr();
 } // end function 163B7
 
@@ -2787,7 +2765,7 @@ var aTiNadeesSqCtoV = 'Ты надеешься, что все это скоро 
 var a____6 = '...';
 
 
-function sub_1653F() {
+async function sub_1653F() {
     ClrScr();
     writeln(aVNebolSomPomis);
     writeln(aKromeNixVKomna);
@@ -2795,16 +2773,16 @@ function sub_1653F() {
     writeln(aIzdausegoXarak);
     writeln(aTiNadeesSqCtoV);
     writeln(a____6);
-    ReadKey();
+    await ReadKey();
     ClrScr();
 } // end function 1653F
 
 
-function sub_165D9(arg_0) {
+async function sub_165D9(arg_0) {
     if (arg_0 == 0) {
-        sub_163B7();
+        await sub_163B7();
     } else if (arg_0 == 2) {
-        sub_1653F();
+        await sub_1653F();
     }
 } // end function 165D9
 
@@ -2813,7 +2791,7 @@ var aTiSeicasVPomi_ = 'Ты сейчас в ПОМИ. К кому идти?';
 var aNiKKomu_0 = 'Ни к кому';
 
 
-function sub_16622() {
+async function sub_16622() {
     show_header_stats();
     TextColor(7);
     GotoXY(1, 8);
@@ -2828,16 +2806,16 @@ function sub_16622() {
     }
 
     dialog_case(aNiKKomu_0, -1);
-    current_subject = dialog_run(1, 0x0A);
+    current_subject = await dialog_run(1, 0x0A);
 
     if (!jnz(Random(2), 0)) {
-        sub_165D9(current_subject);
+        await sub_165D9(current_subject);
     }
 } // end function 16622
 
 
-function look_board_pomi() {
-    show_top_gamers();
+async function look_board_pomi() {
+    await show_top_gamers();
 } // end function 166B7
 
 
@@ -2849,7 +2827,7 @@ var aNicegoProstoPr = 'Ничего, просто просидеть здесь 
 var aSovsemNicego_B = 'Совсем ничего. Бывает.';
 
 
-function sub_1673E() {
+async function sub_1673E() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -2872,7 +2850,7 @@ function sub_1673E() {
     dialog_case(aNicegoProstoPr, -4);
     dialog_case(aSovsemNicego_B, 0);
 
-    var ax = dialog_run(1, 0x0A);
+    var ax = await dialog_run(1, 0x0A);
     if (ax == -1) {
         hero.money -= 2;
         hero.health += Random(hero.charizma) + 3;
@@ -2888,7 +2866,7 @@ function sub_1673E() {
         return;
     }
 
-    hour_pass();
+    await hour_pass();
 
 } // end function 1673E
 
@@ -2902,7 +2880,7 @@ var aKontroleriPoim = 'Контролеры поймали! Высадили в 
 var aKontroleriJi_2 = 'Контролеры жизни лишили.';
 
 
-function sub_16914() {
+async function sub_16914() {
 
     if (!hero.has_ticket && hero.money >= 5) {
         ClrScr();
@@ -2914,7 +2892,7 @@ function sub_16914() {
         dialog_start();
         dialog_case(aDaBudem, -1);
         dialog_case(aNetNeBudem, -2);
-        var ax = dialog_run(1, 0x0A);
+        var ax = await dialog_run(1, 0x0A);
 
         if (!jnz(ax, -1)) {
             hero.money -= 5
@@ -2932,12 +2910,12 @@ function sub_16914() {
         if (hero.charizma < Random(0x0A)) {
             writeln(aKontroleriPoim);
             decrease_health(0x0A, aKontroleriJi_2);
-            hour_pass();
+            await hour_pass();
         }
-        wait_for_key();
+        await wait_for_key();
     }
 
-    hour_pass();
+    await hour_pass();
     hero.has_ticket = 0;
 } // end function 16914
 
@@ -2950,7 +2928,7 @@ var aPoexatVPunk = 'Поехать в ПУНК';
 var aSMenqXvatit_3 = 'С меня хватит!';
 
 
-function scene_pomi() {
+async function scene_pomi() {
     show_header_stats();
     TextColor(7);
     GotoXY(1, 8);
@@ -2970,20 +2948,20 @@ function scene_pomi() {
 
     dialog_case_colored(aSMenqXvatit_3, -5, 9);
     show_short_today_timesheet(0x0A);
-    var res = dialog_run(1, 0x0A);
+    var res = await dialog_run(1, 0x0A);
 
     if (res == -1) {
-        sub_16622();
+        await sub_16622();
     } else if (res == -2) {
-        look_board_pomi();
+        await look_board_pomi();
     } else if (res == -3) {
-        sub_1673E();
+        await sub_1673E();
     } else if (res == -4) {
-        sub_16914();
+        await sub_16914();
     } else if (res == -5) {
-        request_exit();
+        await request_exit();
     } else if (!jl(res, 0) && !jg(res, 0x0B)) {
-        talk_with_classmate(res);
+        await talk_with_classmate(res);
     }
 
 } // end function 16A91
@@ -3094,7 +3072,7 @@ var aGeroiZarabotal = '    ГЕРОЙ            ЗАРАБОТАЛ';
 var aRub__1 = ' руб.';
 
 
-function show_top_gamers() {
+async function show_top_gamers() {
     ClrScr();
     TextColor(0x0F);
     writeln(asc_16F8F);
@@ -3118,7 +3096,7 @@ function show_top_gamers() {
 
     GotoXY(1, 0x14);
     TextColor(7);
-    wait_for_key();
+    await wait_for_key();
 } // end function 1707F
 
 
@@ -3126,7 +3104,7 @@ var aZaderjivaetsqE = ' задерживается еще на час.';
 var aUxodit_ = ' уходит.';
 
 
-function sub_171C4() {
+async function sub_171C4() {
     if (hero.health <= 0) {
         return;
     }
@@ -3150,7 +3128,7 @@ function sub_171C4() {
 
     }
 
-    wait_for_key();
+    await wait_for_key();
 } // end function 171C4
 
 
@@ -3166,7 +3144,7 @@ var aKontroleriJi_3 = 'Контролеры жизни лишили.';
 var aUfDoexal___ = 'Уф, доехал...';
 
 
-function sub_173B6() {
+async function sub_173B6() {
     var var_1;
 
     ClrScr();
@@ -3185,7 +3163,7 @@ function sub_173B6() {
         dialog_start();
         dialog_case(aDomoiVPunk, -1);
         dialog_case(aXocuVPomi, -2);
-        var_1 = dialog_run(1, 0x0F) == -1 ? 1 : 2;
+        var_1 = await dialog_run(1, 0x0F) == -1 ? 1 : 2;
     }
 
     if (jz(var_1, 1)) {
@@ -3196,13 +3174,13 @@ function sub_173B6() {
             writeln(aTebqZalovili_2);
             writeln(aVisadiliVKra_2);
             decrease_health(0x0A, aKontroleriJi_3);
-            hour_pass();
-            wait_for_key();
+            await hour_pass();
+            await wait_for_key();
             ClrScr();
         } else {
             writeln(aUfDoexal___);
         }
-        hour_pass();
+        await hour_pass();
     }
 
     current_place = var_1;
@@ -3218,7 +3196,7 @@ var aTvoiMuceniqBil = 'Твои мучения были напрасны.';
 var aTebeZacliEse = 'Тебе зачли еще ';
 
 
-function sub_175A6() {
+async function sub_175A6() {
     var var_106;
     var var_6;
     var var_4;
@@ -3288,11 +3266,11 @@ function sub_175A6() {
         }
 
         hero.subject[current_subject].tasks_done += var_6;
-        wait_for_key();
-        hour_pass();
+        await wait_for_key();
+        await hour_pass();
     }
 
-    sub_173B6();
+    await sub_173B6();
 } // end function 175A6
 
 
@@ -3312,7 +3290,7 @@ var aKontrolleriKon = 'Контроллеры, контроллеры, конт�
 var aISoVsemirnovim = 'И со Всемирновым ты ничего не успел...';
 
 
-function sub_17AA2() {
+async function sub_17AA2() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 0x0C);
@@ -3325,7 +3303,7 @@ function sub_17AA2() {
         TextColor(0x0E);
         writeln(aUslisavAtuFraz);
         writeln(aOSdaceZacetaPo);
-        wait_for_key();
+        await wait_for_key();
         current_subject = -1;
         return;
     }
@@ -3346,7 +3324,7 @@ function sub_17AA2() {
             writeln(aVisadiliVKra_3);
             decrease_health(0x0A, aKontroleriJi_4);
             current_place = 1;
-            wait_for_key();
+            await wait_for_key();
             ClrScr();
         }
 
@@ -3355,7 +3333,7 @@ function sub_17AA2() {
         dialog_start();
         dialog_case(aExatZaicem_2, -1);
         dialog_case(aCestnoZaplat_2, -2);
-        var ax = dialog_run(1, 0x11);
+        var ax = await dialog_run(1, 0x11);
 
         if (ax == -1) {
             hero.has_ticket = 0;
@@ -3366,7 +3344,7 @@ function sub_17AA2() {
                 writeln(aTebqZalovili_3);
                 decrease_health(0x0A, aKontrolleriKon);
                 writeln(aISoVsemirnovim);
-                wait_for_key();
+                await wait_for_key();
                 ClrScr();
             }
         } else if (ax == -2) {
@@ -3375,8 +3353,8 @@ function sub_17AA2() {
         }
     }
 
-    wait_for_key();
-    sub_175A6();
+    await wait_for_key();
+    await sub_175A6();
 } // end function 17AA2
 
 
@@ -3386,7 +3364,7 @@ var aDaQXocuEsePomu = 'Да, я хочу еще помучаться';
 var aNuUjNetSpasibo = 'Ну уж нет, спасибо!';
 
 
-function sub_17D20() {
+async function sub_17D20() {
     ClrScr();
     show_header_stats();
     TextColor(0x0C);
@@ -3395,30 +3373,30 @@ function sub_17D20() {
 
     if (current_place != 1 || hero.subject[Algebra].tasks_done >= subjects[Algebra].tasks) {
         current_subject = -1;
-        wait_for_key();
+        await wait_for_key();
     } else {
         writeln(aPoitiZaNimNaAl);
         dialog_start();
         dialog_case(aDaQXocuEsePomu, -1);
         dialog_case(aNuUjNetSpasibo, -2);
         show_short_today_timesheet(0x0C);
-        var result = dialog_run(1, 0x0F);
+        var result = await dialog_run(1, 0x0F);
 
         if (result == -2) {
             current_place = 1;
             current_subject = -1;
         } else if (result == -1) {
-            sub_17AA2();
+            await sub_17AA2();
         }
     }
 } // end function 17D20
 
 
-function sub_17DD3(arg_0) {
+async function sub_17DD3(arg_0) {
     if (arg_0 == 0) {
-        sub_17D20();
+        await sub_17D20();
     } else {
-        sub_171C4();
+        await sub_171C4();
     }
 } // end function 17DD3
 
@@ -3426,12 +3404,12 @@ function sub_17DD3(arg_0) {
 var aTvoqZacetkaPop = 'Твоя зачетка пополнилась еще одной записью.';
 
 
-function sub_17E1A() {
+async function sub_17E1A() {
     writeln();
     TextColor(0x0A);
     writeln(aTvoqZacetkaPop);
     TextColor(7);
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
     show_header_stats();
 } // end function 17E1A
@@ -3444,17 +3422,17 @@ var aXorosoXotZacet = 'Хорошо хоть, зачет поставил...';
 var aVsemirnovM_a_I = 'Всемирнов М.А. изничтожил.';
 
 
-function sub_17F12() {
+async function sub_17F12() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
     writeln(aVsemirnovMedle);
-    Delay(0x3E8);
+    await Delay(0x3E8);
     writeln(aITakJeMedlenno);
     writeln(aUfNuISutockiUN);
     writeln(aXorosoXotZacet);
     decrease_health(Random(6), aVsemirnovM_a_I);
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
     show_header_stats();
 } // end function 17F12
@@ -3492,11 +3470,11 @@ var aNeZnauVivetrit = 'Не знаю, выветрится ли такой си�
 var aStrannoeCuvstv = 'Странное чувство быстро прошло.';
 
 
-function sub_183A0() {
+async function sub_183A0() {
     colored_output(7, aVlasenkoN_p_);
     colored_output_ln(0x0F, aZakroiteGlaza_);
     writeln(aTiPoslusnoZakr);
-    Delay(0x3E8);
+    await Delay(0x3E8);
     colored_output_ln(0x0F, aOktroiteGlaza_);
     sub_17FAD(aTiVidisVlasenk);
     sub_17FAD(aVlasenkoN_p_Ka);
@@ -3552,20 +3530,20 @@ function sub_183A0() {
         sub_17FAD(aStrannoeCuvstv);
     }
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
     show_header_stats();
 
 } // end function 183A0
 
 
-function sub_185C9(arg_0) {
+async function sub_185C9(arg_0) {
     if (arg_0 == 4) {
-        sub_183A0();
+        await sub_183A0();
     } else if (arg_0 == 0) {
-        sub_17F12();
+        await sub_17F12();
     } else {
-        sub_17E1A();
+        await sub_17E1A();
     }
 } // end function 185C9
 
@@ -3580,7 +3558,7 @@ var aA_0 = 'а';
 var a__0 = '.';
 
 
-function sub_18677() {
+async function sub_18677() {
     GotoXY(1, 0x14);
     TextColor(0x0D);
     writeln(aMucaesSq____0);
@@ -3651,8 +3629,8 @@ function sub_18677() {
         death_cause += a__0;
     }
 
-    hour_pass();
-    wait_for_key();
+    await hour_pass();
+    await wait_for_key();
 
 } // end function 18677
 
@@ -3672,7 +3650,7 @@ var aMucatSqDalSe = 'Мучаться дальше';
 var aBrositAtoDelo = 'Бросить это дело';
 
 
-function scene_exam() {
+async function scene_exam() {
     var var_15;
     var var_14;
     var var_12 = [];
@@ -3714,7 +3692,7 @@ function scene_exam() {
             --hero.exams_left;
 
             writeln();
-            sub_185C9(current_subject);
+            await sub_185C9(current_subject);
 
             if (!jnz(current_subject, -1)) {
                 return;
@@ -3729,7 +3707,7 @@ function scene_exam() {
 
 
     if (!jg(timesheet[day_of_week][current_subject].to, time_of_day)) {
-        sub_17DD3(current_subject);
+        await sub_17DD3(current_subject);
         return;
     }
 
@@ -3814,13 +3792,13 @@ function scene_exam() {
                                 var_12[var_2] = 1;
 
                                 ++var_14;
-                                sub_18FB2(var_2);
+                                await sub_18FB2(var_2);
 
                                 if (!jg(timesheet[day_of_week][current_subject].to, time_of_day)) {
-                                    sub_17DD3(current_subject);
+                                    await sub_17DD3(current_subject);
                                     return;
                                 } else {
-                                    check_exams_left_count();
+                                    await check_exams_left_count();
                                     if (!jz(is_end, 0)) {
                                         return;
                                     } else {
@@ -3868,13 +3846,13 @@ function scene_exam() {
 
     dialog_case(aBrositAtoDelo, -2);
     show_short_today_timesheet(0x0C);
-    var_2 = dialog_run(1, 0x0C);
+    var_2 = await dialog_run(1, 0x0C);
     if (var_2 == -1) {
-        sub_18677();
+        await sub_18677();
     } else if (var_2 == -2) {
         current_subject = -1;
     } else if (!jl(var_2, 0) && !jg(var_2, 0xB)) {
-        talk_with_classmate(var_2);
+        await talk_with_classmate(var_2);
     }
 
 } // end function 18A75
@@ -3887,7 +3865,7 @@ var aTebeKakToNexor = 'Тебе как-то нехорошо ...';
 var aLucseIgnorirov = ' лучше игнорировать не надо.';
 
 
-function sub_18FB2(arg_0) {
+async function sub_18FB2(arg_0) {
     var var_104;
     var var_4;
     var var_1;
@@ -3906,7 +3884,7 @@ function sub_18FB2(arg_0) {
 
         var_4 = WhereY() + 2;
         show_short_today_timesheet(var_4);
-        var res = dialog_run(1, var_4);
+        var res = await dialog_run(1, var_4);
 
         if (res == -1) {
             if (classmates[arg_0].member0x344 > 0) {
@@ -3916,11 +3894,11 @@ function sub_18FB2(arg_0) {
             }
 
             var_1 = 0;
-            wait_for_key();
+            await wait_for_key();
             ClrScr();
         } else if (res == -2) {
             var_1 = 1;
-            talk_with_classmate(arg_0);
+            await talk_with_classmate(arg_0);
         }
 
     }
@@ -3943,7 +3921,7 @@ var aKolqDostaetTor = 'Коля достает тормозную жидкост
 var aSpilsq_ = 'Спился.';
 
 
-function sub_19259() {
+async function sub_19259() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -3954,9 +3932,9 @@ function sub_19259() {
         writeln(aUTebqOstalisNe);
         hero.subject[Algebra].tasks_done += 2;
         output_with_highlighted_num(7, aKolqResilTebeE, 0x0F, 2, aZadaciPoAlgebr);
-        wait_for_key();
+        await wait_for_key();
         ClrScr();
-        hour_pass();
+        await hour_pass();
         return;
     }
 
@@ -3984,7 +3962,7 @@ function sub_19259() {
         dialog_case(aDa, -1);
         dialog_case(aNet, -2);
         show_short_today_timesheet(0x0C);
-        var res = dialog_run(1, 0x0F);
+        var res = await dialog_run(1, 0x0F);
 
         if (res == -1) {
 
@@ -3996,9 +3974,9 @@ function sub_19259() {
                 writeln(aUTebqOstalisNe);
                 hero.subject[Algebra].tasks_done += 2;
                 output_with_highlighted_num(7, aKolqResilTebeE, 0x0F, 2, aZadaciPoAlgebr);
-                wait_for_key();
+                await wait_for_key();
                 ClrScr();
-                hour_pass();
+                await hour_pass();
                 return;
             } else {
                 current_color = 7;
@@ -4012,14 +3990,14 @@ function sub_19259() {
             current_color = 0x0D;
             writeln(aKolqDostaetTor);
             --hero.brain;
-            wait_for_key();
+            await wait_for_key();
             ClrScr();
             return;
         }
 
     }
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 19259
 
@@ -4064,7 +4042,7 @@ var aNuILaduskiVotT = '"Ну и ладушки! Вот тебе дискетка
 var aIzviniCtoPobes = '"Извини, что побеспокоил."';
 
 
-function sub_19B20() {
+async function sub_19B20() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4079,16 +4057,16 @@ function sub_19B20() {
         dialog_case(aDaKonecnoOcenX, -1);
         dialog_case(aNetUMenqNetNaA, -2);
         show_short_today_timesheet(0x0C);
-        var res = dialog_run(1, 0x0C);
+        var res = await dialog_run(1, 0x0C);
         if (res == -1) {
             GotoXY(1, 0x10);
             writeln(aNuILaduskiVotT);
             hero.has_mmheroes_disk = 1;
-            wait_for_key();
+            await wait_for_key();
         } else if (res == -2) {
             GotoXY(1, 0x10);
             writeln(aIzviniCtoPobes);
-            wait_for_key();
+            await wait_for_key();
         }
         return;
     }
@@ -4105,7 +4083,7 @@ function sub_19B20() {
         }
     }
 
-    wait_for_key();
+    await wait_for_key();
 } // end function 19B20
 
 
@@ -4121,7 +4099,7 @@ var aRaiZamocil_ = 'RAI замочил.';
 var aRaiNeReagiruet = 'RAI не реагирует на твои позывы.';
 
 
-function sub_1A0A2() {
+async function sub_1A0A2() {
     if (current_subject >= 3 || current_subject == -1) {
         ClrScr();
         show_header_stats();
@@ -4140,7 +4118,7 @@ function sub_1A0A2() {
         dialog_case(aDaKonecno, 1);
         dialog_case(aNetIzvini___, 2);
         show_short_today_timesheet(0x0C);
-        var ax = dialog_run(1, 0x0C);
+        var ax = await dialog_run(1, 0x0C);
 
         if (ax == 1) {
             GotoXY(1, 0x0F);
@@ -4153,7 +4131,7 @@ function sub_1A0A2() {
             } else {
                 writeln(aNicegoNeVislo_);
             }
-            hour_pass();
+            await hour_pass();
         } else if (ax == 2) {
             GotoXY(1, 0x0F);
             TextColor(0x0D);
@@ -4165,7 +4143,7 @@ function sub_1A0A2() {
 
     }
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 1A0A2
 
@@ -4205,7 +4183,7 @@ var aGrisaMojetPomo = '"Гриша может помочь с трудоустр
 var aPeremeseniqStu = '"Перемещения студентов предсказуемы."';
 
 
-function sub_1A70A() {
+async function sub_1A70A() {
     ClrScr();
     show_header_stats();
 
@@ -4220,7 +4198,7 @@ function sub_1A70A() {
         dialog_start();
         dialog_case(aDavai, 1);
         dialog_case(aNetNeBuduQVKlo, 2);
-        var res = dialog_run(1, 0x0C);
+        var res = await dialog_run(1, 0x0C);
 
         if (res == 1) {
             GotoXY(1, 0x0F);
@@ -4228,15 +4206,15 @@ function sub_1A70A() {
             writeln(aTiSigralSMisei);
             TextColor(7);
             ++hero.charizma;
-            wait_for_key();
+            await wait_for_key();
             ClrScr();
-            hour_pass();
+            await hour_pass();
         } else if (res == 2) {
             GotoXY(1, 0x0F);
             TextColor(0x0F);
             writeln(aZrqOcenZrq);
             hero.charizma -= Random(2);
-            wait_for_key();
+            await wait_for_key();
             TextColor(7);
             ClrScr();
         }
@@ -4257,7 +4235,7 @@ function sub_1A70A() {
             dialog_start();
             dialog_case(aObqzatelNo, 1);
             dialog_case(aIzviniPotom_, 2);
-            var res = dialog_run(1, 0x0C);
+            var res = await dialog_run(1, 0x0C);
 
             if (res == 1) {
                 GotoXY(1, 0x0F);
@@ -4269,16 +4247,16 @@ function sub_1A70A() {
                 if (hero.charizma < Random(0x0A)) {
                     decrease_health(Random(3) + 3, aZagonqlTebqMis);
                 } else {
-                    wait_for_key();
+                    await wait_for_key();
                     ClrScr();
-                    hour_pass();
+                    await hour_pass();
                 }
 
             } else if (res == 2) {
                 GotoXY(1, 0x0F);
                 TextColor(0x0F);
                 writeln(aNicegoQNaTebqN);
-                wait_for_key();
+                await wait_for_key();
                 TextColor(7);
                 ClrScr();
             }
@@ -4295,7 +4273,7 @@ function sub_1A70A() {
 
     write([aAxJalNegdeSigr, aVsegdaSlediZaZ, aMozgiVliqutNaP, aCemBolSeVinosl, aCemBolSeTvoqXa, aVajnostKonkret, aXarizmaPomogae, aCemBolSeXarizm, aCemMenSeVinosl, aCemBolSeMozgiT, aSidenieVInetEI, aEsliTebeNadoel, aXocesXalqviNab, aXocesDobitSqVs, aVMavzoleeVajno, aOtRazdvoeniqLi, aOtLubogoObseni, aGrisaMojetPomo, aPeremeseniqStu][Random(0x13)]);
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 
 } // end function 1A70A
@@ -4329,7 +4307,7 @@ var aUDubcovaInogda = '"У Дубцова иногда бывает халява
 var aSerjUxoditKuda = 'Серж уходит куда-то по своим делам ...';
 
 
-function serg_talk() {
+async function serg_talk() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4415,7 +4393,7 @@ function serg_talk() {
         }
     }
 
-    wait_for_key();
+    await wait_for_key();
     TextColor(7);
     ClrScr();
 } // end function 1B09A
@@ -4427,7 +4405,7 @@ var aPasaVoodusevlq = 'Паша воодушевляет тебя на вели�
 var aVmesteSAtimOnN = 'Вместе с этим он немного достает тебя.';
 
 
-function pawa_talk() {
+async function pawa_talk() {
     ClrScr();
     show_header_stats();
 
@@ -4453,7 +4431,7 @@ function pawa_talk() {
 
     }
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 
 } // end function 1B526
@@ -4468,7 +4446,7 @@ var aDaUMenqSSoboiA = '"Да, у меня с собой этот конспек�
 var aOxIzviniKtoToD = '"Ох, извини, кто-то другой уже позаимствовал ..."';
 
 
-function sasha_talk() {
+async function sasha_talk() {
     var var_2;
 
     ClrScr();
@@ -4487,7 +4465,7 @@ function sasha_talk() {
     dialog_case(aNicegoNeNado, -1);
     GotoXY(1, 9);
     writeln(aCegoTebeNadoOt);
-    var_2 = dialog_run(1, 0x0B);
+    var_2 = await dialog_run(1, 0x0B);
 
     if (!jnz(var_2, -1)) {
         GotoXY(1, 0x0F);
@@ -4511,7 +4489,7 @@ function sasha_talk() {
         }
     }
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 1B6B7
 
@@ -4529,7 +4507,7 @@ var aTebePoploxelo_ = 'Тебе поплохело.';
 var aObsenieSNilOka = 'Общение с NiL оказалось выше человеческих сил.';
 
 
-function nil_talk() {
+async function nil_talk() {
     ClrScr();
     show_header_stats();
 
@@ -4551,7 +4529,7 @@ function nil_talk() {
         dialog_start();
         dialog_case(aDaKonecno_0, -1);
         dialog_case(aIzviniVDrugoiR, -2);
-        var ax = dialog_run(1, 0x0B);
+        var ax = await dialog_run(1, 0x0B);
 
         if (ax == -1) {
 
@@ -4573,14 +4551,14 @@ function nil_talk() {
                     death_cause = aAlTruizmNeDove;
                 }
 
-                hour_pass();
+                await hour_pass();
 
             } else {
 
                 GotoXY(1, 0x0E);
                 TextColor(0x0D);
                 writeln(aUTebqNicegoNeV);
-                hour_pass();
+                await hour_pass();
                 hero.health -= subjects[current_subject].member0xFC;
                 if (!jg(hero.health, 0)) {
                     is_end = 1;
@@ -4596,7 +4574,7 @@ function nil_talk() {
 
     }
 
-    wait_for_key();
+    await wait_for_key();
     TextColor(7);
     ClrScr();
 } // end function 1B986
@@ -4658,7 +4636,7 @@ var aPo = ' по ';
 var aC__ = 'ч.."';
 
 
-function sub_1C02B() {
+async function sub_1C02B() {
     var var_8;
     var var_6;
     var var_4;
@@ -4708,7 +4686,7 @@ function sub_1C02B() {
 
     }
 
-    wait_for_key();
+    await wait_for_key();
     TextColor(7);
     ClrScr();
 } // end function 1C02B
@@ -4719,7 +4697,7 @@ var aUVasKakoiToSko = '"У Вас какой-то школьный метод р
 var aNeObsaisqSTorm = 'Не общайся с тормозами!';
 
 
-function sub_1C1FF() {
+async function sub_1C1FF() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4733,7 +4711,7 @@ function sub_1C1FF() {
     }
 
     decrease_health(0x0F, aNeObsaisqSTorm);
-    wait_for_key();
+    await wait_for_key();
     TextColor(7);
     ClrScr();
 } // end function 1C1FF
@@ -4834,7 +4812,7 @@ var aAndruTebqIgnor = 'Эндрю тебя игнорирует!';
 var aAndruTojeUmeet = 'Эндрю тоже умеет отбиваться от разных нехороших людей.';
 
 
-function sub_1CC94() {
+async function sub_1CC94() {
     var var_6;
     var var_4;
 
@@ -4849,7 +4827,7 @@ function sub_1CC94() {
         dialog_start();
         dialog_case(aDaCemQXujeDrug, -1);
         dialog_case(aNetQUjKakNibud, -2);
-        var ax = dialog_run(1, 0x0A);
+        var ax = await dialog_run(1, 0x0A);
 
         if (ax == -1) {
 
@@ -4886,7 +4864,7 @@ function sub_1CC94() {
                     }
                 }
 
-                hour_pass();
+                await hour_pass();
 
             } else {
                 GotoXY(1, 0x0D);
@@ -4902,7 +4880,7 @@ function sub_1CC94() {
 
     }
 
-    wait_for_key();
+    await wait_for_key();
     TextColor(7);
     ClrScr();
 } // end function 1CC94
@@ -4936,7 +4914,7 @@ var aGubitLudeiNePi = 'Губит людей не пиво, а избыток п
 var aIEseOdinCasPro = 'И еще один час прошел в бесплодных разговорах...';
 
 
-function sub_1D30D() {
+async function sub_1D30D() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4949,7 +4927,7 @@ function sub_1D30D() {
         dialog_start();
         dialog_case(aDaMneBiNePomes, -1);
         dialog_case(aNetQLucsePoucu, -2);
-        var ax = dialog_run(1, 0x0A);
+        var ax = await dialog_run(1, 0x0A);
 
         if (ax == -1) {
             hero.is_working_in_terkom = 1;
@@ -5022,41 +5000,41 @@ function sub_1D30D() {
 
             if (!jnz(Random(3), 0)) {
                 writeln(aIEseOdinCasPro);
-                hour_pass();
+                await hour_pass();
             }
         }
     }
 
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 1D30D
 
 
-function talk_with_classmate(arg_0) {
+async function talk_with_classmate(arg_0) {
     if (arg_0 == 0) {
-        sub_19259();
+        await sub_19259();
     } else if (arg_0 == 2) {
-        sub_19B20();
+        await sub_19B20();
     } else if (arg_0 == 3) {
-        sub_1A0A2();
+        await sub_1A0A2();
     } else if (arg_0 == 1) {
-        pawa_talk();
+        await pawa_talk();
     } else if (arg_0 == 4) {
-        sub_1A70A();
+        await sub_1A70A();
     } else if (arg_0 == 5) {
-        serg_talk();
+        await serg_talk();
     } else if (arg_0 == 6) {
-        sasha_talk();
+        await sasha_talk();
     } else if (arg_0 == 7) {
-        nil_talk();
+        await nil_talk();
     } else if (arg_0 == 8) {
-        sub_1C02B();
+        await sub_1C02B();
     } else if (arg_0 == 9) {
-        sub_1C1FF();
+        await sub_1C1FF();
     } else if (arg_0 == 0xA) {
-        sub_1CC94();
+        await sub_1CC94();
     } else if (arg_0 == 0xB) {
-        sub_1D30D();
+        await sub_1D30D();
     }
 } // end function 1D6CE
 
@@ -5082,7 +5060,7 @@ var aCtoSnitsqStude = 'что снится студентам-математик
 var aKogdaOniVneKon = 'когда они вне кондиции';
 
 
-function sub_1DA3D() {
+async function sub_1DA3D() {
     ClrScr();
     TextColor(0x0D);
 
@@ -5122,14 +5100,14 @@ function sub_1DA3D() {
     }
 
     writeln(a____7);
-    ReadKey();
+    await ReadKey();
     writeln();
     writeln(aGospodiNuIPris);
     writeln(aZaToTeperTiToc);
     writeln(aCtoSnitsqStude);
     writeln(aKogdaOniVneKon);
     writeln(a____7);
-    ReadKey();
+    await ReadKey();
     hero.health = Random(0x0A) + 0xA;
 } // end function 1DA3D
 
@@ -5153,7 +5131,7 @@ var aMojeteVzqtOdno = ' можете взять одноименный рома�
 var aNuVsePoxojeZau = 'Ну все, похоже, заучился - если преподы по ночам снятся...';
 
 
-function sub_1DF40() {
+async function sub_1DF40() {
     ClrScr();
     TextColor(0x0D);
 
@@ -5183,7 +5161,7 @@ function sub_1DF40() {
 
     writeln();
     writeln(aNuVsePoxojeZau);
-    ReadKey();
+    await ReadKey();
 } // end function 1DF40
 
 
@@ -5208,17 +5186,17 @@ var aUfff___CtoToSe = 'Уффф... Что-то сегодня опять как�
 var aVsePoraZavqziv = 'Все, пора завязывать с этим. Нельзя так много учиться.';
 
 
-function sub_1E37C() {
+async function sub_1E37C() {
     ClrScr();
     TextColor(0x0D);
     writeln(aZdravstvuite__);
-    ReadKey();
+    await ReadKey();
     writeln(aOnoBolSoe___);
-    ReadKey();
+    await ReadKey();
     writeln(aOnoPixtit___);
-    ReadKey();
+    await ReadKey();
     writeln(aOnoMedlennoPol);
-    ReadKey();
+    await ReadKey();
     writeln(aOnoGovoritCelo);
     TextColor(7);
 
@@ -5241,11 +5219,11 @@ function sub_1E37C() {
 
     TextColor(0x0D);
     writeln(a____8);
-    ReadKey();
+    await ReadKey();
     writeln();
     writeln(aUfff___CtoToSe);
     writeln(aVsePoraZavqziv);
-    ReadKey();
+    await ReadKey();
     hero.health = Random(0x0A) + 0xA;
 } // end function 1E37C
 
@@ -5253,7 +5231,7 @@ function sub_1E37C() {
 var aPrevratilsqVOv = 'Превратился в овощ.';
 
 
-function sub_1E5A3() {
+async function sub_1E5A3() {
     var var_4 = 0;
 
     for (var var_2 = 0; var_2 <= 2; ++var_2) {
@@ -5278,12 +5256,12 @@ function sub_1E5A3() {
 
     if (!jnz(Random(2), 0)) {
         if (var_4 == 1) {
-            sub_1DA3D();
+            await sub_1DA3D();
         } else if (var_4 == 2) {
-            sub_1E37C();
+            await sub_1E37C();
         } else {
             if (!jnz(Random(3), 0)) {
-                sub_1DF40();
+                await sub_1DF40();
             }
         }
     }
@@ -5292,21 +5270,21 @@ function sub_1E5A3() {
 } // end function 1E5A3
 
 
-function rest_in_obschaga() {
+async function rest_in_obschaga() {
     hero.health += 7 + Random(8);
-    hour_pass();
+    await hour_pass();
 } // end function 1E647
 
 
-function request_exit() {
-    prompt_exit();
+async function request_exit() {
+    await prompt_exit();
 } // end function 1E66B
 
 
 var aVremqVislo_ = 'Время вышло.';
 
 
-function goto_sleep() {
+async function goto_sleep() {
     var var_4;
     var var_2;
 
@@ -5348,7 +5326,7 @@ function goto_sleep() {
         }
     }
 
-    sub_1E5A3();
+    await sub_1E5A3();
 
     if (time_of_day <= 4) {
         time_of_day = 5;
@@ -5367,7 +5345,7 @@ var aNaPosledneiAle = 'На последней электричке ты еде�
 var aZasnulVAlektri = 'Заснул в электричке и не проснулся.';
 
 
-function sub_1E7F8() {
+async function sub_1E7F8() {
     ClrScr();
     TextColor(7);
     writeln(aTiGlqdisNaCasi);
@@ -5381,7 +5359,7 @@ function sub_1E7F8() {
 
     current_place = 4;
     current_subject = -1;
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 1E7F8
 
@@ -5391,7 +5369,7 @@ var aCtoMojetDelatB = 'что может делать бедный студен�
 var aNeZnaqOtvetNaA = 'Не зная ответ на этот вопрос, ты спешишь в общагу.';
 
 
-function sub_1E907() {
+async function sub_1E907() {
     ClrScr();
     TextColor(7);
     writeln(aVaxtersaGlqdit);
@@ -5399,7 +5377,7 @@ function sub_1E907() {
     writeln(aNeZnaqOtvetNaA);
     current_place = 4;
     current_subject = -1;
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 1E907
 
@@ -5408,27 +5386,27 @@ var aMavzoleiZakriv = 'Мавзолей закрывается.';
 var aPoraDomoi = 'Пора домой!';
 
 
-function sub_1E993() {
+async function sub_1E993() {
     ClrScr();
     TextColor(7);
     writeln(aMavzoleiZakriv);
     writeln(aPoraDomoi);
     current_place = 4;
     current_subject = -1;
-    wait_for_key();
+    await wait_for_key();
     ClrScr();
 } // end function 1E993
 
 
-function midnight() {
+async function midnight() {
     if (current_place == 2) {
-        sub_1E7F8();
+        await sub_1E7F8();
     } else if (current_place == 1) {
-        sub_1E907();
+        await sub_1E907();
     } else if (current_place == 5) {
-        sub_1E993();
+        await sub_1E993();
     } else if (current_place == 4) {
-        goto_sleep();
+        await goto_sleep();
     }
 } // end function 1E9E7
 
@@ -5437,7 +5415,7 @@ var aDjugAtoSmertel = 'DJuG - это смертельно!';
 var aBurnoProgressi = 'Бурно прогрессирующая паранойя.';
 
 
-function hour_pass() {
+async function hour_pass() {
     terkom_has_places = 1;
     sub_1F184();
     ++time_of_day;
@@ -5457,7 +5435,7 @@ function hour_pass() {
         ++day_of_week;
         send_replay();
         time_of_day = 0;
-        midnight();
+        await midnight();
     }
 
     if (hero.charizma > Random(0x0A)) {
@@ -5474,14 +5452,15 @@ var aQJeSkazalSMenq = 'Я же сказал: с меня хватит!';
 var aViselSam_ = 'Вышел сам.';
 
 
-function prompt_exit() {
+async function prompt_exit() {
     ClrScr();
     writeln(aNuMojetNeNadoT);
     writeln(aTiCtoSerEznoXo);
     dialog_start();
     dialog_case(aNetNeXocu, -1);
     dialog_case(aQJeSkazalSMenq, -2);
-    if (dialog_run(1, 4) == -2) {
+    const ax = await dialog_run(1, 4);
+    if (ax === -2) {
         is_end = 1;
         death_cause = aViselSam_;
     }
@@ -6167,7 +6146,7 @@ var aSibkoObsitelNi = 'Шибко общительный';
 var aGodRejim = 'GOD-режим';
 
 
-function init_hero_interactive() {
+async function init_hero_interactive() {
     ClrScr();
 
     dialog_start();
@@ -6182,7 +6161,7 @@ function init_hero_interactive() {
 
     is_god_mode = 0;
 
-    var res = dialog_run(1, 3);
+    var res = await dialog_run(1, 3);
     if (res == -1) {
         hero.brain = Random(3) + 4;
         hero.stamina = Random(3) + 4;
@@ -6210,7 +6189,7 @@ function init_hero_interactive() {
 } // end function 20597
 
 
-function init_hero() {
+async function init_hero() {
     hero.garlic = 0;
     hero.money = 0;
     hero.inception = 0;
@@ -6223,7 +6202,7 @@ function init_hero() {
     byte_2549F = 0;
 
     if (ParamCount()) {
-        init_hero_interactive();
+        await init_hero_interactive();
     } else {
         // #warning
         hero.brain = /*200;*/ Random(3) + 4;
@@ -6263,7 +6242,7 @@ function init_hero() {
 var aBad_cred_count = 'bad_cred_count';
 
 
-function check_exams_left_count() {
+async function check_exams_left_count() {
     var exams_left = 6;
     for (var i = 0; i <= 5; ++i) {
         if (hero.subject[i].passed) {
@@ -6271,7 +6250,7 @@ function check_exams_left_count() {
         }
     }
     if (exams_left != hero.exams_left) {
-        bug_report(aBad_cred_count);
+        await bug_report(aBad_cred_count);
     }
 } // end function 207BF
 
@@ -6297,25 +6276,24 @@ function init_knowledge_synopsis_classmate() {
 } // end function 207FA
 
 
-function init_game() {
-    init_hero();
+async function init_game() {
+    await init_hero();
     init_timesheet();
     init_knowledge_synopsis_classmate();
 
-    send_replay();
 } // end function 20889
 
 
 var aNajmiLubuuKlav = 'Нажми любую клавишу ...';
 
 
-function wait_for_key() {
+async function wait_for_key() {
     GotoXY(1, 0x18);
     current_color = 0x0E;
     write(aNajmiLubuuKlav);
     current_color = 7;
     //if (ReadKey() == 0) {
-    ReadKey();
+    await ReadKey();
     //}
 } // end function 208B8
 
@@ -6325,7 +6303,7 @@ var aSrocnoObratite = 'Срочно обратитесь к разработчи
 var aRazdavlenBezja = 'Раздавлен безжалостной ошибкой в программе.';
 
 
-function bug_report(bug_str) {
+async function bug_report(bug_str) {
     ClrScr();
     current_color = 0x8F;
     write(aVProgrammeBuga);
@@ -6334,7 +6312,7 @@ function bug_report(bug_str) {
     is_end = 1;
     hero.health = -100;
     death_cause = aRazdavlenBezja;
-    wait_for_key();
+    await wait_for_key();
 } // end function 2095D
 
 
@@ -6395,13 +6373,4 @@ function dev_replay() {
 }
 
 
-document.onkeydown = (e) => {
-    const ignoredMeta = ["Control", "Alt", "Meta", "Tab", "Shift"];
-    const ignoredKeys = ["KeyC", "KeyS"];
-    if (!ignoredMeta.includes(e.key)) {
-        if (!ignoredKeys.includes(e.code)) {
-            _update_key(e.key);
-        }
-    }
-};
 Main();
