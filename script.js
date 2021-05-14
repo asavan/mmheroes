@@ -339,7 +339,7 @@ var Replay = {
 
     next_key: function () {
         const key_index = this.data.keys_i - (this.data.keys_count - this.data.keys.length);
-        const result =  key_index >= 0 ? this.data.keys[key_index] : " ";
+        const result = key_index >= 0 ? this.data.keys[key_index] : " ";
         ++this.data.keys_i;
         return result;
     },
@@ -540,7 +540,7 @@ function promt_with_delay(message, default_message) {
     return new Promise(resolve => setTimeout(() => {
         const res = prompt(message, default_message);
         resolve(res);
-        }, 100));
+    }, 100));
 }
 
 async function readln() {
@@ -766,7 +766,7 @@ async function prompt_for_new_game() {
     dialog_case(aDaDaDa, -1);
     dialog_case(aNet___Net___Ne, -2);
     const ax = await dialog_run(1, 4);
-    const result =  ax === -2;
+    const result = ax === -2;
     ClrScr();
     return result;
 }
@@ -5424,7 +5424,6 @@ var aBurnoProgressi = 'Бурно прогрессирующая параной�
 
 async function hour_pass() {
     terkom_has_places = 1;
-    sub_1F184();
     ++time_of_day;
 
     if (current_subject == 2 && current_place == 2) {
@@ -5448,6 +5447,7 @@ async function hour_pass() {
     if (hero.charizma > Random(0x0A)) {
         byte_254A4 = 0;
     }
+    init_classmates();
 
 } // end function 1EA4F
 
@@ -5500,7 +5500,7 @@ function time_between_9_and_19() {
 } // end function 1EC75
 
 
-function sub_1EC97(/*arg_0*/) {
+function init_kolya(/*arg_0*/) {
     if (time_between_9_and_19()) {
         classmates[Kolya].place = 5;
     } else {
@@ -5510,7 +5510,7 @@ function sub_1EC97(/*arg_0*/) {
 } // end function 1EC97
 
 
-function sub_1ECBC(/*arg_0*/) {
+function init_pasha(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 0|1]
     var bp_var_2 = [0, 0];
 
@@ -5540,7 +5540,7 @@ function sub_1ECBC(/*arg_0*/) {
 } // end function 1ECBC
 
 
-function sub_1ED56(/*arg_0*/) {
+function init_diamond(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 1]
     var bp_var_2 = [0, 0];
 
@@ -5569,7 +5569,7 @@ function sub_1ED56(/*arg_0*/) {
 } // end function 1ED56
 
 
-function sub_1EDCC(/*arg_0*/) {
+function init_rai(/*arg_0*/) {
     if (!jz(is_professor_here(Algebra), 0)) {
         classmates[Rai].place = timesheet[day_of_week][Algebra].where;
         classmates[Rai].current_subject = 0;
@@ -5592,7 +5592,7 @@ function sub_1EDCC(/*arg_0*/) {
 } // end function 1EDCC
 
 
-function sub_1EE2C(/*arg_0*/) {
+function init_misha(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 0|1]
     var bp_var_2 = [0, 0];
 
@@ -5624,7 +5624,7 @@ function sub_1EE2C(/*arg_0*/) {
 } // end function 1EE2C
 
 
-function sub_1EECC(/*arg_0*/) {
+function init_serg(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 0|1]
     var bp_var_2 = [0, 0];
 
@@ -5653,7 +5653,7 @@ function sub_1EECC(/*arg_0*/) {
 } // end function 1EECC
 
 
-function sub_1EF66(/*arg_0*/) {
+function init_sasha(/*arg_0*/) {
     classmates[Sasha].current_subject = -1;
     if (time_between_9_and_19()) {
         if (!jnz(Random(4), 0)) {
@@ -5667,7 +5667,7 @@ function sub_1EF66(/*arg_0*/) {
 } // end function 1EF66
 
 
-function sub_1EF9E(/*arg_0*/) {
+function init_nil(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 0|1]
     var bp_var_2 = [0, 0];
 
@@ -5690,7 +5690,7 @@ function sub_1EF9E(/*arg_0*/) {
 } // end function 1EF9E
 
 
-function sub_1F025(/*arg_0*/) {
+function init_kuzmenko(/*arg_0*/) {
     if (time_between_9_and_19() && !jnz(Random(4), 0)) {
         classmates[Kuzmenko].place = 3;
         classmates[Kuzmenko].current_subject = -1;
@@ -5701,13 +5701,13 @@ function sub_1F025(/*arg_0*/) {
 } // end function 1F025
 
 
-function sub_1F05B() {
+function init_djug() {
     classmates[Djug].place = 2;
     classmates[Djug].current_subject = 2;
 } // end function 1F05B
 
 
-function sub_1F06D() {
+function init_andrew() {
     classmates[Endryu].place = 1;
     classmates[Endryu].current_subject = 1;
 
@@ -5723,7 +5723,7 @@ function sub_1F06D() {
 } // end function 1F06D
 
 
-function sub_1F0C6() {
+function init_grisha() {
     classmates[Grisha].current_subject = -1;
     if (!jnz(Random(3), 0)) {
         classmates[Grisha].place = 5;
@@ -5735,37 +5735,46 @@ function sub_1F0C6() {
 
 function sub_1F0EA(arg_0) {
     if (arg_0 == 0) {
-        sub_1EC97();
+        init_kolya();
     } else if (arg_0 == 2) {
-        sub_1ED56();
+        init_diamond();
     } else if (arg_0 == 1) {
-        sub_1ECBC();
+        init_pasha();
     } else if (arg_0 == 3) {
-        sub_1EDCC();
+        init_rai();
     } else if (arg_0 == 4) {
-        sub_1EE2C();
+        init_misha();
     } else if (arg_0 == 5) {
-        sub_1EECC();
+        init_serg();
     } else if (arg_0 == 6) {
-        sub_1EF66();
+        init_sasha();
     } else if (arg_0 == 7) {
-        sub_1EF9E();
+        init_nil();
     } else if (arg_0 == 8) {
-        sub_1F025();
+        init_kuzmenko();
     } else if (arg_0 == 9) {
-        sub_1F05B();
+        init_djug();
     } else if (arg_0 == 0xA) {
-        sub_1F06D();
+        init_andrew();
     } else if (arg_0 == 0xB) {
-        sub_1F0C6();
+        init_grisha();
     }
 } // end function 1F0EA
 
 
-function sub_1F184() {
-    for (var var_2 = 0; var_2 <= 0xB; ++var_2) {
-        sub_1F0EA(var_2);
-    }
+function init_classmates() {
+    init_kolya();
+    init_diamond();
+    init_pasha();
+    init_rai();
+    init_misha();
+    init_serg();
+    init_sasha();
+    init_nil();
+    init_kuzmenko();
+    init_djug();
+    init_andrew();
+    init_grisha();
 } // end function 1F184
 
 
