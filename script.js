@@ -536,7 +536,14 @@ async function ReadKey() {
     return key;
 }
 
-function readln() {
+function promt_with_delay(message, default_message) {
+    return new Promise(resolve => setTimeout(() => {
+        const res = prompt(message, default_message);
+        resolve(res);
+        }, 100));
+}
+
+async function readln() {
     if (Replay.is_on()) {
         var res = false;
         if (Replay.strs_remains()) {
@@ -550,7 +557,7 @@ function readln() {
         }
     }
     _update_screen();
-    var res = prompt('Enter string:', get_user_name());
+    var res = await promt_with_delay('Enter string:', get_user_name());
     if (res === null) {
         res = '';
     }
@@ -1024,7 +1031,7 @@ async function game_end_alive() {
             hero.money = 0;
             writeln(aDaTiEseIGodNet);
         } else {
-            update_top_gamers(score + hero.money);
+            await update_top_gamers(score + hero.money);
         }
     }
     await wait_for_key();
@@ -2988,7 +2995,7 @@ var aNeXocesUvekove = 'Не хочешь увековечиваться - не �
 var aNuVotIVse_ = 'Ну, вот и все.';
 
 
-function update_top_gamers(score) {
+async function update_top_gamers(score) {
     var var_108;
     var var_106;
     var my_place = -1;
@@ -3013,7 +3020,7 @@ function update_top_gamers(score) {
     writeln();
     write(aKakTebqZovutGe);
     TextColor(0x0A);
-    var my_name = readln();
+    var my_name = await readln();
 
     if (my_name.length == 0) {
         TextColor(0x0F);
