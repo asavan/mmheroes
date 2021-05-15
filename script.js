@@ -99,7 +99,7 @@ var top_gamers = [];
 */
 var classmates = [];
 
-var terkom_has_places; // 2549D
+let terkom_has_places = 1; // 2549D
 var klimov_timesheet_was_modified; // 25494
 
 
@@ -144,7 +144,7 @@ function _init_vars() {
     timesheet = [];
     for (let i = 0; i < 6; ++i) {
         timesheet.push([]);
-        for (var j = 0; j < 6; ++j) {
+        for (let j = 0; j < 6; ++j) {
             timesheet[i].push({from: 0, to: 0, where: 0});
         }
     }
@@ -160,7 +160,7 @@ function _init_vars() {
     }
 
     /*top_gamers = [];
-	for (var i = 0; i < 5; ++i) {
+	for (let i = 0; i < 5; ++i) {
 		top_gamers.push({name: '', score: 0});
 	}*/
 
@@ -206,7 +206,7 @@ const Algebra = 0, Matan = 1, GiT = 2, Infa = 3, English = 4, Fizra = 5;
 
 // My little and buggy implementation of utilities like STL
 function _upper_bound(cont, val) {
-    for (var i = 0; i < cont.length; ++i) {
+    for (let i = 0; i < cont.length; ++i) {
         if (cont[i] > val) {
             return i;
         }
@@ -242,10 +242,10 @@ function ParamStr(num) {
 }
 
 function __CrtInit() {
-    for (var i = 0; i < 25; ++i) {
+    for (let i = 0; i < 25; ++i) {
         Screen.push([]);
         ScreenColor.push([]);
-        for (var j = 0; j < 80; ++j) {
+        for (let j = 0; j < 80; ++j) {
             Screen[i].push(' ');
             ScreenColor[i].push(0x07);
         }
@@ -277,7 +277,7 @@ function get_stack() {
 function get_stack_before(func) {
     var s = get_stack().split('\n');
     //console.dir(s);
-    for (var i = s.length - 1; i >= 0; --i) {
+    for (let i = s.length - 1; i >= 0; --i) {
         if (s[i].indexOf(func) != -1) {
             return s[i + 1];
         }
@@ -430,8 +430,8 @@ function ClrScr() {
     PositionC = 0;
     PositionR = 0;
 
-    for (var i = 0; i < 25; ++i) {
-        for (var j = 0; j < 80; ++j) {
+    for (let i = 0; i < 25; ++i) {
+        for (let j = 0; j < 80; ++j) {
             Screen[i][j] = ' ';
             ScreenColor[i][j] = 0x07;
         }
@@ -441,9 +441,9 @@ function ClrScr() {
 function _update_screen() {
     var html = '';
     html += '<table id="screen">';
-    for (var i = 0; i < 25; ++i) {
+    for (let i = 0; i < 25; ++i) {
         html += '<tr>';
-        for (var j = 0; j < 80; ++j) {
+        for (let j = 0; j < 80; ++j) {
             html += '<td class="fg' + (ScreenColor[i][j] & 0xF) + ' bg' + (ScreenColor[i][j] >> 4) + '">' +
                 Screen[i][j] + '</td>';
         }
@@ -462,7 +462,7 @@ function write(str) {
         alyarme('write at pos ' + PositionR + ',' + PositionC);
     }
     str = '' + str;
-    for (var i = 0; i < str.length; ++i) {
+    for (let i = 0; i < str.length; ++i) {
         Screen[PositionR][PositionC] = str.charAt(i);
         ScreenColor[PositionR][PositionC] = current_color;
         ++PositionC;
@@ -472,20 +472,7 @@ function write(str) {
 
 function Random(up) {
     if (Replay.is_on()) {
-        var rec_up = Replay.data.rnds_up[Replay.data.rnds_i];
-
-        //var rec_stack = Replay.data.rnds_stack[Replay.data.rnds_i];
-        //var real_stack = get_stack();
-
-        //rec_stack = rec_stack.split('\r\n').slice(4).join('\r\n');
-        //real_stack = real_stack.split('\r\n').slice(3).join('\r\n');
-
-        //if (rec_stack != real_stack) {
-        //	alert(rec_stack + '\r\n\r\n' + real_stack);
-        //	throw 42;
-        //}
-
-        //console.log('replay ' + Replay.data.rnds_i + ', hero.health = ' + hero.health + '; from ' + get_stack_before('Random'));
+        const rec_up = Replay.data.rnds_up[Replay.data.rnds_i];
 
         const res = Replay.next_rnd();
         if (rec_up !== up || up && res >= up || !up && res > 0) {
@@ -532,7 +519,7 @@ function ReadKey_off() {
 
 async function ReadKey() {
     const key = await ReadKey_on();
-    ReadKey_off();
+    // ReadKey_off();
     return key;
 }
 
@@ -854,7 +841,7 @@ async function show_dzin_and_timesheet() {
 } // end function 102EF
 
 
-var aNowhere_at_tur = 'nowhere_at_turn';
+const aNowhere_at_tur = 'nowhere_at_turn';
 
 
 async function scene_router() {
@@ -962,7 +949,7 @@ async function game_end_alive() {
     }
 
     var score = 0;
-    for (var subj = 0; subj <= 5; ++subj) {
+    for (let subj = 0; subj <= 5; ++subj) {
         if (hero.subject[subj].pass_day != -1) {
             score +=
                 idiv((6 - hero.subject[subj].pass_day) *
@@ -1388,7 +1375,7 @@ async function scene_kompy() {
     if (hero.has_inet) {
         dialog_case(aProvesti1CasVI, -11);
     }
-    for (var i = 0; i <= 0xB; ++i) {
+    for (let i = 0; i <= 0xB; ++i) {
         if (classmates[i].place == 3) {
             dialog_case_colored(classmate_names[i], i, 0xE);
         }
@@ -1517,7 +1504,7 @@ async function scene_mausoleum() {
     dialog_case(aPoexatVPomi_0, -5);
     dialog_case(aIdtiVObsagu, -2);
     dialog_case(aOtdixat, -3);
-    for (var i = 0; i <= 0xB; ++i) {
+    for (let i = 0; i <= 0xB; ++i) {
         if (classmates[i].place == 5) {
             dialog_case_colored(classmate_names[i], i, 0xE);
         }
@@ -1678,9 +1665,9 @@ async function goto_obschaga_to_pomi() {
         dialog_start();
         dialog_case(aExatZaicem_0, -1);
         dialog_case(aCestnoZaplat_0, -2);
-        var res = await dialog_run(1, 0x0C);
+        const res = await dialog_run(1, 0x0C);
 
-        if (!jnz(res, -1)) {
+        if (jz(res, -1)) {
             if (hero.charizma < Random(0x0A)) {
                 GotoXY(1, 0x0F);
                 writeln(aTebqZalovili_0);
@@ -1691,7 +1678,7 @@ async function goto_obschaga_to_pomi() {
                 GotoXY(1, 0x0F);
                 writeln(aUfDoexal_0);
             }
-        } else if (!jnz(res, -2)) {
+        } else if (jz(res, -2)) {
             hero.money -= 10;
             hero.has_ticket = 1;
         }
@@ -1758,14 +1745,14 @@ async function invite_from_neighbor() {
     dialog_start();
     dialog_case(aUguQSeicas, -1);
     dialog_case(aNeIzviniMneGot, -2);
-    var res = await dialog_run(1, 0x0A);
+    const res = await dialog_run(1, 0x0A);
 
-    if (res == -1) {
+    if (res === -1) {
 
         GotoXY(1, 0x0E);
         writeln(aPosliOttqgivat);
 
-        for (var var_2 = 2, var_6 = Random(3) + 4; var_2 <= var_6; ++var_2) {
+        for (let var_2 = 2, var_6 = Random(3) + 4; var_2 <= var_6; ++var_2) {
             await hour_pass();
             var subj = random_from_to(0, 5);
             hero.subject[subj].knowledge -=
@@ -1787,7 +1774,7 @@ async function invite_from_neighbor() {
             hero.brain = Random(3) + 2;
         }
 
-    } else if (res == -2) {
+    } else if (res === -2) {
         GotoXY(1, 0x0E);
         writeln(aNuIZrq);
         hero.charizma -= Random(2) + 1;
@@ -1840,24 +1827,24 @@ async function scene_obschaga() {
     dialog_case_colored(aCtoDelat, -9, 9);
     show_short_today_timesheet(0x0A);
 
-    var res = await dialog_run(1, 0x0A);
-    if (res == -1) {
+    const res = await dialog_run(1, 0x0A);
+    if (res === -1) {
         await botva();
-    } else if (res == -2) {
+    } else if (res === -2) {
         await see_timesheet();
-    } else if (res == -3) {
+    } else if (res === -3) {
         await rest_in_obschaga();
-    } else if (res == -4) {
+    } else if (res === -4) {
         await try_sleep();
-    } else if (res == -5) {
+    } else if (res === -5) {
         await goto_obschaga_to_punk();
-    } else if (res == -6) {
+    } else if (res === -6) {
         await goto_obschaga_to_pomi();
-    } else if (res == -7) {
+    } else if (res === -7) {
         goto_obschaga_to_mausoleum();
-    } else if (res == -8) {
+    } else if (res === -8) {
         await request_exit();
-    } else if (res == -9) {
+    } else if (res === -9) {
         await request_help(1);
     }
 } // end function 1312F
@@ -1872,12 +1859,12 @@ function show_char_description(character, description) {
 
 
 function output_colored_string(s) {
-    for (var i = 1; i <= s.length; ++i) {
-        var c = s.charCodeAt(i - 1);
+    for (let i = 0; i < s.length; ++i) {
+        const c = s.charCodeAt(i);
         if (c >= 0 && c <= 0x0F) {
             TextColor(c);
         } else {
-            write(s.substr(i - 1, 1));
+            write(s.substr(i, 1));
         }
     }
     writeln();
@@ -1908,20 +1895,20 @@ async function select_help_page() {
     TextColor(7);
     writeln(aCtoTebqInteres);
 
-    var res = await dialog_run(1, 0x0F);
-    if (res == -1) {
+    const res = await dialog_run(1, 0x0F);
+    if (res === -1) {
         help_page = 1;
-    } else if (res == -2) {
+    } else if (res === -2) {
         help_page = 3;
-    } else if (res == -3) {
+    } else if (res === -3) {
         help_page = 4;
-    } else if (res == -4) {
+    } else if (res === -4) {
         help_page = 5;
-    } else if (res == -5) {
+    } else if (res === -5) {
         help_page = 6;
-    } else if (res == -10) {
+    } else if (res === -10) {
         help_page = 2;
-    } else if (res == -100) {
+    } else if (res === -100) {
         help_page = 0;
     }
 } // end function 1346B
@@ -2384,7 +2371,7 @@ async function select_professor_punk() {
     writeln(aTiSeicasNaFaku);
 
     dialog_start();
-    for (var i = 0; i <= 5; ++i) {
+    for (let i = 0; i <= 5; ++i) {
         if (is_professor_here(i)) {
             dialog_case(subjects[i].professor.name, i);
         }
@@ -2430,7 +2417,7 @@ function output_ik_string(s) {
     var terkom_line = [0xA, 0xE, 0x10, 0x12];
     var iks = 5 - _upper_bound(terkom_line, time_of_day);
 
-    for (var i = 1; i <= s.length; ++i) {
+    for (let i = 1; i <= s.length; ++i) {
         if (s[i - 1] == ' ' && Random(iks) == 0) {
             write(aIk);
             --iks;
@@ -2478,7 +2465,7 @@ var aRabociiDenZako = 'Рабочий день закончился, все по
 async function sub_15B3A() {
     var var_2;
 
-    if (!jnz(terkom_has_places, 0)) {
+    if (jz(terkom_has_places, 0)) {
         ClrScr();
         show_header_stats();
         GotoXY(1, 8);
@@ -2701,7 +2688,7 @@ async function scene_punk() {
     }
 
 
-    for (var var_2 = 0; var_2 <= 0xB; ++var_2) {
+    for (let var_2 = 0; var_2 <= 0xB; ++var_2) {
 
         if (!jnz(classmates[var_2].place, 1)) {
             if (!jnz(classmates[var_2].current_subject, -1)) {
@@ -2805,7 +2792,7 @@ async function sub_16622() {
     writeln(aTiSeicasVPomi_);
     dialog_start();
 
-    for (var var_2 = 0; var_2 <= 5; ++var_2) {
+    for (let var_2 = 0; var_2 <= 5; ++var_2) {
 
         if (!jz(is_professor_here(var_2), 0)) {
             dialog_case(subjects[var_2].professor.name, var_2);
@@ -2946,7 +2933,7 @@ async function scene_pomi() {
     dialog_case(aPoitiVKafe, -3);
     dialog_case(aPoexatVPunk, -4);
 
-    for (var var_2 = 0; var_2 <= 0xB; ++var_2) {
+    for (let var_2 = 0; var_2 <= 0xB; ++var_2) {
 
         if (!jnz(classmates[var_2].place, 2) && !jnz(classmates[var_2].current_subject, -1)) {
             dialog_case_colored(classmate_names[var_2], var_2, 0xE);
@@ -3001,7 +2988,7 @@ async function update_top_gamers(score) {
     var my_place = -1;
 
     /*
-	for (var i = 4; i >= 0; --i) {
+	for (let i = 4; i >= 0; --i) {
 		if (top_gamers[i].score >= score) {
 			my_place = i;
 			break;
@@ -3034,7 +3021,7 @@ async function update_top_gamers(score) {
     /*
 	++my_place;
 	if (my_place <= 3) {
-		for (var i = 3; i >= my_place; --i) {
+		for (let i = 3; i >= my_place; --i) {
 			top_gamers[i + 1] = top_gamers[i];
 		}
 	}
@@ -3090,7 +3077,7 @@ async function show_top_gamers() {
     writeln();
     writeln(aGeroiZarabotal);
 
-    for (var i = 0; i < top_gamers.length; ++i) {
+    for (let i = 0; i < top_gamers.length; ++i) {
 
         TextColor(0x0F);
         GotoXY(4, i + 7)
@@ -5241,7 +5228,7 @@ var aPrevratilsqVOv = 'Превратился в овощ.';
 async function sub_1E5A3() {
     var var_4 = 0;
 
-    for (var var_2 = 0; var_2 <= 2; ++var_2) {
+    for (let var_2 = 0; var_2 <= 2; ++var_2) {
         synopsis[var_2].sasha_has = 1;
     }
 
@@ -5495,9 +5482,8 @@ function is_professor_here_today(subj) {
 
 
 function time_between_9_and_19() {
-    console.log("time_of_day", time_of_day);
     return time_of_day > 8 && time_of_day < 20;
-} // end function 1EC75
+}
 
 
 function init_kolya(/*arg_0*/) {
@@ -5524,7 +5510,7 @@ function init_pasha(/*arg_0*/) {
 
     do {
 
-        for (var var_2 = 0; var_2 <= 2; ++var_2) {
+        for (let var_2 = 0; var_2 <= 2; ++var_2) {
             if (!jz(is_professor_here_today(var_2), 0)) {
                 bp_var_2[0] = 1;
                 if (!jbe(Random(0x0A), 5)) {
@@ -5552,7 +5538,7 @@ function init_diamond(/*arg_0*/) {
 
     classmates[Diamond].current_subject = -1;
 
-    for (var var_2 = 5; var_2 >= 0; --var_2) {
+    for (let var_2 = 5; var_2 >= 0; --var_2) {
 
         if (!jz(is_professor_here_today(var_2), 0)) {
 
@@ -5605,7 +5591,7 @@ function init_misha(/*arg_0*/) {
     classmates[Misha].current_subject = -1;
 
     do {
-        for (var var_2 = 4; var_2 >= 0; --var_2) {
+        for (let var_2 = 4; var_2 >= 0; --var_2) {
 
             if (!jz(is_professor_here_today(var_2), 0)) {
                 if (!jz(var_2, 3)) {
@@ -5637,7 +5623,7 @@ function init_serg(/*arg_0*/) {
     classmates[Serzg].current_subject = -1;
 
     do {
-        for (var var_2 = 5; var_2 >= 0; --var_2) {
+        for (let var_2 = 5; var_2 >= 0; --var_2) {
 
             if (!jz(is_professor_here_today(var_2), 0)) {
                 bp_var_2[0] = 1;
@@ -5656,7 +5642,7 @@ function init_serg(/*arg_0*/) {
 function init_sasha(/*arg_0*/) {
     classmates[Sasha].current_subject = -1;
     if (time_between_9_and_19()) {
-        if (!jnz(Random(4), 0)) {
+        if (jz(Random(4), 0)) {
             classmates[Sasha].place = 1;
         } else {
             classmates[Sasha].place = 0;
@@ -5675,7 +5661,7 @@ function init_nil(/*arg_0*/) {
     classmates[Nil].current_subject = -1;
 
     do {
-        for (var var_2 = 0; var_2 <= 2; ++var_2) {
+        for (let var_2 = 0; var_2 <= 2; ++var_2) {
             if (!jz(is_professor_here_today(var_2), 0)) {
                 bp_var_2[0] = 1;
                 if (!jbe(Random(0x0A), 5)) {
@@ -5691,7 +5677,7 @@ function init_nil(/*arg_0*/) {
 
 
 function init_kuzmenko(/*arg_0*/) {
-    if (time_between_9_and_19() && !jnz(Random(4), 0)) {
+    if (time_between_9_and_19() && jz(Random(4), 0)) {
         classmates[Kuzmenko].place = 3;
         classmates[Kuzmenko].current_subject = -1;
     } else {
@@ -5711,7 +5697,7 @@ function init_andrew() {
     classmates[Endryu].place = 1;
     classmates[Endryu].current_subject = 1;
 
-    for (var var_2 = 0; var_2 <= 2; ++var_2) {
+    for (let var_2 = 0; var_2 <= 2; ++var_2) {
         if (!jz(is_professor_here_today(var_2), 0)) {
             if (!jbe(Random(0x0A), 5)) {
                 classmates[Endryu].place = timesheet[day_of_week][var_2].where;
@@ -5907,7 +5893,7 @@ function show_header_stats() {
     var knowledge_subj_str = [aPloxo, aUdovl_, aXoroso, aOtlicno];
     var knowledge_subj_col = [3, 7, 0xF, 0xE];
 
-    for (var subj = 0; subj <= 5; ++subj) {
+    for (let subj = 0; subj <= 5; ++subj) {
         GotoXY(0x2D, subj + 1);
         colored_output(0xB, subjects[subj].title);
 
@@ -6017,13 +6003,13 @@ function show_timesheet() {
         }
     }
 
-    for (var day = 0; day <= 5; ++day) {
+    for (let day = 0; day <= 5; ++day) {
         TextColor(7);
         GotoXY(day * 7 + 0x18, 1);
         colored_output(0xB, days[day]);
     }
 
-    for (var subj = 0; subj <= 5; ++subj) {
+    for (let subj = 0; subj <= 5; ++subj) {
         if (hero.subject[subj].passed == 0) {
             if (subjects[subj].tasks > hero.subject[subj].tasks_done) {
                 TextColor(7);
@@ -6067,7 +6053,7 @@ function show_timesheet() {
 
 
 function show_short_today_timesheet(y) {
-    for (var subj = 0; subj <= 5; ++subj) {
+    for (let subj = 0; subj <= 5; ++subj) {
         var ts = timesheet[day_of_week][subj];
 
         TextColor(hero.subject[subj].passed ? 1 : 0xB);
@@ -6104,18 +6090,18 @@ function show_short_today_timesheet(y) {
 
 
 function init_timesheet() {
-    for (var subj = 0; subj <= 5; ++subj) {
-        for (var day = 0; day <= 5; ++day) {
+    for (let subj = 0; subj <= 5; ++subj) {
+        for (let day = 0; day <= 5; ++day) {
             timesheet[day][subj].from =
                 timesheet[day][subj].to =
                     timesheet[day][subj].where = 0;
         }
     }
 
-    for (var subj = 0; subj <= 5; ++subj) {
+    for (let subj = 0; subj <= 5; ++subj) {
         var day_used = [0, 0, 0, 0, 0, 0];
         if (subjects[subj].exam_days >= 1) {
-            for (var i = 1; i <= subjects[subj].exam_days; ++i) {
+            for (let i = 1; i <= subjects[subj].exam_days; ++i) {
                 var day;
                 do {
                     day = random_from_to(0, 5);
@@ -6141,14 +6127,14 @@ function init_timesheet() {
 function inception_reinit_timesheet() {
     // Тут deep copy
     var old_timesheet = [];
-    for (var i = 0; i < 6; ++i) {
+    for (let i = 0; i < 6; ++i) {
         old_timesheet.push([]);
-        for (var j = 0; j < 6; ++j) {
+        for (let j = 0; j < 6; ++j) {
             old_timesheet[i].push({from: timesheet[i][j].from, to: timesheet[i][j].to, where: timesheet[i][j].where});
         }
     }
     init_timesheet();
-    for (var i = 0; i <= day_of_week; ++i) {
+    for (let i = 0; i <= day_of_week; ++i) {
         timesheet[i] = old_timesheet[i]; // 0x1E bytes
     }
 } // end function 204C8
@@ -6259,13 +6245,13 @@ var aBad_cred_count = 'bad_cred_count';
 
 
 async function check_exams_left_count() {
-    var exams_left = 6;
-    for (var i = 0; i <= 5; ++i) {
+    let exams_left = 6;
+    for (let i = 0; i < 6; ++i) {
         if (hero.subject[i].passed) {
             --exams_left;
         }
     }
-    if (exams_left != hero.exams_left) {
+    if (exams_left !== hero.exams_left) {
         await bug_report(aBad_cred_count);
     }
 } // end function 207BF
@@ -6281,12 +6267,12 @@ function init_knowledge_synopsis_classmate() {
         };
     }
 
-    for (var subj = 0; subj <= 2; ++subj) {
+    for (let subj = 0; subj <= 2; ++subj) {
         synopsis[subj].sasha_has = 1;
         synopsis[subj].hero_has = 0;
     }
 
-    for (var i = 0; i <= 0xB; ++i) {
+    for (let i = 0; i <= 0xB; ++i) {
         classmates[i].current_subject = -1;
     }
 } // end function 207FA
@@ -6364,7 +6350,7 @@ function dialog_case_colored(str, num, color) {
 
 function dialog_show(x, y) {
     current_color = 0xB;
-    for (var i = 0; i <= dialog_case_count - 1; ++i) {
+    for (let i = 0; i < dialog_case_count; ++i) {
         GotoXY(x, y + i);
         current_color = dialog[i].color;
         write(dialog[i].str);
@@ -6374,12 +6360,12 @@ function dialog_show(x, y) {
 
 
 function report_bug() {
-    var s = JSON.stringify(Replay.data);
+    const s = JSON.stringify(Replay.data);
     alert('Send this string to developer and tell him what happened\r\n\r\n' + s);
 }
 
 function dev_replay() {
-    var input = prompt('Paste string from tester');
+    const input = prompt('Paste string from tester');
     if (input === null || input === '') {
         return;
     }
