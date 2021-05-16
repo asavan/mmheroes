@@ -160,7 +160,7 @@ function _init_vars() {
 
     hero.subject = [];
     for (let i = 0; i < 6; ++i) {
-        hero.subject.push({knowledge: 0, passed: 0, pass_day: -1, tasks_done: 0});
+        hero.subject.push({knowledge: 0, passed: false, pass_day: -1, tasks_done: 0});
     }
 
     /*top_gamers = [];
@@ -195,7 +195,7 @@ const subject_short_titles = ['АиТЧ', 'МатАн', 'ГиТ', 'Инф', 'И�
 
 var dialog_case_count;
 var current_color;
-var is_end;
+let is_end = false;
 var is_god_mode, is_god_mode_available;
 
 var time_of_day, day_of_week, current_place, death_cause;
@@ -228,6 +228,10 @@ function idiv(x, y) {
 
 function WhereY() {
     return PositionR;
+}
+
+function WhereX() {
+    return PositionC;
 }
 
 function Randomize() {
@@ -533,7 +537,7 @@ async function dialog_run(x, y) {
             case "Enter":
             case " ": {
                 current_color = 7;
-                var result = dialog[current_selection].num;
+                const result = dialog[current_selection].num;
                 Replay.record_dialog(result);
                 Replay.wait_dialog(false);
                 return result;
@@ -629,19 +633,13 @@ function jge(a, b) {
     return a >= b;
 }
 
-function jbe(a, b) {
-    return a <= b;
-}
-
 function ja(a, b) {
     return a > b;
 }
 
 
 // from dseg
-var aGamma3_14 = 'gamma3.14';
-
-
+const aGamma3_14 = 'gamma3.14';
 
 
 async function prompt_for_new_game() {
@@ -693,7 +691,7 @@ async function PROGRAM() {
         do {
             await scene_router();
             await check_exams_left_count();
-        } while (is_end == 0);
+        } while (!is_end);
 
         await game_end();
     } while (await prompt_for_new_game());
@@ -774,11 +772,10 @@ async function scene_router() {
 } // end function 10433
 
 
-var aLegceLbomKolot = 'Легче лбом колоть орехи,';
-var aCemUcitSqNaMat = 'чем учиться на МАТ-МЕХе.';
-
-
 async function game_end_death() {
+    const aLegceLbomKolot = 'Легче лбом колоть орехи,';
+    const aCemUcitSqNaMat = 'чем учиться на МАТ-МЕХе.';
+
     send_replay({death_cause: death_cause});
     current_color = 0x0C;
     writeln(aLegceLbomKolot);
@@ -849,9 +846,9 @@ async function game_end_alive() {
         colored_output_ln(0x0F, aUspesnoiTebeSe);
     }
 
-    var score = 0;
+    let score = 0;
     for (let subj = 0; subj <= 5; ++subj) {
-        if (hero.subject[subj].pass_day != -1) {
+        if (hero.subject[subj].pass_day !== -1) {
             score +=
                 idiv((6 - hero.subject[subj].pass_day) *
                     (subjects[subj].tasks + subjects[subj].member0xFA) * 2, 3);
@@ -926,26 +923,25 @@ async function game_end_alive() {
 } // end function 1081D
 
 
-var aNamPonqtenAtot = '                                                Нам понятен этот смех';
-var aNePopavsixNaM = '                                                Не попавших на Мат-Мех';
-var aNadpisNaPa = '                                                  (надпись на парте)';
-var aHHEeeRrOEeeSsM = ' H H  EEE  RR    O   EEE  SS       M   M  A   A TTTTT       M   M  EEE  X   X';
-var aHHERROOESMmMmA = ' H H  E    R R  O O  E   S         MM MM  AAAAA   T         MM MM    E   X X';
-var aHhhEeRrOOEeSOf = ' HHH  EE   RR   O O  EE   S    OF  M M M  A   A   T    &&&  M M M   EE    X';
-var aHHERROOESMMAAT = ' H H  E    R R  O O  E     S       M   M   A A    T         M   M    E   X X';
-var aHHEeeRROEeeSsM = ' H H  EEE  R R   O   EEE SS        M   M    A     T         M   E  EEE  X   X';
-var aGeroiMataIMexa = '                             ГЕРОИ МАТА И МЕХА ;)';
-var aPCrwmmDevelopm = '(P) CrWMM Development Team, 2001.';
-var aVersiq = 'Версия ';
-var aZaglqniteNaNas = 'Загляните на нашу страничку: mmheroes.chat.ru !';
-
-
 async function show_intro_screen() {
+    const aNamPonqtenAtot = '                                                Нам понятен этот смех';
+    const aNePopavsixNaM = '                                                Не попавших на Мат-Мех';
+    const aNadpisNaParte = '                                                  (надпись на парте)';
+    const aHHEeeRrOEeeSsM = ' H H  EEE  RR    O   EEE  SS       M   M  A   A TTTTT       M   M  EEE  X   X';
+    const aHHERROOESMmMmA = ' H H  E    R R  O O  E   S         MM MM  AAAAA   T         MM MM    E   X X';
+    const aHhhEeRrOOEeSOf = ' HHH  EE   RR   O O  EE   S    OF  M M M  A   A   T    &&&  M M M   EE    X';
+    const aHHERROOESMMAAT = ' H H  E    R R  O O  E     S       M   M   A A    T         M   M    E   X X';
+    const aHHEeeRROEeeSsM = ' H H  EEE  R R   O   EEE SS        M   M    A     T         M   E  EEE  X   X';
+    const aGeroiMataIMexa = '                             ГЕРОИ МАТА И МЕХА ;)';
+    const aPCrwmmDevelopm = '(P) CrWMM Development Team, 2001.';
+    const aVersiq = 'Версия ';
+    const aZaglqniteNaNas = 'Загляните на нашу страничку: mmheroes.chat.ru !';
+
     ClrScr();
     TextColor(8);
     writeln(aNamPonqtenAtot);
     writeln(aNePopavsixNaM);
-    writeln(aNadpisNaPa);
+    writeln(aNadpisNaParte);
     writeln();
     writeln();
     writeln();
@@ -1075,11 +1071,7 @@ async function goto_kompy_to_pomi() {
         if (hero.charizma < Random(0x0A)) {
             writeln(aTebqZaloviliKo);
             writeln(aVisadiliVKrasn);
-            hero.health -= 0xA;
-            if (hero.health <= 0) {
-                is_end = 1;
-                death_cause = aKontroleriJizn;
-            }
+            decrease_health(0xA, aKontroleriJizn);
             await hour_pass();
         } else {
             writeln(aUfDoexal);
@@ -1090,8 +1082,8 @@ async function goto_kompy_to_pomi() {
         dialog_start();
         dialog_case(aExatZaicem, -1);
         dialog_case(aCestnoZaplatit, -2);
-        var result = await dialog_run(1, 0x0C);
-        if (result == -1) {
+        const result = await dialog_run(1, 0x0C);
+        if (result === -1) {
             if (hero.charizma < Random(0x0A)) {
                 GotoXY(1, 0x0F);
                 writeln(aTebqZaloviliKo);
@@ -1101,7 +1093,7 @@ async function goto_kompy_to_pomi() {
                 GotoXY(1, 0x0F);
                 writeln(aUfDoexal);
             }
-        } else if (result == -2) {
+        } else if (result === -2) {
             hero.money -= 10;
             hero.has_ticket = 1;
         }
@@ -1112,12 +1104,10 @@ async function goto_kompy_to_pomi() {
 } // end function 1160A
 
 
-var aKlimovA_a_Sidi = 'Климов А.А. сидит и тоскует по халявному Inet\'у.';
-var a___ = '...';
-
-
 async function goto_klimov() {
-    if (Random(2) == 0) {
+    const aKlimovA_a_Sidi = 'Климов А.А. сидит и тоскует по халявному Inet\'у.';
+    const a___ = '...';
+    if (Random(2) === 0) {
         ClrScr();
         TextColor(7);
         writeln(aKlimovA_a_Sidi);
@@ -1125,16 +1115,14 @@ async function goto_klimov() {
         await ReadKey();
         ClrScr();
     }
-    current_subject = 3;
+    current_subject = Kompy;
 } // end function 1182D
 
 
-var aUmerPoPutiVMav = 'Умер по пути в мавзолей.';
-
-
-async function goto_kompy_to_mausoleum() {
+function goto_kompy_to_mausoleum() {
+    const aUmerPoPutiVMav = 'Умер по пути в мавзолей.';
     current_subject = -1;
-    current_place = 5;
+    current_place = Mavzoley;
     decrease_health(2, aUmerPoPutiVMav);
 } // end function 1189E
 
@@ -1307,8 +1295,6 @@ async function scene_kompy() {
 } // end function 120F8
 
 
-
-
 function goto_mausoleum_to_punk() {
     const aUmerPoPutiNaFa = 'Умер по пути на факультет.';
     decrease_health(3, aUmerPoPutiNaFa);
@@ -1365,11 +1351,7 @@ async function rest_in_mausoleum() {
             ++hero.stamina;
         }
         hero.health += Random(hero.charizma);
-        if (hero.brain <= 0) {
-            hero.health = 0;
-            is_end = 1;
-            death_cause = aPivnoiAlkogoli;
-        }
+        check_brain_dead(aPivnoiAlkogoli);
     } else if (res === -2) {
         hero.money -= 4;
         hero.health += Random(hero.charizma) + 3;
@@ -2032,13 +2014,9 @@ async function goto_punk_or_mausoleum_to_pomi() {
         return;
     }
 
-    hero.health -= Random(0x0A);
-    if (hero.health <= 0) {
-        is_end = 1;
-        death_cause = aVAlektrickeN_1;
-    }
+    decrease_health(Random(0x0A), aVAlektrickeN_1);
 
-    current_place = 2;
+    current_place = Pomi;
 
     if (hero.money < 0x0A) {
 
@@ -2057,9 +2035,9 @@ async function goto_punk_or_mausoleum_to_pomi() {
         dialog_start();
         dialog_case(aExatZaicem_1, -1);
         dialog_case(aCestnoZaplat_1, -2);
-        var res = await dialog_run(1, 0x0C);
+        const res = await dialog_run(1, 0x0C);
 
-        if (res == -1) {
+        if (res === -1) {
             if (hero.charizma < Random(0x0A)) {
                 GotoXY(1, 0x0F);
                 writeln(aTebqZalovili_1);
@@ -2070,7 +2048,7 @@ async function goto_punk_or_mausoleum_to_pomi() {
                 GotoXY(1, 0x0F);
                 writeln(aUfDoexal_1);
             }
-        } else if (res == -2) {
+        } else if (res === -2) {
             hero.money -= 10;
             hero.has_ticket = 1;
         }
@@ -2248,16 +2226,16 @@ async function show_intro_fizra() {
 } // end function 15514
 
 
-async function goto_exam_with_intro(exam) {
-    if (exam == 0) {
+async function goto_exam_with_intro(subj) {
+    if (subj === Algebra) {
         await show_intro_algebra();
-    } else if (exam == 1) {
+    } else if (subj === Matan) {
         await show_intro_matan();
-    } else if (exam == 2) {
+    } else if (subj === GiT) {
         await show_intro_git();
-    } else if (exam == 4) {
+    } else if (subj === English) {
         await show_intro_english();
-    } else if (exam == 5) {
+    } else if (subj === Fizra) {
         await show_intro_fizra();
     }
 } // end function 155AF
@@ -2282,7 +2260,7 @@ async function select_professor_punk() {
     dialog_case(aNiKKomu, -1);
     current_subject = await dialog_run(1, 0x0A);
 
-    if (Random(2) == 0) {
+    if (Random(2) === 0) {
         await goto_exam_with_intro(current_subject);
     }
 } // end function 15623
@@ -2496,7 +2474,7 @@ async function go_to_terkom() {
 
         }
 
-    } while (!jg(time_of_day, 0x12));
+    } while (time_of_day <= 18);
 
     GotoXY(1, 0x14);
     output_ik_string(aRabociiDenZako);
@@ -2581,20 +2559,20 @@ async function scene_punk() {
     dialog_case(aPoexatVPomi_2, -4);
     dialog_case(aPoitiVMavzol_1, -5);
 
-    if (!jge(time_of_day, 0x14)) {
+    if (time_of_day < 20) {
         dialog_case(aPoitiVKompUter, -7);
     }
 
-    if (!jl(time_of_day, 0x0A) && !jg(time_of_day, 0x12)) {
+    if (time_of_day >= 10 && time_of_day <= 18) {
         dialog_case(aSxoditVKafe, -12);
     }
 
 
-    for (let var_2 = 0; var_2 <= 0xB; ++var_2) {
+    for (let i = 0; i <= 0xB; ++i) {
 
-        if (!jnz(classmates[var_2].place, 1)) {
-            if (!jnz(classmates[var_2].current_subject, -1)) {
-                dialog_case_colored(classmate_names[var_2], var_2, 0xE);
+        if (classmates[i].place === Punk) {
+            if (classmates[i].current_subject === -1) {
+                dialog_case_colored(classmate_names[i], i, 0xE);
             }
         }
 
@@ -2633,14 +2611,13 @@ async function scene_punk() {
 } // end function 16167
 
 
-var aMalenKiiKabine = 'Маленький кабинет в ПОМИ заполнен людьми.';
-var aIKakNiStrannoP = 'И, как ни странно, почти все они хотят одного и того же.';
-var aPoxojeTiTojeXo = 'Похоже, ты тоже хочешь именно этого -';
-var aRazdelatSqNako = 'РАЗДЕЛАТЬСЯ НАКОНЕЦ С ЗАЧЕТОМ ПО АЛГЕБРЕ!';
-var a____5 = '...';
-
-
 async function algebra_pomi_intro() {
+    const aMalenKiiKabine = 'Маленький кабинет в ПОМИ заполнен людьми.';
+    const aIKakNiStrannoP = 'И, как ни странно, почти все они хотят одного и того же.';
+    const aPoxojeTiTojeXo = 'Похоже, ты тоже хочешь именно этого -';
+    const aRazdelatSqNako = 'РАЗДЕЛАТЬСЯ НАКОНЕЦ С ЗАЧЕТОМ ПО АЛГЕБРЕ!';
+    const a____5 = '...';
+
     ClrScr();
     TextColor(0x0C);
     writeln(aMalenKiiKabine);
@@ -2648,20 +2625,19 @@ async function algebra_pomi_intro() {
     writeln(aPoxojeTiTojeXo);
     writeln(aRazdelatSqNako);
     writeln(a____5);
-    await ReadKey();
+    await wait_for_key();
     ClrScr();
 } // end function 163B7
 
 
-var aVNebolSomPomis = 'В небольшом ПОМИшном кабинете собралось человек 10 студентов.';
-var aKromeNixVKomna = 'Кроме них, в комнате ты видишь Подкорытова-младшего,';
-var aATakjePolnogoS = 'а также - полного седоволосого лысеющего господина,';
-var aIzdausegoXarak = 'издающего характерные пыхтящие звуки.';
-var aTiNadeesSqCtoV = 'Ты надеешься, что все это скоро кончится...';
-var a____6 = '...';
-
-
 async function git_pomi_intro() {
+    const aVNebolSomPomis = 'В небольшом ПОМИшном кабинете собралось человек 10 студентов.';
+    const aKromeNixVKomna = 'Кроме них, в комнате ты видишь Подкорытова-младшего,';
+    const aATakjePolnogoS = 'а также - полного седоволосого лысеющего господина,';
+    const aIzdausegoXarak = 'издающего характерные пыхтящие звуки.';
+    const aTiNadeesSqCtoV = 'Ты надеешься, что все это скоро кончится...';
+    const a____6 = '...';
+
     ClrScr();
     writeln(aVNebolSomPomis);
     writeln(aKromeNixVKomna);
@@ -2683,21 +2659,21 @@ async function pomi_intro(subj) {
 } // end function 165D9
 
 
-var aTiSeicasVPomi_ = 'Ты сейчас в ПОМИ. К кому идти?';
-var aNiKKomu_0 = 'Ни к кому';
 
 
-async function sub_16622() {
+async function select_professor_pomi() {
+    const aTiSeicasVPomi_ = 'Ты сейчас в ПОМИ. К кому идти?';
+    const aNiKKomu_0 = 'Ни к кому';
+
     show_header_stats();
     TextColor(7);
     GotoXY(1, 8);
     writeln(aTiSeicasVPomi_);
     dialog_start();
 
-    for (let var_2 = 0; var_2 <= 5; ++var_2) {
-
-        if (!jz(is_professor_here(var_2), 0)) {
-            dialog_case(subjects[var_2].professor.name, var_2);
+    for (let subj = 0; subj <= 5; ++subj) {
+        if (is_professor_here(subj)) {
+            dialog_case(subjects[subj].professor.name, subj);
         }
     }
 
@@ -2723,7 +2699,7 @@ var aNicegoProstoPr = 'Ничего, просто просидеть здесь 
 var aSovsemNicego_B = 'Совсем ничего. Бывает.';
 
 
-async function sub_1673E() {
+async function pomi_cafe() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -2776,7 +2752,7 @@ var aKontroleriPoim = 'Контролеры поймали! Высадили в 
 var aKontroleriJi_2 = 'Контролеры жизни лишили.';
 
 
-async function sub_16914() {
+async function go_pomi_to_punk() {
 
     if (!hero.has_ticket && hero.money >= 5) {
         ClrScr();
@@ -2797,7 +2773,7 @@ async function sub_16914() {
     }
 
     decrease_health(Random(0x0A), aVAlektrickeN_2);
-    current_place = 1;
+    current_place = Punk;
 
     if (!hero.has_ticket) {
         GotoXY(1, 0x16);
@@ -2835,26 +2811,25 @@ async function scene_pomi() {
     dialog_case(aPoitiVKafe, -3);
     dialog_case(aPoexatVPunk, -4);
 
-    for (let var_2 = 0; var_2 <= 0xB; ++var_2) {
-
-        if (!jnz(classmates[var_2].place, 2) && !jnz(classmates[var_2].current_subject, -1)) {
-            dialog_case_colored(classmate_names[var_2], var_2, 0xE);
+    for (let i = 0; i <= 0xB; ++i) {
+        if (classmates[i].place === Pomi && classmates[i].current_subject === -1) {
+            dialog_case_colored(classmate_names[i], i, 0xE);
         }
     }
 
     dialog_case_colored(aSMenqXvatit_3, -5, 9);
     show_short_today_timesheet(0x0A);
-    var res = await dialog_run(1, 0x0A);
+    const res = await dialog_run(1, 0x0A);
 
-    if (res == -1) {
-        await sub_16622();
-    } else if (res == -2) {
+    if (res === -1) {
+        await select_professor_pomi();
+    } else if (res === -2) {
         await look_board_pomi();
-    } else if (res == -3) {
-        await sub_1673E();
-    } else if (res == -4) {
-        await sub_16914();
-    } else if (res == -5) {
+    } else if (res === -3) {
+        await pomi_cafe();
+    } else if (res === -4) {
+        await go_pomi_to_punk();
+    } else if (res === -5) {
         await request_exit();
     } else if (!jl(res, 0) && !jg(res, 0x0B)) {
         await talk_with_classmate(res);
@@ -3137,7 +3112,7 @@ async function algebra_in_train() {
 
     hero.health += health_drop;
     if (hero.health <= 0) {
-        is_end = 1;
+        is_end = true;
         death_cause = subjects[current_subject].professor.name + aZamucil;
         if (subjects[current_subject].professor.sex === Female) {
             death_cause += aA;
@@ -3504,10 +3479,10 @@ async function continue_exam() {
     const health_drop = Math.min(Random(hero.stamina) - subjects[current_subject].member0xFC, 0);
 
     hero.health += health_drop;
-    if (jle(hero.health, 0)) {
-        is_end = 1;
+    if (hero.health <= 0) {
+        is_end = true;
         death_cause = subjects[current_subject].professor.name + aZamucil_0;
-        if (!jnz(subjects[current_subject].professor.sex, 0)) {
+        if (subjects[current_subject].professor.sex === Female) {
             death_cause += aA_0;
         }
         death_cause += a__0;
@@ -3555,7 +3530,7 @@ async function scene_exam() {
         return;
     }
 
-    if (jle(hero.health, 0) || !jz(is_end, 0)) {
+    if (hero.health <= 0 || is_end) {
         return;
     }
 
@@ -3569,9 +3544,9 @@ async function scene_exam() {
         writeln(aUVasVseZacteno);
         TextColor(7);
 
-        if (hero.subject[current_subject].passed == 0) {
+        if (!hero.subject[current_subject].passed) {
             hero.subject[current_subject].pass_day = day_of_week;
-            hero.subject[current_subject].passed = 1;
+            hero.subject[current_subject].passed = true;
             --hero.exams_left;
 
             writeln();
@@ -3582,7 +3557,7 @@ async function scene_exam() {
                 return;
             }
 
-            if (!jz(is_end, 0)) {
+            if (is_end) {
                 return;
             }
         }
@@ -3626,24 +3601,20 @@ async function scene_exam() {
         }
 
         for (let i = Kolya; i <= Grisha; ++i) {
-            if (i < 16) {
-                if (classmates_bitset & (1 << i)) {
+            if (classmates_bitset & (1 << i)) {
+                write(classmate_names[i]);
 
-                    write(classmate_names[i]);
+                --classmates_count;
 
-                    --classmates_count;
-
-                    if (!jbe(WhereY(), 0x46)) {
-                        writeln();
-                    }
-
-                    if (!jnz(classmates_count, 0)) {
-                        writeln('.');
-                    } else if (!jnz(classmates_count, 1)) {
-                        write(aI);
-                    } else {
-                        write(asc_18A07);
-                    }
+                if (classmates_count === 0) {
+                    writeln('.');
+                } else if (classmates_count === 1) {
+                    write(aI);
+                } else {
+                    write(asc_18A07);
+                }
+                if (WhereX() > 70) {
+                    writeln();
                 }
             }
         }
@@ -3682,7 +3653,7 @@ async function scene_exam() {
                                     return;
                                 } else {
                                     await check_exams_left_count();
-                                    if (!jz(is_end, 0)) {
+                                    if (is_end) {
                                         return;
                                     } else {
                                         ClrScr();
@@ -3715,15 +3686,13 @@ async function scene_exam() {
     }
 
     dialog_start();
-    if (!jnz(hero.subject[current_subject].passed, 0)) {
+    if (!hero.subject[current_subject].passed) {
         dialog_case(aMucatSqDalSe, -1);
     }
 
     for (let i = 0; i <= 0xB; ++i) {
-        if (i < 0x10) {
-            if (classmates_bitset & (1 << i)) {
-                dialog_case_colored(classmate_names[i], i, 0xE);
-            }
+        if (classmates_bitset & (1 << i)) {
+            dialog_case_colored(classmate_names[i], i, 0xE);
         }
     }
 
@@ -3734,7 +3703,7 @@ async function scene_exam() {
         await continue_exam();
     } else if (ax === -2) {
         current_subject = -1;
-    } else if (!jl(ax, 0) && !jg(ax, 0xB)) {
+    } else if (ax >= 0 && ax <= 0xB) {
         await talk_with_classmate(ax);
     }
 
@@ -3830,12 +3799,7 @@ async function kolya_talk() {
         current_color = 0x0D;
         writeln(aKolqDostaetTor);
         --hero.brain;
-
-        if (hero.brain <= 0) {
-            hero.health = 0;
-            is_end = 1;
-            death_cause = aSpilsq_;
-        }
+        check_brain_dead(aSpilsq_);
 
     } else {
 
@@ -4006,7 +3970,7 @@ async function rai_talk() {
         if (ax === 1) {
             GotoXY(1, 0x0F);
 
-            if (!jbe(Random(hero.subject[current_subject].knowledge), Random(subjects[current_subject].member0xFA))) {
+            if (Random(hero.subject[current_subject].knowledge) > Random(subjects[current_subject].member0xFA)) {
                 TextColor(0x0A);
                 writeln(aTiPomogRai_);
                 ++hero.brain;
@@ -4162,35 +4126,34 @@ async function misha_talk() {
 } // end function 1A70A
 
 
-var aSerj_0 = 'Серж: ';
-var aNaGlotniKefirc = '"На, глотни кефирчику."';
-var aQZnauGdeSrezat = '"Я знаю, где срезать в парке на физ-ре!"';
-var aPomnitsqKogdaT = '"Помнится, когда-то была еще графическая версия mmHeroes..."';
-var aQBilBetaTester = '"Я был бета-тестером первой версии mmHeroes (тогда еще CRWMM19)!"';
-var aKakZdorovoCtoD = '"Как здорово, что Diamond написал новую версию!"';
-var aTiUjePolucilDe = '"Ты уже получил деньги у Паши?"';
-var aPoprobuiDlqNac = '"Попробуй для начала легкие зачеты."';
-var aTiEseNePolucil = '"Ты еще не получил зачет по английскому?"';
-var aXocesOtdixatGd = '"Хочешь отдыхать, где угодно? Заимей деньги!"';
-var aNeVDenGaxScast = '"Не в деньгах счастье. Но они действуют успокаивающе."';
-var aNaVsemirnoveVs = '"На Всемирнове всегда толпа народу."';
-var aVlasenkoDamaVe = '"Влащенко - дама весьма оригинальная."';
-var aInteresnoKogda = '"Интересно, когда будет готова следующая версия?"';
-var aZdorovEVKafePo = '"Здоровье в кафе повышается в зависимости от наличия денег."';
-var aEsliBiQZnalAdr = '"Если бы я знал адрес хорошего proxy..."';
-var aStarVremennoNa = '"STAR временно накрылся. Хорошо бы узнать адрес другого proxy..."';
-var aQPodozrevauCto = '"Я подозреваю, что Гриша знает адресок теркомовского proxy."';
-var aADiamondVseSvo = '"А Diamond все свободное время дописывает свою игрушку!"';
-var aVSleduusemSeme = '"В следующем семестре информатику будет вести Терехов-младший."';
-var aDiamondXocetPe = '"Diamond хочет переписать это все на Java."';
-var aMisaProkonsulT = '"Миша проконсультирует тебя о стратегии."';
-var aPogovoriSDiamo = '"Поговори с Diamond\'ом, он много ценного скажет."';
-var aBorisDoKonca = '"Борись до конца!"';
-var aUDubcovaInogda = '"У Дубцова иногда бывает халява."';
-var aSerjUxoditKuda = 'Серж уходит куда-то по своим делам ...';
-
-
 async function serg_talk() {
+    const aSerj_0 = 'Серж: ';
+    const aNaGlotniKefirc = '"На, глотни кефирчику."';
+    const aQZnauGdeSrezat = '"Я знаю, где срезать в парке на физ-ре!"';
+    const aPomnitsqKogdaT = '"Помнится, когда-то была еще графическая версия mmHeroes..."';
+    const aQBilBetaTester = '"Я был бета-тестером первой версии mmHeroes (тогда еще CRWMM19)!"';
+    const aKakZdorovoCtoD = '"Как здорово, что Diamond написал новую версию!"';
+    const aTiUjePolucilDe = '"Ты уже получил деньги у Паши?"';
+    const aPoprobuiDlqNac = '"Попробуй для начала легкие зачеты."';
+    const aTiEseNePolucil = '"Ты еще не получил зачет по английскому?"';
+    const aXocesOtdixatGd = '"Хочешь отдыхать, где угодно? Заимей деньги!"';
+    const aNeVDenGaxScast = '"Не в деньгах счастье. Но они действуют успокаивающе."';
+    const aNaVsemirnoveVs = '"На Всемирнове всегда толпа народу."';
+    const aVlasenkoDamaVe = '"Влащенко - дама весьма оригинальная."';
+    const aInteresnoKogda = '"Интересно, когда будет готова следующая версия?"';
+    const aZdorovEVKafePo = '"Здоровье в кафе повышается в зависимости от наличия денег."';
+    const aEsliBiQZnalAdr = '"Если бы я знал адрес хорошего proxy..."';
+    const aStarVremennoNa = '"STAR временно накрылся. Хорошо бы узнать адрес другого proxy..."';
+    const aQPodozrevauCto = '"Я подозреваю, что Гриша знает адресок теркомовского proxy."';
+    const aADiamondVseSvo = '"А Diamond все свободное время дописывает свою игрушку!"';
+    const aVSleduusemSeme = '"В следующем семестре информатику будет вести Терехов-младший."';
+    const aDiamondXocetPe = '"Diamond хочет переписать это все на Java."';
+    const aMisaProkonsulT = '"Миша проконсультирует тебя о стратегии."';
+    const aPogovoriSDiamo = '"Поговори с Diamond\'ом, он много ценного скажет."';
+    const aBorisDoKonca = '"Борись до конца!"';
+    const aUDubcovaInogda = '"У Дубцова иногда бывает халява."';
+    const aSerjUxoditKuda = 'Серж уходит куда-то по своим делам ...';
+
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4198,12 +4161,12 @@ async function serg_talk() {
     write(aSerj_0);
     TextColor(0x0F);
 
-    if (!(!ja(Random(hero.charizma), Random(3) + 2)) && !jle(hero.charizma * 2 + 0x14, hero.health)) {
+    if (Random(hero.charizma) > Random(3) + 2 && hero.charizma * 2 + 20 > hero.health) {
 
         writeln(aNaGlotniKefirc);
         hero.health += hero.charizma + Random(hero.charizma);
 
-        if (!jz(current_subject, -1)) {
+        if (current_subject !== -1) {
             if (hero.subject[current_subject].knowledge > 3) {
                 hero.subject[current_subject].knowledge -= Random(3);
             }
@@ -4215,52 +4178,14 @@ async function serg_talk() {
             writeln(aQZnauGdeSrezat);
             hero.subject[Fizra].knowledge += 0x1E;
         } else {
-            var ax = Random(0x16);
-            if (ax == 0) {
-                writeln(aPomnitsqKogdaT);
-            } else if (ax == 1) {
-                writeln(aQBilBetaTester);
-            } else if (ax == 2) {
-                writeln(aKakZdorovoCtoD);
-            } else if (ax == 3) {
-                writeln(aTiUjePolucilDe);
-            } else if (ax == 4) {
-                writeln(aPoprobuiDlqNac);
-            } else if (ax == 5) {
-                writeln(aTiEseNePolucil);
-            } else if (ax == 6) {
-                writeln(aXocesOtdixatGd);
-            } else if (ax == 7) {
-                writeln(aNeVDenGaxScast);
-            } else if (ax == 8) {
-                writeln(aNaVsemirnoveVs);
-            } else if (ax == 9) {
-                writeln(aVlasenkoDamaVe);
-            } else if (ax == 0xA) {
-                writeln(aInteresnoKogda);
-            } else if (ax == 0xB) {
-                writeln(aZdorovEVKafePo);
-            } else if (ax == 0xC) {
-                writeln(aEsliBiQZnalAdr);
-            } else if (ax == 0xD) {
-                writeln(aStarVremennoNa);
-            } else if (ax == 0xE) {
-                writeln(aQPodozrevauCto);
-            } else if (ax == 0xF) {
-                writeln(aADiamondVseSvo);
-            } else if (ax == 0x10) {
-                writeln(aVSleduusemSeme);
-            } else if (ax == 0x11) {
-                writeln(aDiamondXocetPe);
-            } else if (ax == 0x12) {
-                writeln(aMisaProkonsulT);
-            } else if (ax == 0x13) {
-                writeln(aPogovoriSDiamo);
-            } else if (ax == 0x14) {
-                writeln(aBorisDoKonca);
-            } else if (ax == 0x15) {
-                writeln(aUDubcovaInogda);
-            }
+            const phrases = [
+                aPomnitsqKogdaT, aQBilBetaTester, aKakZdorovoCtoD, aTiUjePolucilDe, aPoprobuiDlqNac,
+                aTiEseNePolucil, aXocesOtdixatGd, aNeVDenGaxScast, aNaVsemirnoveVs, aVlasenkoDamaVe,
+                aInteresnoKogda, aZdorovEVKafePo, aEsliBiQZnalAdr, aStarVremennoNa, aQPodozrevauCto,
+                aADiamondVseSvo, aVSleduusemSeme, aDiamondXocetPe, aMisaProkonsulT, aPogovoriSDiamo,
+                aBorisDoKonca, aUDubcovaInogda
+            ];
+            writeln(RandomPhrase(phrases));
         }
 
     }
@@ -4306,9 +4231,9 @@ async function pawa_talk() {
         writeln(aVmesteSAtimOnN);
         ++hero.stamina;
 
-        for (let var_2 = 0; var_2 <= 5; ++var_2) {
-            if (hero.subject[var_2].knowledge > 3) {
-                hero.subject[var_2].knowledge -= Random(3);
+        for (let subj = 0; subj <= 5; ++subj) {
+            if (hero.subject[subj].knowledge > 3) {
+                hero.subject[subj].knowledge -= Random(3);
             }
         }
 
@@ -4330,37 +4255,36 @@ var aOxIzviniKtoToD = '"Ох, извини, кто-то другой уже по
 
 
 async function sasha_talk() {
-    var var_2;
 
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
     TextColor(0x0E);
     writeln(aTiVstretilSasu);
-    dialog_start();
+    GotoXY(1, 9);
+    writeln(aCegoTebeNadoOt);
 
-    for (var_2 = 0; var_2 <= 2; ++var_2) {
-        if (synopsis[var_2].hero_has == 0) {
-            dialog_case(subjects[var_2].title, var_2);
+    dialog_start();
+    for (let subj = 0; subj <= 2; ++subj) {
+        if (synopsis[subj].hero_has == 0) {
+            dialog_case(subjects[subj].title, subj);
         }
     }
 
     dialog_case(aNicegoNeNado, -1);
-    GotoXY(1, 9);
-    writeln(aCegoTebeNadoOt);
-    var_2 = await dialog_run(1, 0x0B);
+    const res = await dialog_run(1, 0x0B);
 
-    if (!jnz(var_2, -1)) {
+    if (res === -1) {
         GotoXY(1, 0x0F);
         writeln(aKakZnaes___);
     } else {
-        if (hero.charizma > Random(0x12) && !jz(synopsis[var_2].sasha_has, 0)) {
+        if (hero.charizma > Random(0x12) && !jz(synopsis[res].sasha_has, 0)) {
             GotoXY(1, 0x0F);
             TextColor(7);
             write(aSasa_1);
             TextColor(0x0F);
             writeln(aDaUMenqSSoboiA);
-            synopsis[var_2].hero_has = 1;
+            synopsis[res].hero_has = 1;
             byte_2549F = 0;
         } else {
             GotoXY(1, 0x0F);
@@ -4368,7 +4292,7 @@ async function sasha_talk() {
             write(aSasa_1);
             TextColor(0x0F);
             writeln(aOxIzviniKtoToD);
-            synopsis[var_2].sasha_has = 0;
+            synopsis[res].sasha_has = 0;
         }
     }
 
@@ -4425,15 +4349,9 @@ async function nil_talk() {
                 writeln(aRub_ZaAto___);
 
                 hero.money += hero.subject[current_subject].knowledge;
-                hero.health -= subjects[current_subject].member0xFC;
-
                 hero.subject[current_subject].knowledge -= subjects[current_subject].member0x100 + Random(subjects[current_subject].member0xFC);
 
-                if (!jg(hero.health, 0)) {
-                    is_end = 1;
-                    death_cause = aAlTruizmNeDove;
-                }
-
+                decrease_health(subjects[current_subject].member0xFC, aAlTruizmNeDove);
                 await hour_pass();
 
             } else {
@@ -4441,12 +4359,8 @@ async function nil_talk() {
                 GotoXY(1, 0x0E);
                 TextColor(0x0D);
                 writeln(aUTebqNicegoNeV);
+                decrease_health(subjects[current_subject].member0xFC, aAlTruizmNeDove);
                 await hour_pass();
-                hero.health -= subjects[current_subject].member0xFC;
-                if (!jg(hero.health, 0)) {
-                    is_end = 1;
-                    death_cause = aAlTruizmNeDove;
-                }
             }
 
         } else if (ax === -2) {
@@ -4461,8 +4375,6 @@ async function nil_talk() {
     TextColor(7);
     ClrScr();
 } // end function 1B986
-
-
 
 
 function kuzmenko_speech() {
@@ -4794,7 +4706,7 @@ async function grisha_talk() {
 
     } else {
 
-        if (hero.charizma > Random(0x14) && !hero.has_inet) {
+        if (hero.charizma > Random(20) && !hero.has_inet) {
             writeln(aKstatiQTutZnau);
             TextColor(7);
             writeln();
@@ -4818,18 +4730,14 @@ async function grisha_talk() {
             writeln();
 
             TextColor(7);
-            if (!jbe(Random(3), 0)) {
+            if (Random(3) > 0) {
                 writeln(aIEsePoPivu___);
                 hero.brain -= Random(2);
-                if (!jg(hero.brain, 0)) {
-                    hero.health = 0;
-                    is_end = 1;
-                    death_cause = aGubitLudeiNePi;
-                }
+                check_brain_dead(aGubitLudeiNePi);
                 hero.charizma += Random(2);
             }
 
-            if (!jnz(Random(3), 0)) {
+            if (Random(3) === 0) {
                 writeln(aIEseOdinCasPro);
                 await hour_pass();
             }
@@ -4864,7 +4772,7 @@ async function talk_with_classmate(classmate) {
         await djug_talk();
     } else if (classmate === Endryu) {
         await andrew_talk();
-    } else if (classmate == Grisha) {
+    } else if (classmate === Grisha) {
         await grisha_talk();
     }
 } // end function 1D6CE
@@ -4940,8 +4848,6 @@ async function week_brain_dream() {
     await ReadKey();
     hero.health = Random(0x0A) + 0xA;
 } // end function 1DA3D
-
-
 
 
 async function zauchilsya_dream() {
@@ -5059,8 +4965,6 @@ async function knows_djug_dream() {
 } // end function 1E37C
 
 
-
-
 async function hero_dream() {
     const aPrevratilsqVOv = 'Превратился в овощ.';
     let dream_scenario = 0;
@@ -5076,7 +4980,7 @@ async function hero_dream() {
     }
 
     if (hero.stamina <= 0) {
-        is_end = 1;
+        is_end = true;
         hero.health = 0;
         death_cause = aPrevratilsqVOv;
     }
@@ -5113,18 +5017,14 @@ async function request_exit() {
 } // end function 1E66B
 
 
-var aVremqVislo_ = 'Время вышло.';
-
-
 async function goto_sleep() {
-    var var_4;
-    var var_2;
+    const aVremqVislo_ = 'Время вышло.';
 
     current_subject = -1;
-    current_place = 4;
+    current_place = Obshaga;
 
-    if (!jle(day_of_week, 5)) {
-        is_end = 1;
+    if (day_of_week > 5) {
+        is_end = true;
         death_cause = aVremqVislo_;
         return;
     }
@@ -5133,16 +5033,16 @@ async function goto_sleep() {
         hero.health = 0x28;
     }
 
-    var_2 = hero.health + 0xF + Random(0x14);
+    let health_addition = hero.health + 0xF + Random(0x14);
 
-    if (var_2 > 0x32) {
-        var_2 = 0x32;
+    if (health_addition > 50) {
+        health_addition = 50;
     }
 
-    var_2 -= hero.health;
-    hero.health += var_2;
-    var_4 = Random(idiv(var_2, 4)) + 7;
-    time_of_day += var_4;
+    health_addition -= hero.health;
+    hero.health += health_addition;
+    let sleep_time = Random(idiv(health_addition, 4)) + 7;
+    time_of_day += sleep_time;
 
     if (time_of_day > 23) {
 
@@ -5150,7 +5050,7 @@ async function goto_sleep() {
         ++day_of_week;
 
         if (day_of_week > 5) {
-            is_end = 1;
+            is_end = true;
             death_cause = aVremqVislo_;
         } else {
             // #warning new code
@@ -5182,14 +5082,9 @@ async function pomi_midnight() {
     TextColor(7);
     writeln(aTiGlqdisNaCasi);
     writeln(aNaPosledneiAle);
-    hero.health -= 4;
+    decrease_health(4, aZasnulVAlektri);
 
-    if (!jge(hero.health, 1)) {
-        is_end = 1;
-        death_cause = aZasnulVAlektri;
-    }
-
-    current_place = 4;
+    current_place = Obshaga;
     current_subject = -1;
     await wait_for_key();
     ClrScr();
@@ -5258,7 +5153,7 @@ async function hour_pass() {
 
     if (hero.charizma <= 0) {
         hero.health = 0;
-        is_end = 1;
+        is_end = true;
         death_cause = aBurnoProgressi;
     }
 
@@ -5277,14 +5172,13 @@ async function hour_pass() {
 } // end function 1EA4F
 
 
-var aNuMojetNeNadoT = 'Ну, может не надо так резко...';
-var aTiCtoSerEznoXo = 'Ты что, серьезно хочешь закончить игру?';
-var aNetNeXocu = 'Нет, не хочу!';
-var aQJeSkazalSMenq = 'Я же сказал: с меня хватит!';
-var aViselSam_ = 'Вышел сам.';
-
-
 async function prompt_exit() {
+    const aNuMojetNeNadoT = 'Ну, может не надо так резко...';
+    const aTiCtoSerEznoXo = 'Ты что, серьезно хочешь закончить игру?';
+    const aNetNeXocu = 'Нет, не хочу!';
+    const aQJeSkazalSMenq = 'Я же сказал: с меня хватит!';
+    const aViselSam_ = 'Вышел сам.';
+
     ClrScr();
     writeln(aNuMojetNeNadoT);
     writeln(aTiCtoSerEznoXo);
@@ -5293,7 +5187,7 @@ async function prompt_exit() {
     dialog_case(aQJeSkazalSMenq, -2);
     const ax = await dialog_run(1, 4);
     if (ax === -2) {
-        is_end = 1;
+        is_end = true;
         death_cause = aViselSam_;
     }
     ClrScr();
@@ -5377,17 +5271,12 @@ function init_diamond(/*arg_0*/) {
 
     classmates[Diamond].current_subject = -1;
 
-    const bp_var_2 = [0, 0];
     for (let subj = 5; subj >= 0; --subj) {
 
         if (is_professor_here_today(subj)) {
-
-            if (bp_var_2[1] == 0) {
-
-                if (!jbe(Random(0x0A), 5)) {
-                    classmates[Diamond].place = timesheet[day_of_week][subj].where;
-                    classmates[Diamond].current_subject = subj;
-                }
+            if (Random(0x0A) > 5) {
+                classmates[Diamond].place = timesheet[day_of_week][subj].where;
+                classmates[Diamond].current_subject = subj;
             }
         }
     }
@@ -5428,7 +5317,7 @@ function init_classmate_place_by_subj(student, subjTo, exclude) {
                     continue;
                 }
                 some_professor_here = true;
-                if (!jbe(Random(0x0A), 5)) {
+                if (Random(0x0A) > 5) {
                     go_to_exam = true;
                     classmates[student].place = timesheet[day_of_week][subj].where;
                     classmates[student].current_subject = subj;
@@ -5453,23 +5342,6 @@ function init_misha(/*arg_0*/) {
 } // end function 1EE2C
 
 
-function init_classmate_place_3(student, subjTo) {
-    const bp_var_2 = [0, 0];
-    do {
-        for (let subj = subjTo; subj >= Algebra; --subj) {
-
-            if (is_professor_here_today(subj)) {
-                bp_var_2[0] = 1;
-                if (!jbe(Random(0x0A), 5)) {
-                    bp_var_2[1] = 1;
-                    classmates[student].place = timesheet[day_of_week][subj].where;
-                    classmates[student].current_subject = subj;
-                }
-            }
-        }
-    } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
-}
-
 function init_serg(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 0|1]
 
@@ -5481,8 +5353,6 @@ function init_serg(/*arg_0*/) {
 
     classmates[Serzg].current_subject = -1;
     init_classmate_place_by_subj(Serzg, Fizra);
-    console.log("Serg place", classmates[Serzg].place, classmates[Serzg].current_subject);
-
 } // end function 1EECC
 
 
@@ -5527,13 +5397,13 @@ function init_djug() {
 
 function init_andrew() {
     classmates[Endryu].place = Punk;
-    classmates[Endryu].current_subject = 1;
+    classmates[Endryu].current_subject = Matan;
 
-    for (let var_2 = 0; var_2 <= 2; ++var_2) {
-        if (is_professor_here_today(var_2)) {
-            if (!jbe(Random(0x0A), 5)) {
-                classmates[Endryu].place = timesheet[day_of_week][var_2].where;
-                classmates[Endryu].current_subject = var_2;
+    for (let subj = Algebra; subj <= GiT; ++subj) {
+        if (is_professor_here_today(subj)) {
+            if (Random(0x0A) > 5) {
+                classmates[Endryu].place = timesheet[day_of_week][subj].where;
+                classmates[Endryu].current_subject = subj;
             }
         }
     }
@@ -5571,7 +5441,7 @@ function init_classmates() {
 
 function declOfNum(number, titles) {
     const cases = [2, 0, 1, 1, 1, 2];
-    return titles[ (number%100>4 && number%100<20)? 2 : cases[(number%10<5)?number%10:5] ];
+    return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
 }
 
 
@@ -5752,8 +5622,6 @@ function show_header_stats() {
 } // end function 1F685
 
 
-
-
 function show_timesheet_day(day_color, day, subj) {
     const asc_1FD4D = '██████';
     TextColor(hero.subject[subj].passed ? 1 : day_color);
@@ -5812,7 +5680,7 @@ function show_timesheet() {
     }
 
     for (let subj = 0; subj <= 5; ++subj) {
-        if (hero.subject[subj].passed == 0) {
+        if (!hero.subject[subj].passed) {
             if (subjects[subj].tasks > hero.subject[subj].tasks_done) {
                 TextColor(7);
                 GotoXY(0x46, subj * 3 + 2);
@@ -5942,19 +5810,18 @@ function inception_reinit_timesheet() {
 } // end function 204C8
 
 
-var aViberiNacalNie = 'Выбери начальные параметры своего "героя":';
-var aSlucainiiStude = 'Случайный студент';
-var aSibkoUmnii = 'Шибко умный';
-var aSibkoNaglii = 'Шибко наглый';
-var aSibkoObsitelNi = 'Шибко общительный';
-var aGodRejim = 'GOD-режим';
-
-
 async function init_hero_interactive() {
+    const aViberiNacalNie = 'Выбери начальные параметры своего "героя":';
+    const aSlucainiiStude = 'Случайный студент';
+    const aSibkoUmnii = 'Шибко умный';
+    const aSibkoNaglii = 'Шибко наглый';
+    const aSibkoObsitelNi = 'Шибко общительный';
+    const aGodRejim = 'GOD-режим';
+
     ClrScr();
+    writeln(aViberiNacalNie);
 
     dialog_start();
-    writeln(aViberiNacalNie);
     dialog_case(aSlucainiiStude, -1);
     dialog_case(aSibkoUmnii, -2);
     dialog_case(aSibkoNaglii, -3);
@@ -6031,7 +5898,7 @@ async function init_hero() {
 
     hero.exams_left = 6;
     hero.has_ticket = 0;
-    is_end = 0;
+    is_end = false;
     death_cause = 0;
     klimov_timesheet_was_modified = 0;
     hero.is_invited = 0;
@@ -6043,10 +5910,8 @@ async function init_hero() {
 } // end function 206E4
 
 
-var aBad_cred_count = 'bad_cred_count';
-
-
 async function check_exams_left_count() {
+    const aBad_cred_count = 'bad_cred_count';
     let exams_left = 6;
     for (let i = 0; i < 6; ++i) {
         if (hero.subject[i].passed) {
@@ -6065,7 +5930,7 @@ function init_knowledge_synopsis_classmate() {
             tasks_done: 0,
             pass_day: -1,
             knowledge: Random(hero.brain),
-            passed: 0
+            passed: false
         };
     }
 
@@ -6088,11 +5953,9 @@ async function init_game() {
 } // end function 20889
 
 
-var aNajmiLubuuKlav = 'Нажми любую клавишу ...';
-
-
 async function wait_for_key() {
-    GotoXY(1, 0x18);
+    const aNajmiLubuuKlav = 'Нажми любую клавишу ...';
+    GotoXY(1, 24);
     current_color = 0x0E;
     write(aNajmiLubuuKlav);
     current_color = 7;
@@ -6102,18 +5965,17 @@ async function wait_for_key() {
 } // end function 208B8
 
 
-var aVProgrammeBuga = 'В программе буга! Код : ';
-var aSrocnoObratite = 'Срочно обратитесь к разработчику ;)';
-var aRazdavlenBezja = 'Раздавлен безжалостной ошибкой в программе.';
-
-
 async function bug_report(bug_str) {
+    const aVProgrammeBuga = 'В программе буга! Код : ';
+    const aSrocnoObratite = 'Срочно обратитесь к разработчику ;)';
+    const aRazdavlenBezja = 'Раздавлен безжалостной ошибкой в программе.';
+
     ClrScr();
     current_color = 0x8F;
     write(aVProgrammeBuga);
     writeln(bug_str);
     writeln(aSrocnoObratite);
-    is_end = 1;
+    is_end = true;
     hero.health = -100;
     death_cause = aRazdavlenBezja;
     await wait_for_key();
@@ -6129,10 +5991,19 @@ function decrease_health(num, death_str) {
     hero.health -= num;
 
     if (hero.health <= 0) {
-        is_end = 1;
+        hero.health = 0;
+        is_end = true;
         death_cause = death_str;
     }
 } // end function 20A10
+
+function check_brain_dead(death_str) {
+    if (hero.brain <= 0) {
+        hero.health = 0;
+        is_end = true;
+        death_cause = death_str;
+    }
+}
 
 
 function dialog_start() {
@@ -6159,7 +6030,6 @@ function dialog_show(x, y) {
     }
     current_color = 7;
 } // end function 20B20
-
 
 
 Main();
