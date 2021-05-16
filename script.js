@@ -58,7 +58,7 @@ var synopsis = [];
 [i * 2 + 0x550] // subject_knowledges
 [i + 0x53E] // byte exam_passed [6]
 */
-var hero = {
+const hero = {
     subject: [],
     garlic: 0, // 25498
     has_mmheroes_disk: false, // 2549B
@@ -270,27 +270,14 @@ function alyarme(str) {
 }
 
 function get_stack() {
-    try {
-        throw Error();
-    } catch (e) {
-        return e.stack;
-    }
-}
-
-function get_stack_before(func) {
-    var s = get_stack().split('\n');
-    //console.dir(s);
-    for (let i = s.length - 1; i >= 0; --i) {
-        if (s[i].indexOf(func) != -1) {
-            return s[i + 1];
-        }
-    }
+    const err = new Error();
+    return err.stack;
 }
 
 
-var first_run = true;
+let first_run = true;
 
-var Replay = {
+const Replay = {
 
     data: {
         on: 0,
@@ -325,13 +312,6 @@ var Replay = {
     },
     wait_dialog: function (arg) {
         this.data.wait_for_dialog = arg;
-    },
-
-    next_string: function () {
-        return this.data.strs[this.data.strs_i++];
-    },
-    record_string: function (res) {
-        this.data.strs.push(res);
     },
 
     keys_remains: function () {
@@ -575,27 +555,6 @@ function GotoXY(x, y) {
     PositionC = x - 1;
 }
 
-
-function Assign(f, file) {
-}
-
-function Reset(f, mode) {
-}
-
-function Rewrite(f, mode) {
-}
-
-function IOResult() {
-    return 1;
-}
-
-function Read(f) {
-}
-
-function Close(f) {
-}
-
-
 function Sqrt(x) {
     return Math.sqrt(x);
 }
@@ -629,10 +588,6 @@ function jg(a, b) {
     return a > b;
 }
 
-function jge(a, b) {
-    return a >= b;
-}
-
 function ja(a, b) {
     return a > b;
 }
@@ -658,7 +613,7 @@ async function prompt_for_new_game() {
 }
 
 
-var a3decHappyBirth = '-3dec-happy-birthday-Diamond';
+const a3decHappyBirth = '-3dec-happy-birthday-Diamond';
 
 
 async function PROGRAM() {
@@ -1624,7 +1579,8 @@ var aNuIZrq = '"Ну и зря!"';
 
 async function invite_from_neighbor() {
     write(aKTebeLomitsqSo);
-    writeln([aNaSvoiDenRojde, aNaDiskotekuVSa, aPoigratVMafiu_, aPoQuakat_][Random(4)]);
+    const phrases = [aNaSvoiDenRojde, aNaDiskotekuVSa, aPoigratVMafiu_, aPoQuakat_];
+    writeln(RandomPhrase(phrases));
 
     dialog_start();
     dialog_case(aUguQSeicas, -1);
@@ -2762,9 +2718,9 @@ async function go_pomi_to_punk() {
         dialog_start();
         dialog_case(aDaBudem, -1);
         dialog_case(aNetNeBudem, -2);
-        var ax = await dialog_run(1, 0x0A);
+        const ax = await dialog_run(1, 0x0A);
 
-        if (!jnz(ax, -1)) {
+        if (ax === -1) {
             hero.money -= 5
             hero.has_ticket = 1;
         }
@@ -2913,7 +2869,7 @@ async function update_top_gamers(score) {
 } // end function 16D8E
 
 
-var aMmheroes_hi_0 = 'mmheroes.hi';
+const aMmheroes_hi_0 = 'mmheroes.hi';
 
 
 function write_top_gamers() {
@@ -3199,9 +3155,9 @@ async function go_to_train() {
         dialog_start();
         dialog_case(aExatZaicem_2, -1);
         dialog_case(aCestnoZaplat_2, -2);
-        var ax = await dialog_run(1, 0x11);
+        const ax = await dialog_run(1, 0x11);
 
-        if (ax == -1) {
+        if (ax === -1) {
             hero.has_ticket = 0;
 
             if (hero.charizma < Random(0x0A)) {
@@ -3213,7 +3169,7 @@ async function go_to_train() {
                 await wait_for_key();
                 ClrScr();
             }
-        } else if (ax == -2) {
+        } else if (ax === -2) {
             hero.money -= -0xA;
             hero.has_ticket = 1;
         }
@@ -3224,13 +3180,12 @@ async function go_to_train() {
 } // end function 17AA2
 
 
-var aVseminovM_a_Ux = 'Всеминов М.А. уходит.';
-var aPoitiZaNimNaAl = 'Пойти за ним на электричку?';
-var aDaQXocuEsePomu = 'Да, я хочу еще помучаться';
-var aNuUjNetSpasibo = 'Ну уж нет, спасибо!';
-
-
 async function algebra_ends() {
+    const aVseminovM_a_Ux = 'Всеминов М.А. уходит.';
+    const aPoitiZaNimNaAl = 'Пойти за ним на электричку?';
+    const aDaQXocuEsePomu = 'Да, я хочу еще помучаться';
+    const aNuUjNetSpasibo = 'Ну уж нет, спасибо!';
+    
     ClrScr();
     show_header_stats();
     TextColor(0x0C);
@@ -3664,15 +3619,15 @@ async function scene_exam() {
                 }
             }
         }
-    } while (jnz(Random(2), 0));
+    } while (Random(2) === 0);
 
 
     GotoXY(1, 7);
 
-    if (!jnz(hero.subject[current_subject].tasks_done, 0)) {
+    if (hero.subject[current_subject].tasks_done === 0) {
         colored_output_ln(7, aUTebqEseNicego);
     } else {
-        if (!jge(hero.subject[current_subject].tasks_done, subjects[current_subject].tasks)) {
+        if (hero.subject[current_subject].tasks_done < subjects[current_subject].tasks) {
             colored_output(7, aZacteno);
             colored_output_white(hero.subject[current_subject].tasks_done);
             colored_output(7, aZadacIz);
@@ -3757,21 +3712,21 @@ async function bothers(student) {
 } // end function 18FB2
 
 
-var aKolqSmotritNaT = 'Коля смотрит на тебя немного окосевшими глазами.';
-var aUTebqOstalisNe = '"У тебя остались нерешенные задачи по Всемирнову? Давай сюда!"';
-var aKolqResilTebeE = 'Коля решил тебе еще ';
-var aZadaciPoAlgebr = ' задачи по алгебре!';
-var aZnaesPivoKonec = '"Знаешь, пиво, конечно, хорошо, но настойка овса - лучше!"';
-var aZakazatKoleNas = 'Заказать Коле настойку овса?';
-var aDa = 'Да';
-var aNet = 'Нет';
-var aTvoiAlTruizmNa = 'Твой альтруизм навсегда останется в памяти потомков.';
-var aZrqOiZrq___ = '"Зря, ой, зря ..."';
-var aKolqDostaetTor = 'Коля достает тормозную жидкость, и вы распиваете еще по стакану.';
-var aSpilsq_ = 'Спился.';
-
-
 async function kolya_talk() {
+    const aKolqSmotritNaT = 'Коля смотрит на тебя немного окосевшими глазами.';
+    const aUTebqOstalisNe = '"У тебя остались нерешенные задачи по Всемирнову? Давай сюда!"';
+    const aKolqResilTebeE = 'Коля решил тебе еще ';
+    const aZadaciPoAlgebr = ' задачи по алгебре!';
+    const aZnaesPivoKonec = '"Знаешь, пиво, конечно, хорошо, но настойка овса - лучше!"';
+    const aZakazatKoleNas = 'Заказать Коле настойку овса?';
+    const aDa = 'Да';
+    const aNet = 'Нет';
+    const aTvoiAlTruizmNa = 'Твой альтруизм навсегда останется в памяти потомков.';
+    const aZrqOiZrq___ = '"Зря, ой, зря ..."';
+    const aKolqDostaetTor = 'Коля достает тормозную жидкость, и вы распиваете еще по стакану.';
+    const aSpilsq_ = 'Спился.';
+    
+    
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -3917,7 +3872,14 @@ async function diamond_dialog() {
     }
 
     current_color = 0x0F;
-    writeln([aKolqPomojetSAl, aMisaRasskajetV, aPasaTvoiStaros, aSDjugomLucseNe, aRaiNeOtstanetL, aKolqVseVremqSi, aSlediZaSvoimZd, aEsliVstretisSa, aEsliPloxoDumae, aIdqKKoleBudUve, aPolucaqZacetPo, aInogdaRazgovor, aAndruMojetPomo, aKuzMenkoInogda, aNeSpesiSlatGne + '\n' + aZaglqniNaMmher + '\n' + aMojetBitVseUje, aSerjTojeInogda, aNePereuciTopol, aMojesUstroitSq, aGrisaRabotaetV, aVTerkomeMojnoZ, aGrisaInogdaBiv, aNeNravitsqRasp, aNilDaetDenGiZa, aCestnoNeZnauKo, aSrocnoNujniNov, aPojelaniqIdeiB, aVstretisKostuB, aBolSoeSpasiboV][Random(0x1C)]);
+    const phrases = [
+        aKolqPomojetSAl, aMisaRasskajetV, aPasaTvoiStaros, aSDjugomLucseNe, aRaiNeOtstanetL,
+        aKolqVseVremqSi, aSlediZaSvoimZd, aEsliVstretisSa, aEsliPloxoDumae, aIdqKKoleBudUve,
+        aPolucaqZacetPo, aInogdaRazgovor, aAndruMojetPomo, aKuzMenkoInogda, aNeSpesiSlatGne + '\n' + aZaglqniNaMmher + '\n' + aMojetBitVseUje,
+        aSerjTojeInogda, aNePereuciTopol, aMojesUstroitSq, aGrisaRabotaetV, aVTerkomeMojnoZ,
+        aGrisaInogdaBiv, aNeNravitsqRasp, aNilDaetDenGiZa, aCestnoNeZnauKo, aSrocnoNujniNov,
+        aPojelaniqIdeiB, aVstretisKostuB, aBolSoeSpasiboV];
+    writeln(RandomPhrase(phrases));
     current_color = 7;
 
     if (current_subject === -1) {
@@ -3932,20 +3894,19 @@ async function diamond_dialog() {
 } // end function 19B20
 
 
-var aRai_0 = 'RAI:';
-var aTiMnePomojes = '"Ты мне поможешь?"';
-var aDaKonecno = '"Да, конечно"';
-var aNetIzvini___ = '"Нет, извини..."';
-var aTiPomogRai_ = 'Ты помог RAI.';
-var aNicegoNeVislo_ = 'Ничего не вышло.';
-var aAxTakPolucaiPo = '"Ах, так! Получай! Получай!"';
-var aRaiDelaetTebeB = 'RAI делает тебе больно ...';
-var aRaiZamocil_ = 'RAI замочил.';
-var aRaiNeReagiruet = 'RAI не реагирует на твои позывы.';
-
-
 async function rai_talk() {
-    if (current_subject >= 3 || current_subject == -1) {
+    const aRai_0 = 'RAI:';
+    const aTiMnePomojes = '"Ты мне поможешь?"';
+    const aDaKonecno = '"Да, конечно"';
+    const aNetIzvini___ = '"Нет, извини..."';
+    const aTiPomogRai_ = 'Ты помог RAI.';
+    const aNicegoNeVislo_ = 'Ничего не вышло.';
+    const aAxTakPolucaiPo = '"Ах, так! Получай! Получай!"';
+    const aRaiDelaetTebeB = 'RAI делает тебе больно ...';
+    const aRaiZamocil_ = 'RAI замочил.';
+    const aRaiNeReagiruet = 'RAI не реагирует на твои позывы.';
+
+    if (current_subject >= 3 || current_subject === -1) {
         ClrScr();
         show_header_stats();
         GotoXY(1, 8);
@@ -4027,7 +3988,7 @@ async function misha_talk() {
     const aOtLubogoObseni = '"От любого общения с NiL ты тупеешь!"';
     const aGrisaMojetPomo = '"Гриша может помочь с трудоустройством."';
     const aPeremeseniqStu = '"Перемещения студентов предсказуемы."';
-    
+
     ClrScr();
     show_header_stats();
 
@@ -4524,14 +4485,15 @@ function andrew_speech(subject) {
 
     if (Random(3) > 0) {
 
-        writeln([
+        const phrases = [
             aSkajiDiamondUC, aAEseDiamondDum, aAQZnauViigrisn, aVoobseToVseAto,
             aQVidelNadpisNa, aZaglqniNaMmh_0, aTolKoNePredlag, aNuKogdaJeBudet,
             aVmwareSuxx___N, aPoxojeCtoMoqSt, aUxTiGamma3_14V, aMojetBitDiamon,
             aGovorqtMojnoZa, aVotInogdaMnePr, aXorosoLiCtoMno, aPomogiteMneXoc,
             aACto, aEsliOnoCvetaBo, aVsexSDnemMatMe, aPridumaiSvouFr,
             a120kIsxodnikov, a120kVesMaKrivi
-        ][Random(0x16)]);
+        ];
+        writeln(RandomPhrase(phrases));
 
     } else {
         if (subject === -1) {
@@ -4780,65 +4742,40 @@ async function talk_with_classmate(classmate) {
 } // end function 1D6CE
 
 
-var aRozovieSloniki = 'Розовые слоники с блестящими крылышками';
-var aZelenieCelovec = 'Зеленые человечки с длинными антеннами';
-var aOveckiSOslepit = 'Овечки с ослепительно-белой шерстью';
-var aSidqtSOkosevsi = 'сидят с окосевшими глазами в Мавзолее';
-var aIScitautOprede = 'и считают определитель матрицы 10 на 10';
-var aIIsutJordanovu = 'и ищут Жорданову форму матрицы';
-var aIVozvodqtMatri = 'и возводят матрицы в 239-ю степень';
-var aIResautLineinu = 'и решают линейную систему уравнений с параметрами';
-var aIDokazivautNep = 'и доказывают неприводимость многочлена 10-й степени над Z';
-var aIDokazivautSxo = 'и доказывают сходимость неопределенного интеграла с параметрами';
-var aIScitautSummuR = 'и считают сумму ряда с параметрами';
-var aIDifferenciruu = 'и дифференцируют, дифференцируют, дифференцируют';
-var aIBerutIntergal = 'и берут интергалы не отдают их';
-var aIResautZadaciP = 'и решают задачи по математической болтологии';
-var a____7 = '...';
-var aGospodiNuIPris = 'Господи! Ну и присниться же такое!';
-var aZaToTeperTiToc = 'За то теперь ты точно знаешь,';
-var aCtoSnitsqStude = 'что снится студентам-математикам,';
-var aKogdaOniVneKon = 'когда они вне кондиции';
-
-
 async function week_brain_dream() {
+    const aRozovieSloniki = 'Розовые слоники с блестящими крылышками';
+    const aZelenieCelovec = 'Зеленые человечки с длинными антеннами';
+    const aOveckiSOslepit = 'Овечки с ослепительно-белой шерстью';
+    const aSidqtSOkosevsi = 'сидят с окосевшими глазами в Мавзолее';
+    const aIScitautOprede = 'и считают определитель матрицы 10 на 10';
+    const aIIsutJordanovu = 'и ищут Жорданову форму матрицы';
+    const aIVozvodqtMatri = 'и возводят матрицы в 239-ю степень';
+    const aIResautLineinu = 'и решают линейную систему уравнений с параметрами';
+    const aIDokazivautNep = 'и доказывают неприводимость многочлена 10-й степени над Z';
+    const aIDokazivautSxo = 'и доказывают сходимость неопределенного интеграла с параметрами';
+    const aIScitautSummuR = 'и считают сумму ряда с параметрами';
+    const aIDifferenciruu = 'и дифференцируют, дифференцируют, дифференцируют';
+    const aIBerutIntergal = 'и берут интергалы не отдают их';
+    const aIResautZadaciP = 'и решают задачи по математической болтологии';
+    const a____7 = '...';
+    const aGospodiNuIPris = 'Господи! Ну и присниться же такое!';
+    const aZaToTeperTiToc = 'За то теперь ты точно знаешь,';
+    const aCtoSnitsqStude = 'что снится студентам-математикам,';
+    const aKogdaOniVneKon = 'когда они вне кондиции';
+
     ClrScr();
     TextColor(0x0D);
 
-    const res = Random(3);
-    if (res === 0) {
-        writeln(aRozovieSloniki);
-    } else if (res === 1) {
-        writeln(aZelenieCelovec);
-    } else if (res === 2) {
-        writeln(aOveckiSOslepit);
-    }
+    const who = [aRozovieSloniki, aZelenieCelovec, aOveckiSOslepit];
+    writeln(RandomPhrase(who));
 
     writeln(aSidqtSOkosevsi);
 
-    const ax = Random(0x0A);
-    if (ax == 0) {
-        writeln(aIScitautOprede);
-    } else if (ax == 1) {
-        writeln(aIIsutJordanovu);
-    } else if (ax == 2) {
-        writeln(aIVozvodqtMatri);
-    } else if (ax == 3) {
-        writeln(aIResautLineinu);
-    } else if (ax == 4) {
-        writeln(aIDokazivautNep);
-    } else if (ax == 5) {
-        writeln(aIDokazivautSxo);
-    } else if (ax == 6) {
-        writeln(aIScitautSummuR);
-    } else if (ax == 7) {
-        writeln(aIDifferenciruu);
-    } else if (ax == 8) {
-        writeln(aIBerutIntergal);
-    } else if (ax == 9) {
-        writeln(aIResautZadaciP);
-    }
-
+    const doing = [
+        aIScitautOprede, aIIsutJordanovu, aIVozvodqtMatri, aIResautLineinu, aIDokazivautNep,
+        aIDokazivautSxo, aIScitautSummuR, aIDifferenciruu, aIBerutIntergal, aIResautZadaciP
+    ];
+    writeln(RandomPhrase(doing));
     writeln(a____7);
     await ReadKey();
     writeln();
@@ -5482,10 +5419,8 @@ function output_with_highlighted_num(color, before, color_hi, number, after) {
 } // end function 1F2AC
 
 
-function colored_output_white(number) {
-    current_color = 0x0F;
-    write(number);
-    current_color = 7;
+function colored_output_white(str) {
+    colored_output(0x0F, str);
 } // end function 1F335
 
 
@@ -5554,9 +5489,9 @@ function show_header_stats() {
     colored_output(health_col[health_i], health_str[health_i]);
 
 
-    var knowledge_line = [6, 13, 21, 31];
-    var knowledge_col = [3, 7, 0xF, 0xA, 0xE];
-    var knowledge_subj_line = [
+    const knowledge_line = [6, 13, 21, 31];
+    const knowledge_col = [3, 7, 0xF, 0xA, 0xE];
+    const knowledge_subj_line = [
         [0xB, 0x15, 0x33],
         [9, 0x13, 0x29],
         [6, 0xB, 0x1F],
@@ -5564,20 +5499,20 @@ function show_header_stats() {
         [5, 9, 0x10],
         [5, 9, 0x10]
     ];
-    var knowledge_subj_str = [aPloxo, aUdovl_, aXoroso, aOtlicno];
-    var knowledge_subj_col = [3, 7, 0xF, 0xE];
+    const knowledge_subj_str = [aPloxo, aUdovl_, aXoroso, aOtlicno];
+    const knowledge_subj_col = [3, 7, 0xF, 0xE];
 
     for (let subj = 0; subj <= 5; ++subj) {
         GotoXY(0x2D, subj + 1);
         colored_output(0xB, subjects[subj].title);
 
         GotoXY(0x43, subj + 1);
-        var ax = hero.subject[subj].knowledge;
+        const ax = hero.subject[subj].knowledge;
         current_color = knowledge_col[_upper_bound(knowledge_line, ax)];
         write(hero.subject[subj].knowledge);
 
         GotoXY(0x47, subj + 1);
-        var k_i = _upper_bound(knowledge_subj_line[subj], ax);
+        const k_i = _upper_bound(knowledge_subj_line[subj], ax);
         colored_output(knowledge_subj_col[k_i], knowledge_subj_str[k_i]);
 
         current_color = 7;
@@ -5601,10 +5536,10 @@ function show_header_stats() {
 
 
     GotoXY(1, 4);
-    var brain_line = [0, 1, 2, 3, 4, 5, 6, 0x65];
-    var brain_str = [aKliniceskaqSme, aGolovaProstoNi, aDumatPraktices, aDumatTrudno, aGolovaPoctiVNo, aGolovaVNorme, aGolovaSvejaq, aLegkostVMislqx, aObratitesKRazr];
-    var brain_col = [5, 5, 0xC, 0xC, 0xE, 0xE, 0xA, 0xA, 0xB];
-    var brain_i = _upper_bound(brain_line, hero.brain);
+    const brain_line = [0, 1, 2, 3, 4, 5, 6, 0x65];
+    const brain_str = [aKliniceskaqSme, aGolovaProstoNi, aDumatPraktices, aDumatTrudno, aGolovaPoctiVNo, aGolovaVNorme, aGolovaSvejaq, aLegkostVMislqx, aObratitesKRazr];
+    const brain_col = [5, 5, 0xC, 0xC, 0xE, 0xE, 0xA, 0xA, 0xB];
+    const brain_i = _upper_bound(brain_line, hero.brain);
     colored_output(brain_col[brain_i], brain_str[brain_i]);
 
 
