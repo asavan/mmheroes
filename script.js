@@ -47,7 +47,7 @@ var subjects = [];
 */
 var timesheet = [];
 /*
-{sasha_has: 1, hero_has: 0} [3]
+{sasha_has: true, hero_has: false} [3]
 [i + 0x52E] // is_sasha_has_synopsis
 [i + 0x55C] // synopsis_presences
 */
@@ -63,7 +63,7 @@ var hero = {
     garlic: 0, // 25498
     has_mmheroes_disk: false, // 2549B
     has_inet: false, // 2549E
-    is_invited: 0, // 25496
+    is_invited: false, // 25496
     inception: 0, // 254A0
     is_working_in_terkom: false,
     got_stipend: false,
@@ -155,7 +155,7 @@ function _init_vars() {
 
     synopsis = [];
     for (let i = 0; i < 3; ++i) {
-        synopsis.push({sasha_has: 1, hero_has: 0});
+        synopsis.push({sasha_has: true, hero_has: false});
     }
 
     hero.subject = [];
@@ -1693,7 +1693,7 @@ async function scene_obschaga() {
         await goto_sleep();
         return;
     } else if (time_of_day > 17 && Random(0x0A) < 3 && !hero.is_invited) {
-        hero.is_invited = 1;
+        hero.is_invited = true;
         await invite_from_neighbor();
         return;
     }
@@ -2657,8 +2657,6 @@ async function pomi_intro(subj) {
         await git_pomi_intro();
     }
 } // end function 165D9
-
-
 
 
 async function select_professor_pomi() {
@@ -3995,42 +3993,41 @@ async function rai_talk() {
 } // end function 1A0A2
 
 
-var aMisa_0 = 'Миша : ';
-var aSlusaiXvatitMu = '"Слушай, хватит мучаться! Прервись!';
-var aDavaiVKlopodav = 'Давай в клоподавку сыграем!"';
-var aDavai = '"Давай!"';
-var aNetNeBuduQVKlo = '"Нет, не буду я в клоподавку ..."';
-var aTiSigralSMisei = 'Ты сыграл с Мишей партию в клоподавку.';
-var aZrqOcenZrq = '"Зря, очень зря!"';
-var aSlusaiAVedVTer = '"Слушай, а ведь в ТЕРКОМе есть столик для тенниса. Сыграем?"';
-var aObqzatelNo = '"Обязательно!"';
-var aIzviniPotom_ = '"Извини, потом."';
-var aTiSigralSMis_0 = 'Ты сыграл с Мишей в теннис.';
-var aZagonqlTebqMis = 'Загонял тебя Миша.';
-var aNicegoQNaTebqN = '"Ничего, я на тебя не в обиде."';
-var aMisa_1 = 'Миша:';
-var aAxJalNegdeSigr = '"Эх, жаль, негде сыграть в клоподавку!"';
-var aVsegdaSlediZaZ = '"Всегда следи за здоровьем!"';
-var aMozgiVliqutNaP = '"Мозги влияют на подготовку и сдачу зачетов."';
-var aCemBolSeVinosl = '"Чем больше выносливость, тем меньше здоровья ты тратишь."';
-var aCemBolSeTvoqXa = '"Чем больше твоя харизма, тем лучше у тебя отношения с людьми."';
-var aVajnostKonkret = '"Важность конкретного качества сильно зависит от стиля игры."';
-var aXarizmaPomogae = '"Харизма помогает получить что угодно от кого угодно."';
-var aCemBolSeXarizm = '"Чем больше харизма, тем чаще к тебе пристают."';
-var aCemMenSeVinosl = '"Чем меньше выносливость, тем больнее учиться."';
-var aCemBolSeMozgiT = '"Чем больше мозги, тем легче готовиться."';
-var aSidenieVInetEI = '"Сидение в Inet\'e иногда развивает мозги."';
-var aEsliTebeNadoel = '"Если тебе надоело умирать - попробуй другую стратегию."';
-var aXocesXalqviNab = '"Хочешь халявы - набирай харизму."';
-var aXocesDobitSqVs = '"Хочешь добиться всего сам - развивай мозги."';
-var aVMavzoleeVajno = '"В "Мавзолее" важно знать меру..."';
-var aOtRazdvoeniqLi = '"От раздвоения личности спасают харизма и выносливость."';
-var aOtLubogoObseni = '"От любого общения с NiL ты тупеешь!"';
-var aGrisaMojetPomo = '"Гриша может помочь с трудоустройством."';
-var aPeremeseniqStu = '"Перемещения студентов предсказуемы."';
-
-
 async function misha_talk() {
+    const aMisa_0 = 'Миша : ';
+    const aSlusaiXvatitMu = '"Слушай, хватит мучаться! Прервись!';
+    const aDavaiVKlopodav = 'Давай в клоподавку сыграем!"';
+    const aDavai = '"Давай!"';
+    const aNetNeBuduQVKlo = '"Нет, не буду я в клоподавку ..."';
+    const aTiSigralSMisei = 'Ты сыграл с Мишей партию в клоподавку.';
+    const aZrqOcenZrq = '"Зря, очень зря!"';
+    const aSlusaiAVedVTer = '"Слушай, а ведь в ТЕРКОМе есть столик для тенниса. Сыграем?"';
+    const aObqzatelNo = '"Обязательно!"';
+    const aIzviniPotom_ = '"Извини, потом."';
+    const aTiSigralSMis_0 = 'Ты сыграл с Мишей в теннис.';
+    const aZagonqlTebqMis = 'Загонял тебя Миша.';
+    const aNicegoQNaTebqN = '"Ничего, я на тебя не в обиде."';
+    const aMisa_1 = 'Миша:';
+    const aAxJalNegdeSigr = '"Эх, жаль, негде сыграть в клоподавку!"';
+    const aVsegdaSlediZaZ = '"Всегда следи за здоровьем!"';
+    const aMozgiVliqutNaP = '"Мозги влияют на подготовку и сдачу зачетов."';
+    const aCemBolSeVinosl = '"Чем больше выносливость, тем меньше здоровья ты тратишь."';
+    const aCemBolSeTvoqXa = '"Чем больше твоя харизма, тем лучше у тебя отношения с людьми."';
+    const aVajnostKonkret = '"Важность конкретного качества сильно зависит от стиля игры."';
+    const aXarizmaPomogae = '"Харизма помогает получить что угодно от кого угодно."';
+    const aCemBolSeXarizm = '"Чем больше харизма, тем чаще к тебе пристают."';
+    const aCemMenSeVinosl = '"Чем меньше выносливость, тем больнее учиться."';
+    const aCemBolSeMozgiT = '"Чем больше мозги, тем легче готовиться."';
+    const aSidenieVInetEI = '"Сидение в Inet\'e иногда развивает мозги."';
+    const aEsliTebeNadoel = '"Если тебе надоело умирать - попробуй другую стратегию."';
+    const aXocesXalqviNab = '"Хочешь халявы - набирай харизму."';
+    const aXocesDobitSqVs = '"Хочешь добиться всего сам - развивай мозги."';
+    const aVMavzoleeVajno = '"В "Мавзолее" важно знать меру..."';
+    const aOtRazdvoeniqLi = '"От раздвоения личности спасают харизма и выносливость."';
+    const aOtLubogoObseni = '"От любого общения с NiL ты тупеешь!"';
+    const aGrisaMojetPomo = '"Гриша может помочь с трудоустройством."';
+    const aPeremeseniqStu = '"Перемещения студентов предсказуемы."';
+    
     ClrScr();
     show_header_stats();
 
@@ -4117,8 +4114,13 @@ async function misha_talk() {
     TextColor(7);
     write(aMisa_1);
     TextColor(0x0F);
-
-    write([aAxJalNegdeSigr, aVsegdaSlediZaZ, aMozgiVliqutNaP, aCemBolSeVinosl, aCemBolSeTvoqXa, aVajnostKonkret, aXarizmaPomogae, aCemBolSeXarizm, aCemMenSeVinosl, aCemBolSeMozgiT, aSidenieVInetEI, aEsliTebeNadoel, aXocesXalqviNab, aXocesDobitSqVs, aVMavzoleeVajno, aOtRazdvoeniqLi, aOtLubogoObseni, aGrisaMojetPomo, aPeremeseniqStu][Random(0x13)]);
+    const phrases = [
+        aAxJalNegdeSigr, aVsegdaSlediZaZ, aMozgiVliqutNaP, aCemBolSeVinosl, aCemBolSeTvoqXa, aVajnostKonkret,
+        aXarizmaPomogae, aCemBolSeXarizm, aCemMenSeVinosl, aCemBolSeMozgiT, aSidenieVInetEI, aEsliTebeNadoel,
+        aXocesXalqviNab, aXocesDobitSqVs, aVMavzoleeVajno, aOtRazdvoeniqLi, aOtLubogoObseni, aGrisaMojetPomo,
+        aPeremeseniqStu
+    ];
+    write(RandomPhrase(phrases));
 
     await wait_for_key();
     ClrScr();
@@ -4266,7 +4268,7 @@ async function sasha_talk() {
 
     dialog_start();
     for (let subj = 0; subj <= 2; ++subj) {
-        if (synopsis[subj].hero_has == 0) {
+        if (!synopsis[subj].hero_has) {
             dialog_case(subjects[subj].title, subj);
         }
     }
@@ -4278,13 +4280,13 @@ async function sasha_talk() {
         GotoXY(1, 0x0F);
         writeln(aKakZnaes___);
     } else {
-        if (hero.charizma > Random(0x12) && !jz(synopsis[res].sasha_has, 0)) {
+        if (hero.charizma > Random(0x12) && synopsis[res].sasha_has) {
             GotoXY(1, 0x0F);
             TextColor(7);
             write(aSasa_1);
             TextColor(0x0F);
             writeln(aDaUMenqSSoboiA);
-            synopsis[res].hero_has = 1;
+            synopsis[res].hero_has = true;
             byte_2549F = 0;
         } else {
             GotoXY(1, 0x0F);
@@ -4292,7 +4294,7 @@ async function sasha_talk() {
             write(aSasa_1);
             TextColor(0x0F);
             writeln(aOxIzviniKtoToD);
-            synopsis[res].sasha_has = 0;
+            synopsis[res].sasha_has = false;
         }
     }
 
@@ -4970,10 +4972,10 @@ async function hero_dream() {
     let dream_scenario = 0;
 
     for (let i = 0; i < 3; ++i) {
-        synopsis[i].sasha_has = 1;
+        synopsis[i].sasha_has = true;
     }
 
-    hero.is_invited = 0;
+    hero.is_invited = false;
     if (hero.brain <= 2) {
         hero.brain = 2;
         dream_scenario = 1;
@@ -5669,7 +5671,7 @@ function show_timesheet() {
         colored_output(0xB, subjects[subj].title);
 
         for (let day = 0; day <= 5; ++day) {
-            show_timesheet_day(day == day_of_week ? 0xE : 7, day, subj);
+            show_timesheet_day(day === day_of_week ? 0xE : 7, day, subj);
         }
     }
 
@@ -5888,7 +5890,7 @@ async function init_hero() {
 
     day_of_week = 0;
     time_of_day = 8;
-    current_place = 4;
+    current_place = Obshaga;
     current_subject = -1;
 
     hero.health = Random(hero.stamina * 2) + 0x28;
@@ -5901,7 +5903,7 @@ async function init_hero() {
     is_end = false;
     death_cause = 0;
     klimov_timesheet_was_modified = 0;
-    hero.is_invited = 0;
+    hero.is_invited = false;
 
     // #warning no refs
     byte_254A4 = 0;
@@ -5935,8 +5937,8 @@ function init_knowledge_synopsis_classmate() {
     }
 
     for (let subj = 0; subj <= 2; ++subj) {
-        synopsis[subj].sasha_has = 1;
-        synopsis[subj].hero_has = 0;
+        synopsis[subj].sasha_has = true;
+        synopsis[subj].hero_has = false;
     }
 
     for (let i = 0; i <= 0xB; ++i) {
