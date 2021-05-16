@@ -201,7 +201,7 @@ var is_god_mode, is_god_mode_available;
 var time_of_day, day_of_week, current_place, death_cause;
 
 var current_subject;
-var last_subject;
+let last_subject;
 
 
 // My little and buggy implementation of utilities like STL
@@ -4942,48 +4942,49 @@ async function week_brain_dream() {
 } // end function 1DA3D
 
 
-var aTiSlisisMqgkii = 'Ты слышишь мягкий, ненавязчивый голос:';
-var aAViDeistvitelN = '"А Вы действительно правильно выбрали';
-var aSebeSpecialNos = ' себе специальность?"';
-var aIntegral___ = '"Интеграл..."';
-var aKakoiIntegral = '"Какой интеграл?"';
-var aDaVotJeOnMiEgo = '"Да вот же он, мы его только что стерли!"';
-var aViKonecnoVelik = '"Вы, конечно, великий парильщик.';
-var aNoAtuZadacuQVa = ' Но эту задачу я Вам засчитаю."';
-var aACtoUNasSegodn = '"А что, у нас сегодня разве аудиторное занятие?"';
-var aWellLastTimeIF = '"Well, last time I found a pencil left by one of you.';
-var aIWillReturnItT = ' I will return it to the owner, if he or she';
-var aCanTellMeSomeN = ' can tell me some nice and pleasant words.';
-var aIAmALadyNotYou = ' I am a lady, not your computer!"';
-var aVSleduusemSe_0 = '"В следующем семестре вы должны будете написать реферат';
-var aNaTemuBegVMiro = ' на тему "Бег в мировой литературе". В качестве первоисточника';
-var aMojeteVzqtOdno = ' можете взять одноименный роман Булгакова."';
-var aNuVsePoxojeZau = 'Ну все, похоже, заучился - если преподы по ночам снятся...';
 
 
 async function zauchilsya_dream() {
+    const aTiSlisisMqgkii = 'Ты слышишь мягкий, ненавязчивый голос:';
+    const aAViDeistvitelN = '"А Вы действительно правильно выбрали';
+    const aSebeSpecialNos = ' себе специальность?"';
+    const aIntegral___ = '"Интеграл..."';
+    const aKakoiIntegral = '"Какой интеграл?"';
+    const aDaVotJeOnMiEgo = '"Да вот же он, мы его только что стерли!"';
+    const aViKonecnoVelik = '"Вы, конечно, великий парильщик.';
+    const aNoAtuZadacuQVa = ' Но эту задачу я Вам засчитаю."';
+    const aACtoUNasSegodn = '"А что, у нас сегодня разве аудиторное занятие?"';
+    const aWellLastTimeIF = '"Well, last time I found a pencil left by one of you.';
+    const aIWillReturnItT = ' I will return it to the owner, if he or she';
+    const aCanTellMeSomeN = ' can tell me some nice and pleasant words.';
+    const aIAmALadyNotYou = ' I am a lady, not your computer!"';
+    const aVSleduusemSe_0 = '"В следующем семестре вы должны будете написать реферат';
+    const aNaTemuBegVMiro = ' на тему "Бег в мировой литературе". В качестве первоисточника';
+    const aMojeteVzqtOdno = ' можете взять одноименный роман Булгакова."';
+    const aNuVsePoxojeZau = 'Ну все, похоже, заучился - если преподы по ночам снятся...';
+
     ClrScr();
     TextColor(0x0D);
 
-    if (last_subject == 0) {
+    if (last_subject === Algebra) {
         writeln(aTiSlisisMqgkii);
         writeln(aAViDeistvitelN);
         writeln(aSebeSpecialNos);
-    } else if (last_subject == 1) {
+    } else if (last_subject === Matan) {
         writeln(aIntegral___);
         writeln(aKakoiIntegral);
         writeln(aDaVotJeOnMiEgo);
-    } else if (last_subject == 2) {
+    } else if (last_subject === GiT) {
         writeln(aViKonecnoVelik);
         writeln(aNoAtuZadacuQVa);
-    } else if (last_subject == 3) {
+    } else if (last_subject === Infa) {
         writeln(aACtoUNasSegodn);
-    } else if (last_subject == 4) {
+    } else if (last_subject === English) {
         writeln(aWellLastTimeIF);
         writeln(aIWillReturnItT);
         writeln(aCanTellMeSomeN);
         writeln(aIAmALadyNotYou);
-    } else if (last_subject == 5) {
+    } else if (last_subject === Fizra) {
         writeln(aVSleduusemSe_0);
         writeln(aNaTemuBegVMiro);
         writeln(aMojeteVzqtOdno);
@@ -5058,10 +5059,10 @@ async function knows_djug_dream() {
 } // end function 1E37C
 
 
-var aPrevratilsqVOv = 'Превратился в овощ.';
 
 
 async function hero_dream() {
+    const aPrevratilsqVOv = 'Превратился в овощ.';
     let dream_scenario = 0;
 
     for (let i = 0; i < 3; ++i) {
@@ -5074,7 +5075,7 @@ async function hero_dream() {
         dream_scenario = 1;
     }
 
-    if (!jg(hero.stamina, 0)) {
+    if (hero.stamina <= 0) {
         is_end = 1;
         hero.health = 0;
         death_cause = aPrevratilsqVOv;
@@ -5313,7 +5314,7 @@ function is_professor_here_today(subj) {
     if (day_of_week >= 0 && day_of_week <= 5) {
         return timesheet[day_of_week][subj].where === current_place;
     } else {
-        return 0;
+        return false;
     }
 } // end function 1EC48
 
@@ -5334,20 +5335,20 @@ function init_kolya(/*arg_0*/) {
 
 
 function init_classmate_place(student) {
-    const bp_var_2 = [0, 0];
+    let some_professor_here = false;
+    let go_to_exam = false;
     do {
-
         for (let subj = Algebra; subj <= GiT; ++subj) {
             if (is_professor_here_today(subj)) {
-                bp_var_2[0] = 1;
-                if (!jbe(Random(0x0A), 5)) {
-                    bp_var_2[1] = 1;
+                some_professor_here = true;
+                if (Random(0x0A) > 5) {
+                    go_to_exam = true;
                     classmates[student].place = timesheet[day_of_week][subj].where;
                     classmates[student].current_subject = subj;
                 }
             }
         }
-    } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
+    } while (!go_to_exam && some_professor_here);
 }
 
 function init_pasha(/*arg_0*/) {
@@ -5417,24 +5418,24 @@ function init_rai(/*arg_0*/) {
 } // end function 1EDCC
 
 
-function init_classmate_place_by_subj(student, subjTo) {
-    const bp_var_2 = [0, 0];
+function init_classmate_place_by_subj(student, subjTo, exclude) {
+    let some_professor_here = false;
+    let go_to_exam = false;
     do {
         for (let subj = subjTo; subj >= Algebra; --subj) {
-
             if (is_professor_here_today(subj)) {
-                if (subj !== Kompy) {
-                    bp_var_2[0] = 1;
-
-                    if (!jbe(Random(0x0A), 5)) {
-                        bp_var_2[1] = 1;
-                        classmates[student].place = timesheet[day_of_week][subj].where;
-                        classmates[student].current_subject = subj;
-                    }
+                if (subj === exclude) {
+                    continue;
+                }
+                some_professor_here = true;
+                if (!jbe(Random(0x0A), 5)) {
+                    go_to_exam = true;
+                    classmates[student].place = timesheet[day_of_week][subj].where;
+                    classmates[student].current_subject = subj;
                 }
             }
         }
-    } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
+    } while (!go_to_exam && some_professor_here);
 }
 
 function init_misha(/*arg_0*/) {
@@ -5447,7 +5448,7 @@ function init_misha(/*arg_0*/) {
     }
 
     classmates[Misha].current_subject = -1;
-    init_classmate_place_by_subj(Misha, English);
+    init_classmate_place_by_subj(Misha, English, Kompy);
 
 } // end function 1EE2C
 
@@ -5479,7 +5480,8 @@ function init_serg(/*arg_0*/) {
     }
 
     classmates[Serzg].current_subject = -1;
-    init_classmate_place_3(Serzg, 5);
+    init_classmate_place_by_subj(Serzg, Fizra);
+    console.log("Serg place", classmates[Serzg].place, classmates[Serzg].current_subject);
 
 } // end function 1EECC
 
@@ -5528,7 +5530,7 @@ function init_andrew() {
     classmates[Endryu].current_subject = 1;
 
     for (let var_2 = 0; var_2 <= 2; ++var_2) {
-        if (!jz(is_professor_here_today(var_2), 0)) {
+        if (is_professor_here_today(var_2)) {
             if (!jbe(Random(0x0A), 5)) {
                 classmates[Endryu].place = timesheet[day_of_week][var_2].where;
                 classmates[Endryu].current_subject = var_2;
