@@ -61,14 +61,14 @@ var synopsis = [];
 var hero = {
     subject: [],
     garlic: 0, // 25498
-    has_mmheroes_disk: 0, // 2549B
-    has_inet: 0, // 2549E
+    has_mmheroes_disk: false, // 2549B
+    has_inet: false, // 2549E
     is_invited: 0, // 25496
     inception: 0, // 254A0
-    is_working_in_terkom: 0,
-    got_stipend: 0,
+    is_working_in_terkom: false,
+    got_stipend: false,
     has_ticket: 0,
-    knows_djug: 0,
+    knows_djug: false,
 
     brain: 0,
     stamina: 0,
@@ -99,8 +99,8 @@ var top_gamers = [];
 */
 var classmates = [];
 
-let terkom_has_places = 1; // 2549D
-var klimov_timesheet_was_modified; // 25494
+let terkom_has_places = true; // 2549D
+let klimov_timesheet_was_modified = 0; // 25494
 
 
 /*
@@ -262,9 +262,7 @@ async function Delay(pause) { /*var start = new Date().getTime(); while (new Dat
 }
 
 function alyarme(str) {
-    var d = Replay.data;
-    //d.rnds_stack = [];
-    alert(str + '\r\n\r\n' + get_stack() + '\r\n\r\n' + JSON.stringify(d));
+    alert(str + '\r\n\r\n' + get_stack() + '\r\n\r\n' + JSON.stringify(Replay.data));
 }
 
 function get_stack() {
@@ -304,31 +302,6 @@ var Replay = {
     is_on: function () {
         return this.data.on;
     },
-    is_start: function () {
-        return this.data.start;
-    },
-    is_end: function () {
-        return this.data.end;
-    },
-    start: function () {
-        this.data.start = true;
-        this.data.end = false;
-    },
-    stop: function () {
-        this.data.start = false;
-        this.data.end = true;
-    },
-
-    check_last_cls: function () {
-        ++this.data.clrscr_i;
-        return this.data.clrscr_i >= this.data.clrscr_count;
-    },
-    record_cls: function () {
-        ++this.data.clrscr_count;
-    },
-    can_skip_output: function () {
-        return this.data.on && this.data.clrscr_i < this.data.clrscr_count;
-    },
 
     next_rnd: function () {
         return this.data.rnds[this.data.rnds_i++];
@@ -336,21 +309,6 @@ var Replay = {
     record_rnd: function (res, up) {
         this.data.rnds.push(res);
         this.data.rnds_up.push(up); /*this.data.rnds_stack.push(get_stack());*/
-    },
-
-    next_key: function () {
-        const key_index = this.data.keys_i - (this.data.keys_count - this.data.keys.length);
-        const result = key_index >= 0 ? this.data.keys[key_index] : " ";
-        ++this.data.keys_i;
-        return result;
-    },
-    record_key: function (res) {
-        //console.log('record_key');
-
-        if (this.data.wait_for_dialog) {
-            this.data.keys.push(res);
-        }
-        ++this.data.keys_count;
     },
 
     next_dialog: function () {
@@ -456,7 +414,7 @@ function _update_screen() {
 }
 
 function write(str) {
-    if (Replay.can_skip_output() || str === undefined) {
+    if (str === undefined) {
         return;
     }
     if (PositionR >= 25) {
@@ -468,7 +426,7 @@ function write(str) {
         ScreenColor[PositionR][PositionC] = current_color;
         ++PositionC;
     }
-    _update_screen();
+    // _update_screen();
 }
 
 function Random(up) {
@@ -485,11 +443,6 @@ function Random(up) {
         if (up && res >= up || !up && res > 0) {
             alyarme('Random(' + up + ') = ' + res);
         }
-        //if (Replay.data.rnds.length == 78) {
-        //	alyarme('78th');
-        //}
-
-        //console.log('record ' + Replay.data.rnds.length + ' num ' + res + ', up ' + up + ', hero.health = ' + hero.health/* + '; from ' + get_stack_before('Random')*/);
 
         Replay.record_rnd(res, up);
         return res;
@@ -515,18 +468,9 @@ function ReadKey_on() {
     });
 }
 
-function ReadKey_off() {
-    // Апдейтим экран только когда уходим в режим ожидания
+function ReadKey() {
     _update_screen();
-    // Когда в следующий раз вызовется Main, он будет работать в режиме реплея, пока не кончатся клавиши
-    // Replay.turn_on();
-    // throw 42;
-}
-
-async function ReadKey() {
-    const key = await ReadKey_on();
-    ReadKey_off();
-    return key;
+    return ReadKey_on();
 }
 
 function promt_with_delay(message, default_message) {
@@ -536,26 +480,9 @@ function promt_with_delay(message, default_message) {
     }, 100));
 }
 
-async function readln() {
-    if (Replay.is_on()) {
-        var res = false;
-        if (Replay.strs_remains()) {
-            var res = Replay.next_string();
-        }
-        if (Replay.last()) {
-            Replay.turn_off();
-        }
-        if (res !== false) {
-            return res;
-        }
-    }
+function readln() {
     _update_screen();
-    var res = await promt_with_delay('Enter string:', get_user_name());
-    if (res === null) {
-        res = '';
-    }
-    Replay.record_string(res);
-    return res;
+    return promt_with_delay('Enter string:', get_user_name());
 }
 
 async function dialog_run(x, y) {
@@ -617,7 +544,6 @@ async function dialog_run(x, y) {
 
 
 async function Main() {
-    Replay.start();
     try {
         await PROGRAM();
     } catch (e) {
@@ -626,25 +552,9 @@ async function Main() {
             alert(e + '\r\n' + e.stack);
         }
         console.log(e);
-        return;
     }
-    console.log("before stop");
-    Replay.stop();
 }
 
-
-const _color = [
-    '#000', '#000080', '#008000', '#008080', '#800000', '#800080', '#808000', '#C0C0C0',
-    '#404040', '#00f', '#0f0', '#0ff', '#f00', '#f0f', '#ff0', '#fff'
-];
-
-function _color_to_html_fg(col) {
-    return _color[col & 0xF];
-}
-
-function _color_to_html_bg(col) {
-    return _color[col >> 4];
-}
 
 function _crlf() {
     ++PositionR;
@@ -719,28 +629,12 @@ function jge(a, b) {
     return a >= b;
 }
 
-function jb(a, b) {
-    return a < b;
-}
-
-function jnb(a, b) {
-    return a >= b;
-}
-
 function jbe(a, b) {
     return a <= b;
 }
 
 function ja(a, b) {
     return a > b;
-}
-
-function jna(a, b) {
-    return a <= b;
-}
-
-function jae(a, b) {
-    return a >= b;
 }
 
 
@@ -943,14 +837,14 @@ async function game_end_alive() {
 
         await wait_for_key();
         return;
-    } else if (hero.exams_left == 2) {
+    } else if (hero.exams_left === 2) {
         colored_output_ln(0x0E, aNetDvuxZacetov);
         colored_output_ln(0x0E, aGovorqtUMexani);
         colored_output_ln(0x0E, aZrqGovorqtXalq);
-    } else if (hero.exams_left == 1) {
+    } else if (hero.exams_left === 1) {
         colored_output_ln(0x0A, aNetOdnogoZacet);
         colored_output_ln(0x0A, aNicegoOtAtogoE);
-    } else if (hero.exams_left == 0) {
+    } else if (hero.exams_left === 0) {
         colored_output_ln(0x0F, aPozdravlquTiMo);
         colored_output_ln(0x0F, aUspesnoiTebeSe);
     }
@@ -1394,8 +1288,8 @@ async function scene_kompy() {
 
     show_short_today_timesheet(0x0A);
 
-    var res = await dialog_run(1, 0x0A);
-    var arr = {
+    const res = await dialog_run(1, 0x0A);
+    const arr = {
         1: goto_klimov,
         2: goto_kompy_to_obschaga,
         3: goto_kompy_to_punk,
@@ -1512,7 +1406,7 @@ async function scene_mausoleum() {
     dialog_case(aIdtiVObsagu, -2);
     dialog_case(aOtdixat, -3);
     for (let i = 0; i <= 0xB; ++i) {
-        if (classmates[i].place == 5) {
+        if (classmates[i].place === Mavzoley) {
             dialog_case_colored(classmate_names[i], i, 0xE);
         }
     }
@@ -1520,16 +1414,16 @@ async function scene_mausoleum() {
 
     show_short_today_timesheet(0x0A);
 
-    var res = await dialog_run(1, 0x0A);
-    if (res == -1) {
+    const res = await dialog_run(1, 0x0A);
+    if (res === -1) {
         await goto_mausoleum_to_punk();
-    } else if (res == -2) {
+    } else if (res === -2) {
         await goto_mausoleum_to_obschaga();
-    } else if (res == -3) {
+    } else if (res === -3) {
         await rest_in_mausoleum();
-    } else if (res == -4) {
+    } else if (res === -4) {
         await request_exit();
-    } else if (res == -5) {
+    } else if (res === -5) {
         await goto_punk_or_mausoleum_to_pomi();
     } else if (res >= 0 && res <= 0xB) {
         await talk_with_classmate(res);
@@ -2471,10 +2365,9 @@ var aRabociiDenZako = 'Рабочий день закончился, все по
 // =============================================================================
 
 
-async function sub_15B3A() {
-    var var_2;
+async function go_to_terkom() {
 
-    if (jz(terkom_has_places, 0)) {
+    if (!terkom_has_places) {
         ClrScr();
         show_header_stats();
         GotoXY(1, 8);
@@ -2486,7 +2379,7 @@ async function sub_15B3A() {
         return;
     }
 
-    if (!jbe(Random(3), 0)) {
+    if (Random(3) > 0) {
         ClrScr();
         show_header_stats();
         GotoXY(1, 8);
@@ -2495,7 +2388,7 @@ async function sub_15B3A() {
         writeln();
         output_ik_string(aPoidiPoucisPok);
         writeln();
-        terkom_has_places = 0;
+        terkom_has_places = false;
         await wait_for_key();
         ClrScr();
         return;
@@ -2513,11 +2406,11 @@ async function sub_15B3A() {
         dialog_start();
         dialog_case(aSidetIZarabati, -1);
 
-        if (!jz(hero.has_mmheroes_disk, 0)) {
+        if (hero.has_mmheroes_disk) {
             dialog_case(aPoigratVMmhe_0, -10);
         }
 
-        if (!jz(hero.has_inet, 0)) {
+        if (hero.has_inet) {
             dialog_case(aPosidetCasokVI, -11);
         }
 
@@ -2527,7 +2420,7 @@ async function sub_15B3A() {
         const ax = await dialog_run(1, 0x0C);
         if (jz(ax, -1)) {
 
-            var_2 = Random(Random(hero.charizma + hero.brain)) + 1;
+            let var_2 = Random(Random(hero.charizma + hero.brain)) + 1;
 
             while (var_2 > 4) {
                 var_2 = Random(var_2 - 3) + 2;
@@ -2584,7 +2477,7 @@ async function sub_15B3A() {
             GotoXY(1, 0x13);
             writeln(aVotZdorovoMiSi);
 
-            var_2 = Random(Random(hero.charizma + hero.brain)) + 1;
+            let var_2 = Random(Random(hero.charizma + hero.brain)) + 1;
 
             while (var_2 > 4) {
                 var_2 = Random(var_2 - 3) + 2;
@@ -2620,7 +2513,7 @@ var aProstoPosijuSP = 'Просто посижу с приятелями.';
 var aQVoobseZrqSuda = 'Я вообще зря сюда зашел.';
 
 
-async function sub_15F9B() {
+async function go_to_cafe() {
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -2628,34 +2521,34 @@ async function sub_15F9B() {
     show_short_today_timesheet(0x0B);
     dialog_start();
 
-    if (!jl(hero.money, 2)) {
+    if (hero.money >= 2) {
         dialog_case(aCaiZa2R_, -1);
     }
 
-    if (!jl(hero.money, 4)) {
+    if (hero.money >= 4) {
         dialog_case(aKeksZa4R_, -2);
     }
 
-    if (!jl(hero.money, 6)) {
+    if (hero.money >= 6) {
         dialog_case(aCaiIVipecku6R_, -3);
     }
 
     dialog_case(aProstoPosijuSP, -4);
     dialog_case(aQVoobseZrqSuda, 0);
-    var ax = await dialog_run(1, 0x0B);
+    const ax = await dialog_run(1, 0x0B);
 
-    if (!jnz(ax, -1)) {
+    if (ax === -1) {
         hero.money -= 2;
         hero.health += Random(hero.charizma) + 2;
-    } else if (!jnz(ax, -2)) {
+    } else if (ax === -2) {
         hero.money -= 4;
         hero.health += Random(hero.charizma) + 4;
-    } else if (!jnz(ax, -3)) {
+    } else if (ax === -3) {
         hero.money -= 6;
         hero.health += Random(hero.charizma) + 7;
-    } else if (!jnz(ax, -4)) {
+    } else if (ax === -4) {
         hero.health += Random(hero.charizma);
-    } else if (!jnz(ax, 0)) {
+    } else if (ax === 0) {
         return;
     }
 
@@ -2707,32 +2600,32 @@ async function scene_punk() {
 
     }
 
-    if (!jz(hero.is_working_in_terkom, 0) && !jg(time_of_day, 0x12)) {
+    if (hero.is_working_in_terkom && time_of_day <= 18) {
         dialog_case(aPoitiVTerkomPo, -10);
     }
 
     dialog_case_colored(aSMenqXvatit_2, -6, 9);
 
-    var res = await dialog_run(1, 0x0A);
+    const res = await dialog_run(1, 0x0A);
 
-    if (res == -1) {
+    if (res === -1) {
         await select_professor_punk();
-    } else if (res == -2) {
+    } else if (res === -2) {
         await look_baobab_punk();
-    } else if (res == -3) {
+    } else if (res === -3) {
         await goto_punk_to_obschaga();
-    } else if (res == -4) {
+    } else if (res === -4) {
         await goto_punk_or_mausoleum_to_pomi();
-    } else if (res == -5) {
+    } else if (res === -5) {
         await goto_punk_to_mausoleum();
-    } else if (res == -6) {
+    } else if (res === -6) {
         await request_exit();
-    } else if (res == -7) {
+    } else if (res === -7) {
         await goto_punk_to_kompy();
-    } else if (res == -10) {
-        await sub_15B3A();
-    } else if (res == -12) {
-        await sub_15F9B();
+    } else if (res === -10) {
+        await go_to_terkom();
+    } else if (res === -12) {
+        await go_to_cafe();
     } else if (!jl(res, 0) && !jg(res, 0x0B)) {
         await talk_with_classmate(res);
     }
@@ -2747,7 +2640,7 @@ var aRazdelatSqNako = 'РАЗДЕЛАТЬСЯ НАКОНЕЦ С ЗАЧЕТОМ �
 var a____5 = '...';
 
 
-async function sub_163B7() {
+async function algebra_pomi_intro() {
     ClrScr();
     TextColor(0x0C);
     writeln(aMalenKiiKabine);
@@ -2768,7 +2661,7 @@ var aTiNadeesSqCtoV = 'Ты надеешься, что все это скоро 
 var a____6 = '...';
 
 
-async function sub_1653F() {
+async function git_pomi_intro() {
     ClrScr();
     writeln(aVNebolSomPomis);
     writeln(aKromeNixVKomna);
@@ -2781,11 +2674,11 @@ async function sub_1653F() {
 } // end function 1653F
 
 
-async function sub_165D9(arg_0) {
-    if (arg_0 == 0) {
-        await sub_163B7();
-    } else if (arg_0 == 2) {
-        await sub_1653F();
+async function pomi_intro(subj) {
+    if (subj === Algebra) {
+        await algebra_pomi_intro();
+    } else if (subj === GiT) {
+        await git_pomi_intro();
     }
 } // end function 165D9
 
@@ -2811,8 +2704,8 @@ async function sub_16622() {
     dialog_case(aNiKKomu_0, -1);
     current_subject = await dialog_run(1, 0x0A);
 
-    if (!jnz(Random(2), 0)) {
-        await sub_165D9(current_subject);
+    if (Random(2) === 0) {
+        await pomi_intro(current_subject);
     }
 } // end function 16622
 
@@ -3016,9 +2909,9 @@ async function update_top_gamers(score) {
     writeln();
     write(aKakTebqZovutGe);
     TextColor(0x0A);
-    var my_name = await readln();
+    const my_name = await readln();
 
-    if (my_name.length == 0) {
+    if (my_name) {
         TextColor(0x0F);
         writeln();
         writeln(aNeXocesUvekove);
@@ -3733,7 +3626,7 @@ async function scene_exam() {
         }
 
         for (let i = Kolya; i <= Grisha; ++i) {
-            if (i < 0x10) {
+            if (i < 16) {
                 if (classmates_bitset & (1 << i)) {
 
                     write(classmate_names[i]);
@@ -3773,7 +3666,7 @@ async function scene_exam() {
 
                 if (classmates[var_2].bothers_activity - idiv(var_14, 2) - hero.garlic > Random(0x0A)) {
 
-                    if (!jnb(var_2, 0x10)) {
+                    if (var_2 < 0x10) {
 
                         if (classmates_bitset & (1 << var_2)) {
 
@@ -3826,10 +3719,10 @@ async function scene_exam() {
         dialog_case(aMucatSqDalSe, -1);
     }
 
-    for (let var_2 = 0; var_2 <= 0xB; ++var_2) {
-        if (!jnb(var_2, 0x10)) {
-            if (classmates_bitset & (1 << var_2)) {
-                dialog_case_colored(classmate_names[var_2], var_2, 0xE);
+    for (let i = 0; i <= 0xB; ++i) {
+        if (i < 0x10) {
+            if (classmates_bitset & (1 << i)) {
+                dialog_case_colored(classmate_names[i], i, 0xE);
             }
         }
     }
@@ -4041,7 +3934,7 @@ async function diamond_dialog() {
     writeln();
     write(aDiamond_0);
 
-    if (hero.has_mmheroes_disk == 0 && current_place == 3 && !ja(Random(8), 0)) {
+    if (hero.has_mmheroes_disk && current_place === Kompy && Random(8) === 0) {
         writeln(aXocesPoTestitN);
         dialog_start();
         dialog_case(aDaKonecnoOcenX, -1);
@@ -4051,9 +3944,9 @@ async function diamond_dialog() {
         if (res === -1) {
             GotoXY(1, 0x10);
             writeln(aNuILaduskiVotT);
-            hero.has_mmheroes_disk = 1;
+            hero.has_mmheroes_disk = true;
             await wait_for_key();
-        } else if (res == -2) {
+        } else if (res === -2) {
             GotoXY(1, 0x10);
             writeln(aIzviniCtoPobes);
             await wait_for_key();
@@ -4376,10 +4269,10 @@ async function serg_talk() {
         TextColor(7);
         writeln(aSerjUxoditKuda);
         classmates[Serzg].current_subject = -1;
-        if (!jnz(classmates[Serzg].place, 5)) {
-            classmates[Serzg].place = 0;
+        if (classmates[Serzg].place === Mavzoley) {
+            classmates[Serzg].place = Nowhere;
         } else {
-            classmates[Serzg].place = 5;
+            classmates[Serzg].place = Mavzoley;
         }
     }
 
@@ -4399,8 +4292,8 @@ async function pawa_talk() {
     ClrScr();
     show_header_stats();
 
-    if (hero.got_stipend == 0) {
-        hero.got_stipend = 1
+    if (!hero.got_stipend) {
+        hero.got_stipend = true;
         GotoXY(1, 8);
         output_with_highlighted_num(7, aPasaVrucaetTeb, 0x0F, 0x32, aRub__2);
         hero.money += 50;
@@ -4611,24 +4504,26 @@ async function kuzmenko_talk() {
     show_header_stats();
     let new_day = 0;
     let is_set = false;
-    const tomorrow = day_of_week + 1;
-    for (let day = 5; day >= tomorrow; --day) {
-        if (hero.charizma > Random(0x12)) {
-            if (timesheet[day][Infa].where === 0) {
-                if (!is_set) {
-                    is_set = true;
-                    new_day = day;
-                    timesheet[new_day][Infa].where = 3;
-                    timesheet[new_day][Infa].from = Random(5) + 0xA;
-                    timesheet[new_day][Infa].to = timesheet[new_day][Infa].from + 1 + Random(2);
-                    break;
+    if (klimov_timesheet_was_modified < 2) {
+        const tomorrow = day_of_week + 1;
+        for (let day = 5; day >= tomorrow; --day) {
+            if (hero.charizma > Random(0x12)) {
+                if (timesheet[day][Infa].where === 0) {
+                    if (!is_set) {
+                        is_set = true;
+                        new_day = day;
+                        timesheet[new_day][Infa].where = 3;
+                        timesheet[new_day][Infa].from = Random(5) + 0xA;
+                        timesheet[new_day][Infa].to = timesheet[new_day][Infa].from + 1 + Random(2);
+                        break;
+                    }
                 }
             }
         }
     }
 
 
-    if (is_set && klimov_timesheet_was_modified < 2) {
+    if (is_set) {
 
         GotoXY(1, 8);
         ++klimov_timesheet_was_modified;
@@ -4878,7 +4773,7 @@ async function grisha_talk() {
     show_header_stats();
     GotoXY(1, 8);
 
-    if (jz(hero.is_working_in_terkom, 0) && hero.charizma > Random(0x14)) {
+    if ((!hero.is_working_in_terkom) && hero.charizma > Random(20)) {
 
         TextColor(0x0E);
         write(aATiNeXocesUstr);
@@ -4889,7 +4784,7 @@ async function grisha_talk() {
         const ax = await dialog_run(1, 0x0A);
 
         if (ax === -1) {
-            hero.is_working_in_terkom = 1;
+            hero.is_working_in_terkom = true;
             GotoXY(1, 0x0E);
             writeln(aPozdravlquTepe);
         } else if (ax === -2) {
@@ -4899,12 +4794,12 @@ async function grisha_talk() {
 
     } else {
 
-        if (hero.charizma > Random(0x14) && !jnz(hero.has_inet, 0)) {
+        if (hero.charizma > Random(0x14) && !hero.has_inet) {
             writeln(aKstatiQTutZnau);
             TextColor(7);
             writeln();
             writeln(aTiZapisivaesAd);
-            hero.has_inet = 1;
+            hero.has_inet = true;
         } else {
 
             GotoXY(1, 8);
@@ -5185,7 +5080,7 @@ async function hero_dream() {
         death_cause = aPrevratilsqVOv;
     }
 
-    if (hero.knows_djug !== 0) {
+    if (hero.knows_djug) {
         dream_scenario = 2;
     }
 
@@ -5202,7 +5097,7 @@ async function hero_dream() {
         }
     }
 
-    hero.knows_djug = 0;
+    hero.knows_djug = false;
 } // end function 1E5A3
 
 
@@ -5352,12 +5247,12 @@ var aBurnoProgressi = 'Бурно прогрессирующая параной�
 
 
 async function hour_pass() {
-    terkom_has_places = 1;
+    terkom_has_places = true;
     ++time_of_day;
 
     if (current_subject === GiT && current_place === Pomi) {
         decrease_health(6, aDjugAtoSmertel);
-        hero.knows_djug = 1;
+        hero.knows_djug = true;
     }
 
     if (hero.charizma <= 0) {
@@ -5409,7 +5304,7 @@ function is_professor_here(subj) {
         const ts = timesheet[day_of_week][subj];
         return time_of_day >= ts.from && time_of_day < ts.to && ts.where === current_place;
     } else {
-        return 0;
+        return false;
     }
 } // end function 1EBE0
 
@@ -5438,57 +5333,59 @@ function init_kolya(/*arg_0*/) {
 } // end function 1EC97
 
 
-function init_pasha(/*arg_0*/) {
-    // #warning arg_0, [arg_0 + var_2 + 0|1]
-    var bp_var_2 = [0, 0];
-
-    if (time_between_9_and_19()) {
-        classmates[Pasha].place = 1;
-    } else {
-        classmates[Pasha].place = 0;
-    }
-
-    classmates[Pasha].current_subject = -1;
-
+function init_classmate_place(student) {
+    const bp_var_2 = [0, 0];
     do {
 
-        for (let var_2 = 0; var_2 <= 2; ++var_2) {
-            if (!jz(is_professor_here_today(var_2), 0)) {
+        for (let subj = Algebra; subj <= GiT; ++subj) {
+            if (is_professor_here_today(subj)) {
                 bp_var_2[0] = 1;
                 if (!jbe(Random(0x0A), 5)) {
                     bp_var_2[1] = 1;
-                    classmates[Pasha].place = timesheet[day_of_week][var_2].where;
-                    classmates[Pasha].current_subject = var_2;
+                    classmates[student].place = timesheet[day_of_week][subj].where;
+                    classmates[student].current_subject = subj;
                 }
             }
         }
-
     } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
+}
+
+function init_pasha(/*arg_0*/) {
+    // #warning arg_0, [arg_0 + var_2 + 0|1]
+
+    if (time_between_9_and_19()) {
+        classmates[Pasha].place = Punk;
+    } else {
+        classmates[Pasha].place = Nowhere;
+    }
+
+    classmates[Pasha].current_subject = -1;
+    init_classmate_place(Pasha);
 
 } // end function 1ECBC
 
 
 function init_diamond(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 1]
-    var bp_var_2 = [0, 0];
 
     if (time_between_9_and_19()) {
-        classmates[Diamond].place = 3;
+        classmates[Diamond].place = Kompy;
     } else {
-        classmates[Diamond].place = 0;
+        classmates[Diamond].place = Nowhere;
     }
 
     classmates[Diamond].current_subject = -1;
 
-    for (let var_2 = 5; var_2 >= 0; --var_2) {
+    const bp_var_2 = [0, 0];
+    for (let subj = 5; subj >= 0; --subj) {
 
-        if (!jz(is_professor_here_today(var_2), 0)) {
+        if (is_professor_here_today(subj)) {
 
             if (bp_var_2[1] == 0) {
 
                 if (!jbe(Random(0x0A), 5)) {
-                    classmates[Diamond].place = timesheet[day_of_week][var_2].where;
-                    classmates[Diamond].current_subject = var_2;
+                    classmates[Diamond].place = timesheet[day_of_week][subj].where;
+                    classmates[Diamond].current_subject = subj;
                 }
             }
         }
@@ -5498,13 +5395,13 @@ function init_diamond(/*arg_0*/) {
 
 
 function init_rai(/*arg_0*/) {
-    if (!jz(is_professor_here(Algebra), 0)) {
+    if (is_professor_here(Algebra)) {
         classmates[Rai].place = timesheet[day_of_week][Algebra].where;
         classmates[Rai].current_subject = 0;
         return;
     }
 
-    if (!jz(is_professor_here(Matan), 0)) {
+    if (is_professor_here(Matan)) {
         classmates[Rai].place = timesheet[day_of_week][Matan].where;
         classmates[Rai].current_subject = 1;
         return;
@@ -5520,41 +5417,60 @@ function init_rai(/*arg_0*/) {
 } // end function 1EDCC
 
 
-function init_misha(/*arg_0*/) {
-    // #warning arg_0, [arg_0 + var_2 + 0|1]
-    var bp_var_2 = [0, 0];
-
-    if (time_between_9_and_19()) {
-        classmates[Misha].place = 1;
-    } else {
-        classmates[Misha].place = 0;
-    }
-
-    classmates[Misha].current_subject = -1;
-
+function init_classmate_place_by_subj(student, subjTo) {
+    const bp_var_2 = [0, 0];
     do {
-        for (let var_2 = 4; var_2 >= 0; --var_2) {
+        for (let subj = subjTo; subj >= Algebra; --subj) {
 
-            if (!jz(is_professor_here_today(var_2), 0)) {
-                if (!jz(var_2, 3)) {
+            if (is_professor_here_today(subj)) {
+                if (subj !== Kompy) {
                     bp_var_2[0] = 1;
 
                     if (!jbe(Random(0x0A), 5)) {
                         bp_var_2[1] = 1;
-                        classmates[Misha].place = timesheet[day_of_week][var_2].where;
-                        classmates[Misha].current_subject = var_2;
+                        classmates[student].place = timesheet[day_of_week][subj].where;
+                        classmates[student].current_subject = subj;
                     }
                 }
             }
         }
     } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
+}
+
+function init_misha(/*arg_0*/) {
+    // #warning arg_0, [arg_0 + var_2 + 0|1]
+
+    if (time_between_9_and_19()) {
+        classmates[Misha].place = Punk;
+    } else {
+        classmates[Misha].place = Nowhere;
+    }
+
+    classmates[Misha].current_subject = -1;
+    init_classmate_place_by_subj(Misha, English);
 
 } // end function 1EE2C
 
 
+function init_classmate_place_3(student, subjTo) {
+    const bp_var_2 = [0, 0];
+    do {
+        for (let subj = subjTo; subj >= Algebra; --subj) {
+
+            if (is_professor_here_today(subj)) {
+                bp_var_2[0] = 1;
+                if (!jbe(Random(0x0A), 5)) {
+                    bp_var_2[1] = 1;
+                    classmates[student].place = timesheet[day_of_week][subj].where;
+                    classmates[student].current_subject = subj;
+                }
+            }
+        }
+    } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
+}
+
 function init_serg(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 0|1]
-    var bp_var_2 = [0, 0];
 
     if (time_between_9_and_19()) {
         classmates[Serzg].place = 1;
@@ -5563,20 +5479,7 @@ function init_serg(/*arg_0*/) {
     }
 
     classmates[Serzg].current_subject = -1;
-
-    do {
-        for (let var_2 = 5; var_2 >= 0; --var_2) {
-
-            if (!jz(is_professor_here_today(var_2), 0)) {
-                bp_var_2[0] = 1;
-                if (!jbe(Random(0x0A), 5)) {
-                    bp_var_2[1] = 1;
-                    classmates[Serzg].place = timesheet[day_of_week][var_2].where;
-                    classmates[Serzg].current_subject = var_2;
-                }
-            }
-        }
-    } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
+    init_classmate_place_3(Serzg, 5);
 
 } // end function 1EECC
 
@@ -5597,35 +5500,20 @@ function init_sasha(/*arg_0*/) {
 
 function init_nil(/*arg_0*/) {
     // #warning arg_0, [arg_0 + var_2 + 0|1]
-    var bp_var_2 = [0, 0];
 
-    classmates[Nil].place = 0;
+    classmates[Nil].place = Nowhere;
     classmates[Nil].current_subject = -1;
-
-    do {
-        for (let var_2 = 0; var_2 <= 2; ++var_2) {
-            if (!jz(is_professor_here_today(var_2), 0)) {
-                bp_var_2[0] = 1;
-                if (!jbe(Random(0x0A), 5)) {
-                    bp_var_2[1] = 1;
-                    classmates[Nil].place = timesheet[day_of_week][var_2].where;
-                    classmates[Nil].current_subject = var_2;
-                }
-            }
-        }
-    } while (!jnz(bp_var_2[1], 0) && jnz(bp_var_2[0], 0));
-
+    init_classmate_place(Nil);
 } // end function 1EF9E
 
 
 function init_kuzmenko(/*arg_0*/) {
-    if (time_between_9_and_19() && jz(Random(4), 0)) {
-        classmates[Kuzmenko].place = 3;
-        classmates[Kuzmenko].current_subject = -1;
+    if (time_between_9_and_19() && Random(4) === 0) {
+        classmates[Kuzmenko].place = Kompy;
     } else {
-        classmates[Kuzmenko].place = 0;
-        classmates[Kuzmenko].current_subject = -1;
+        classmates[Kuzmenko].place = Nowhere;
     }
+    classmates[Kuzmenko].current_subject = -1;
 } // end function 1F025
 
 
@@ -5636,7 +5524,7 @@ function init_djug() {
 
 
 function init_andrew() {
-    classmates[Endryu].place = 1;
+    classmates[Endryu].place = Punk;
     classmates[Endryu].current_subject = 1;
 
     for (let var_2 = 0; var_2 <= 2; ++var_2) {
@@ -5653,41 +5541,12 @@ function init_andrew() {
 
 function init_grisha() {
     classmates[Grisha].current_subject = -1;
-    if (!jnz(Random(3), 0)) {
-        classmates[Grisha].place = 5;
+    if (Random(3) === 0) {
+        classmates[Grisha].place = Mavzoley;
     } else {
-        classmates[Grisha].place = 0;
+        classmates[Grisha].place = Nowhere;
     }
 } // end function 1F0C6
-
-
-function sub_1F0EA(arg_0) {
-    if (arg_0 == 0) {
-        init_kolya();
-    } else if (arg_0 == 2) {
-        init_diamond();
-    } else if (arg_0 == 1) {
-        init_pasha();
-    } else if (arg_0 == 3) {
-        init_rai();
-    } else if (arg_0 == 4) {
-        init_misha();
-    } else if (arg_0 == 5) {
-        init_serg();
-    } else if (arg_0 == 6) {
-        init_sasha();
-    } else if (arg_0 == 7) {
-        init_nil();
-    } else if (arg_0 == 8) {
-        init_kuzmenko();
-    } else if (arg_0 == 9) {
-        init_djug();
-    } else if (arg_0 == 0xA) {
-        init_andrew();
-    } else if (arg_0 == 0xB) {
-        init_grisha();
-    }
-} // end function 1F0EA
 
 
 function init_classmates() {
@@ -5708,20 +5567,19 @@ function init_classmates() {
 
 // =============================================================================
 
-
-var aZadanie = ' задание';
-var aZadaniq = ' задания';
-var aZadanii = ' заданий';
+function declOfNum(number, titles) {
+    const cases = [2, 0, 1, 1, 1, 2];
+    return titles[ (number%100>4 && number%100<20)? 2 : cases[(number%10<5)?number%10:5] ];
+}
 
 
 function zadanie_in_case(number) {
-    if (number == 1) {
-        write(aZadanie);
-    } else if (number >= 2 && number <= 4) {
-        write(aZadaniq);
-    } else {
-        write(aZadanii);
-    }
+    const aZadanie = ' задание';
+    const aZadaniq = ' задания';
+    const aZadanii = ' заданий';
+
+    const word = declOfNum(number, [aZadanie, aZadaniq, aZadanii]);
+    write(word);
 } // end function 1F1CB
 
 
@@ -5856,12 +5714,12 @@ function show_header_stats() {
     colored_output(7, aFinansi);
 
 
-    if (!jle(hero.money, 0)) {
+    if (hero.money > 0) {
         TextColor(0x0F);
         write(hero.money);
         TextColor(7);
         write(aRub__3);
-    } else if (hero.got_stipend == 0) {
+    } else if (!hero.got_stipend) {
         colored_output(0x0C, aNadoPolucitDen);
     } else {
         write(aTiUspelPotrati);
@@ -5892,13 +5750,13 @@ function show_header_stats() {
 } // end function 1F685
 
 
-var asc_1FD4D = '██████';
 
 
 function show_timesheet_day(day_color, day, subj) {
+    const asc_1FD4D = '██████';
     TextColor(hero.subject[subj].passed ? 1 : day_color);
 
-    var ts = timesheet[day][subj];
+    const ts = timesheet[day][subj];
     if (ts.where != 0) {
         GotoXY(day * 7 + 0x18, subj * 3 + 2);
         write(places[ts.where].title);
@@ -5980,9 +5838,9 @@ function show_timesheet() {
     TextColor(7);
     GotoXY(1, 0x17);
 
-    if (hero.exams_left == 0) {
+    if (hero.exams_left === 0) {
         colored_output(0xF, aVseUjeSdano);
-    } else if (hero.exams_left == 1) {
+    } else if (hero.exams_left === 1) {
         output_with_highlighted_num(7, aOstalsq, 0xD, 1, aZacet_0);
     } else if (hero.exams_left < 5) {
         output_with_highlighted_num(7, aOstalos_0, 0xE, hero.exams_left, aZaceta_);
@@ -6041,10 +5899,10 @@ function init_timesheet() {
     }
 
     for (let subj = 0; subj <= 5; ++subj) {
-        var day_used = [0, 0, 0, 0, 0, 0];
+        const day_used = [0, 0, 0, 0, 0, 0];
         if (subjects[subj].exam_days >= 1) {
             for (let i = 1; i <= subjects[subj].exam_days; ++i) {
-                var day;
+                let day;
                 do {
                     day = random_from_to(0, 5);
                 } while (day_used[day]);
@@ -6137,10 +5995,10 @@ async function init_hero() {
     hero.garlic = 0;
     hero.money = 0;
     hero.inception = 0;
-    hero.got_stipend = 0;
-    hero.knows_djug = 0;
-    hero.has_mmheroes_disk = 0;
-    hero.is_working_in_terkom = 0;
+    hero.got_stipend = false;
+    hero.knows_djug = false;
+    hero.has_mmheroes_disk = false;
+    hero.is_working_in_terkom = false;
 
     // #warning no refs
     byte_2549F = 0;
@@ -6179,7 +6037,7 @@ async function init_hero() {
     // #warning no refs
     byte_254A4 = 0;
 
-    hero.has_inet = 0;
+    hero.has_inet = false;
 } // end function 206E4
 
 
@@ -6300,21 +6158,6 @@ function dialog_show(x, y) {
     current_color = 7;
 } // end function 20B20
 
-
-function report_bug() {
-    const s = JSON.stringify(Replay.data);
-    alert('Send this string to developer and tell him what happened\r\n\r\n' + s);
-}
-
-function dev_replay() {
-    const input = prompt('Paste string from tester');
-    if (input === null || input === '') {
-        return;
-    }
-    Replay.data = JSON.parse(input);
-    Replay.data.on = 1;
-    Main();
-}
 
 
 Main();
