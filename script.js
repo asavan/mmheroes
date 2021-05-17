@@ -2925,11 +2925,11 @@ async function show_top_gamers() {
 } // end function 1707F
 
 
-var aZaderjivaetsqE = ' задерживается еще на час.';
-var aUxodit_ = ' уходит.';
-
 
 async function exam_ends_common() {
+    const aZaderjivaetsqE = ' задерживается еще на час.';
+    const aUxodit_ = ' уходит.';
+    
     if (hero.health <= 0) {
         return;
     }
@@ -2939,7 +2939,7 @@ async function exam_ends_common() {
     GotoXY(1, 0x17);
     TextColor(0x0C);
 
-    if (subjects[current_subject].member0xFA * 5 + time_of_day * 6 < hero.charizma * 3 + Random(0x3C) + 0x14) {
+    if (subjects[current_subject].member0xFA * 5 + time_of_day * 6 < hero.charizma * 3 + Random(60) + 20) {
 
         write(subjects[current_subject].professor.name);
         write(aZaderjivaetsqE);
