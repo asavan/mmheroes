@@ -116,6 +116,7 @@ byte_254A4
 */
 var word_2559A, word_256CE, word_256D0, asc_256D2, byte_2549F, byte_254A4;
 const Algebra = 0, Matan = 1, GiT = 2, Infa = 3, English = 4, Fizra = 5;
+const NoSubj = -1;
 
 const places = [{title: '----'}, {title: 'ПУНК '}, {title: 'ПОМИ '}, {title: 'Компы'}, {title: 'Общага'}, {title: 'Мавзолей'}];
 const Nowhere = 0, Punk = 1, Pomi = 2, Kompy = 3, Obshaga = 4, Mavzoley = 5;
@@ -171,7 +172,7 @@ function _init_vars() {
     classmates = [];
     for (let i = 0; i < 12; ++i) {
         classmates.push({
-            current_subject: -1, place: Nowhere,
+            current_subject: NoSubj, place: Nowhere,
             bothers_activity: [0, 0, 0, 4, 2, 0, 0, 6, 0, 0, 0, 0][i],
             bothers_penalty: [0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0][i]
         });
@@ -200,8 +201,79 @@ var is_god_mode, is_god_mode_available;
 
 var time_of_day, day_of_week, current_place, death_cause;
 
-var current_subject;
+let current_subject;
 let last_subject;
+
+function dialogShower(x, y) {
+    const dialog = [];
+
+    function addDialod(d) {
+        dialog.push(d);
+    }
+
+    function dialog_case(str, num) {
+        dialog_case_colored(str, num, 0xB);
+    }
+
+    function dialog_case_colored(str, num, color) {
+        addDialod({str: str, num: num, color: color});
+    }
+
+    function dialog_show(x, y) {
+        current_color = 0xB;
+        for (let i = 0; i < dialog.length; ++i) {
+            GotoXY(x, y + i);
+            current_color = dialog[i].color;
+            write(dialog[i].str);
+        }
+        current_color = 7;
+    } // end function 20B20
+
+
+    async function dialog_run() {
+
+        let current_selection = 0;
+        dialog_show(x, y);
+
+        //console.log(dialog);
+        //console.log(dialog_case_count);
+
+        while (1) {
+            current_color = 0x70;
+            GotoXY(x, y + current_selection);
+            write(dialog[current_selection].str);
+            const key = await ReadKey();
+
+            current_color = dialog[current_selection].color;
+            GotoXY(x, y + current_selection);
+            write(dialog[current_selection].str);
+            switch (key) {
+                case "ArrowDown":
+                    current_selection = (current_selection + 1) % dialog.length;
+                    break;
+                case "ArrowUp":
+                    current_selection = (current_selection + dialog.length - 1) % dialog.length;
+                    break;
+                case "Enter":
+                case " ": {
+                    current_color = 7;
+                    const result = dialog[current_selection].num;
+                    return result;
+                }
+            }
+        }
+    }
+
+    return {
+        dialog_run: dialog_run,
+        dialog_case: dialog_case,
+        dialog_case_colored: dialog_case_colored
+    }
+}
+
+function dialogShower1(y) {
+    return dialogShower(1, y);
+}
 
 
 // My little and buggy implementation of utilities like STL
@@ -220,7 +292,6 @@ var Screen = [];
 var ScreenColor = [];
 var PositionR = 0, PositionC = 0;
 
-//var Key = -1;
 
 function idiv(x, y) {
     return Math.floor(x / y);
@@ -531,11 +602,8 @@ async function Main() {
     try {
         await PROGRAM();
     } catch (e) {
-        if (e !== 42) {
-            console.dir(e);
-            alert(e + '\r\n' + e.stack);
-        }
-        console.log(e);
+        console.dir(e);
+        alert(e + '\r\n' + e.stack);
     }
 }
 
@@ -604,12 +672,12 @@ async function prompt_for_new_game() {
 
     ClrScr();
     writeln(aXocesPoprobova);
-    dialog_start();
-    dialog_case(aDaDaDa, -1);
-    dialog_case(aNet___Net___Ne, -2);
-    const ax = await dialog_run(1, 4);
+    const d = dialogShower1(4);
+    d.dialog_case(aDaDaDa, -1);
+    d.dialog_case(aNet___Net___Ne, -2);
+    const ax = await d.dialog_run();
     ClrScr();
-    return ax === -2;
+    return ax === -1;
 }
 
 
@@ -655,19 +723,19 @@ async function PROGRAM() {
 }
 
 
-var aDzin = 'ДЗИНЬ!';
-var aDddzzzzziiiiii = 'ДДДЗЗЗЗЗИИИИИИННННННЬ !!!!';
-var aDdddddzzzzzzzz = 'ДДДДДДЗЗЗЗЗЗЗЗЗЗЗЗЗИИИИИИИИИИННННННННННННЬ !!!!!!!!!!';
-var aTiProsipaesSqO = 'Ты просыпаешься от звонка будильника ';
-var aGoMaqV800_ = '-го мая в 8:00. ';
-var aNeojidannoTiOs = 'Неожиданно ты осознаешь, что началась зачетная неделя,';
-var aATvoqGotovnost = 'а твоя готовность к этому моменту практически равна нулю.';
-var aNatqgivaqNaSeb = 'Натягивая на себя скромное одеяние студента,';
-var aTiVsmatrivaesS = 'ты всматриваешься в заботливо оставленное соседом на стене';
-var aRaspisanieKogd = 'расписание: когда и где можно найти искомого препода ?';
-
-
 async function show_dzin_and_timesheet() {
+    const aDzin = 'ДЗИНЬ!';
+    const aDddzzzzziiiiii = 'ДДДЗЗЗЗЗИИИИИИННННННЬ !!!!';
+    const aDdddddzzzzzzzz = 'ДДДДДДЗЗЗЗЗЗЗЗЗЗЗЗЗИИИИИИИИИИННННННННННННЬ !!!!!!!!!!';
+    const aTiProsipaesSqO = 'Ты просыпаешься от звонка будильника ';
+    const aGoMaqV800_ = '-го мая в 8:00. ';
+    const aNeojidannoTiOs = 'Неожиданно ты осознаешь, что началась зачетная неделя,';
+    const aATvoqGotovnost = 'а твоя готовность к этому моменту практически равна нулю.';
+    const aNatqgivaqNaSeb = 'Натягивая на себя скромное одеяние студента,';
+    const aTiVsmatrivaesS = 'ты всматриваешься в заботливо оставленное соседом на стене';
+    const aRaspisanieKogd = 'расписание: когда и где можно найти искомого препода ?';
+
+
     ClrScr();
     TextColor(0x0A);
     writeln(aDzin);
@@ -700,26 +768,26 @@ const aNowhere_at_tur = 'nowhere_at_turn';
 
 async function scene_router() {
     if (current_place === Pomi) {
-        if (current_subject !== -1) {
-            await scene_exam();
-        } else {
+        if (current_subject === NoSubj) {
             await scene_pomi();
+        } else {
+            await scene_exam();
         }
     } else if (current_place === Punk) {
-        if (current_subject !== -1) {
-            await scene_exam();
-        } else {
+        if (current_subject === NoSubj) {
             await scene_punk();
+        } else {
+            await scene_exam();
         }
     } else if (current_place === Mavzoley) {
         await scene_mausoleum();
     } else if (current_place === Obshaga) {
         await scene_obschaga();
     } else if (current_place === Kompy) {
-        if (current_subject !== -1) {
-            await scene_exam();
-        } else {
+        if (current_subject === NoSubj) {
             await scene_kompy();
+        } else {
+            await scene_exam();
         }
     } else if (current_place === Nowhere) {
         await bug_report(aNowhere_at_tur);
@@ -933,21 +1001,21 @@ async function game_end() {
 } // end function 11029
 
 
-var aDisclaimer = 'DISCLAIMER';
-var a1_VsePersonaji = '1.) Все персонажи реальны. Эта программа является лишь неким отражением';
-var aMneniqEeAvtora = '    мнения ее автора об окружающей действительности.';
-var aAvtorNeStavilC = '    Автор не ставил цели оценить чью-либо линию поведения.';
-var a2_PoctiVseSobi = '2.) Почти все события реальны. Естественно, многие из них';
-var aPredstavleniVN = '    представлены в несколько аллегорическом виде.';
-var a3_VseSovpadeni = '3.) Все совпадения с другими реальными зачетными неделями,';
-var aProvedennimiKe = '    проведенными кем-либо в каком-либо ВУЗе, лишь подчеркивают';
-var aRealisticnostV = '    реалистичность взглядов автора на реальность.';
-var a_EsliViNasliVD = '*.) Если вы нашли в данной программе ошибку (любую, включая опечатки),';
-var aVasiKommentari = '    Ваши комментарии будут очень полезны.';
-var aAvtorNeNesetOt = 'Автор не несет ответственность за психическое состояние игрока.';
-
-
 async function show_disclaimer() {
+    const aDisclaimer = 'DISCLAIMER';
+    const a1_VsePersonaji = '1.) Все персонажи реальны. Эта программа является лишь неким отражением';
+    const aMneniqEeAvtora = '    мнения ее автора об окружающей действительности.';
+    const aAvtorNeStavilC = '    Автор не ставил цели оценить чью-либо линию поведения.';
+    const a2_PoctiVseSobi = '2.) Почти все события реальны. Естественно, многие из них';
+    const aPredstavleniVN = '    представлены в несколько аллегорическом виде.';
+    const a3_VseSovpadeni = '3.) Все совпадения с другими реальными зачетными неделями,';
+    const aProvedennimiKe = '    проведенными кем-либо в каком-либо ВУЗе, лишь подчеркивают';
+    const aRealisticnostV = '    реалистичность взглядов автора на реальность.';
+    const a_EsliViNasliVD = '*.) Если вы нашли в данной программе ошибку (любую, включая опечатки),';
+    const aVasiKommentari = '    Ваши комментарии будут очень полезны.';
+    const aAvtorNeNesetOt = 'Автор не несет ответственность за психическое состояние игрока.';
+
+
     ClrScr();
     TextColor(0x0A);
     writeln(aDisclaimer);
@@ -973,19 +1041,19 @@ async function show_disclaimer() {
     writeln(aAvtorNeNesetOt);
     await wait_for_key();
     ClrScr();
+    _update_screen();
 } // end function 112D0
 
 
 async function goto_kompy_to_obschaga() {
     current_subject = -1;
-    current_place = 4;
+    current_place = Obshaga;
 } // end function 11450
 
 
-var aNeSmogRasstatS = 'Не смог расстаться с компьютером.';
-
-
 async function goto_kompy_to_punk() {
+    const aNeSmogRasstatS = 'Не смог расстаться с компьютером.';
+
     current_place = 1;
     current_subject = -1;
     decrease_health(2, aNeSmogRasstatS);
@@ -1018,7 +1086,7 @@ async function goto_kompy_to_pomi() {
     }
 
     decrease_health(Random(0x0A), aVAlektrickeNas);
-    current_place = 2;
+    current_place = Pomi;
 
     if (hero.money < 10) {
         writeln(aDenegUTebqNetP);
@@ -2925,11 +2993,10 @@ async function show_top_gamers() {
 } // end function 1707F
 
 
-
 async function exam_ends_common() {
     const aZaderjivaetsqE = ' задерживается еще на час.';
     const aUxodit_ = ' уходит.';
-    
+
     if (hero.health <= 0) {
         return;
     }
@@ -3185,7 +3252,7 @@ async function algebra_ends() {
     const aPoitiZaNimNaAl = 'Пойти за ним на электричку?';
     const aDaQXocuEsePomu = 'Да, я хочу еще помучаться';
     const aNuUjNetSpasibo = 'Ну уж нет, спасибо!';
-    
+
     ClrScr();
     show_header_stats();
     TextColor(0x0C);
@@ -3655,7 +3722,7 @@ async function scene_exam() {
     if (ax === -1) {
         await continue_exam();
     } else if (ax === -2) {
-        current_subject = -1;
+        current_subject = NoSubj;
     } else if (ax >= 0 && ax <= 0xB) {
         await talk_with_classmate(ax);
     }
@@ -3725,8 +3792,8 @@ async function kolya_talk() {
     const aZrqOiZrq___ = '"Зря, ой, зря ..."';
     const aKolqDostaetTor = 'Коля достает тормозную жидкость, и вы распиваете еще по стакану.';
     const aSpilsq_ = 'Спился.';
-    
-    
+
+
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4129,7 +4196,7 @@ async function serg_talk() {
         writeln(aNaGlotniKefirc);
         hero.health += hero.charizma + Random(hero.charizma);
 
-        if (current_subject !== -1) {
+        if (current_subject !== NoSubj) {
             if (hero.subject[current_subject].knowledge > 3) {
                 hero.subject[current_subject].knowledge -= Random(3);
             }
@@ -4156,7 +4223,7 @@ async function serg_talk() {
     if (hero.charizma < Random(9)) {
         TextColor(7);
         writeln(aSerjUxoditKuda);
-        classmates[Serzg].current_subject = -1;
+        classmates[Serzg].current_subject = NoSubj;
         if (classmates[Serzg].place === Mavzoley) {
             classmates[Serzg].place = Nowhere;
         } else {
@@ -4170,13 +4237,13 @@ async function serg_talk() {
 } // end function 1B09A
 
 
-var aPasaVrucaetTeb = 'Паша вручает тебе твою стипуху за май: ';
-var aRub__2 = ' руб.';
-var aPasaVoodusevlq = 'Паша воодушевляет тебя на великие дела.';
-var aVmesteSAtimOnN = 'Вместе с этим он немного достает тебя.';
-
-
 async function pawa_talk() {
+    const aPasaVrucaetTeb = 'Паша вручает тебе твою стипуху за май: ';
+    const aRub__2 = ' руб.';
+    const aPasaVoodusevlq = 'Паша воодушевляет тебя на великие дела.';
+    const aVmesteSAtimOnN = 'Вместе с этим он немного достает тебя.';
+
+
     ClrScr();
     show_header_stats();
 
@@ -4208,16 +4275,14 @@ async function pawa_talk() {
 } // end function 1B526
 
 
-var aTiVstretilSasu = 'Ты встретил Сашу! Говорят, у него классные конспекты ...';
-var aNicegoNeNado = 'Ничего не надо';
-var aCegoTebeNadoOt = 'Чего тебе надо от Саши?';
-var aKakZnaes___ = 'Как знаешь...';
-var aSasa_1 = 'Саша:';
-var aDaUMenqSSoboiA = '"Да, у меня с собой этот конспект ..."';
-var aOxIzviniKtoToD = '"Ох, извини, кто-то другой уже позаимствовал ..."';
-
-
 async function sasha_talk() {
+    const aTiVstretilSasu = 'Ты встретил Сашу! Говорят, у него классные конспекты ...';
+    const aNicegoNeNado = 'Ничего не надо';
+    const aCegoTebeNadoOt = 'Чего тебе надо от Саши?';
+    const aKakZnaes___ = 'Как знаешь...';
+    const aSasa_1 = 'Саша:';
+    const aDaUMenqSSoboiA = '"Да, у меня с собой этот конспект ..."';
+    const aOxIzviniKtoToD = '"Ох, извини, кто-то другой уже позаимствовал ..."';
 
     ClrScr();
     show_header_stats();
@@ -4424,12 +4489,12 @@ async function kuzmenko_talk() {
 } // end function 1C02B
 
 
-var aDjug_0 = 'DJuG:';
-var aUVasKakoiToSko = '"У Вас какой-то школьный метод решения задач..."';
-var aNeObsaisqSTorm = 'Не общайся с тормозами!';
-
-
 async function djug_talk() {
+    const aDjug_0 = 'DJuG:';
+    const aUVasKakoiToSko = '"У Вас какой-то школьный метод решения задач..."';
+    const aNeObsaisqSTorm = 'Не общайся с тормозами!';
+
+
     ClrScr();
     show_header_stats();
     GotoXY(1, 8);
@@ -4714,30 +4779,13 @@ async function grisha_talk() {
 
 
 async function talk_with_classmate(classmate) {
-    if (classmate === Kolya) {
-        await kolya_talk();
-    } else if (classmate === Diamond) {
-        await diamond_dialog();
-    } else if (classmate === Rai) {
-        await rai_talk();
-    } else if (classmate === Pasha) {
-        await pawa_talk();
-    } else if (classmate === Misha) {
-        await misha_talk();
-    } else if (classmate === Serzg) {
-        await serg_talk();
-    } else if (classmate === Sasha) {
-        await sasha_talk();
-    } else if (classmate === Nil) {
-        await nil_talk();
-    } else if (classmate === Kuzmenko) {
-        await kuzmenko_talk();
-    } else if (classmate === Djug) {
-        await djug_talk();
-    } else if (classmate === Endryu) {
-        await andrew_talk();
-    } else if (classmate === Grisha) {
-        await grisha_talk();
+    const talks = [
+        kolya_talk, pawa_talk, diamond_dialog, rai_talk, misha_talk, serg_talk, sasha_talk,
+        nil_talk, kuzmenko_talk, djug_talk, andrew_talk, grisha_talk
+    ];
+    const talk = talks[classmate];
+    if (talk) {
+        await talk();
     }
 } // end function 1D6CE
 
@@ -5011,12 +5059,12 @@ async function goto_sleep() {
 } // end function 1E682
 
 
-var aTiGlqdisNaCasi = 'Ты глядишь на часы и видишь: уже полночь!';
-var aNaPosledneiAle = 'На последней электричке ты едешь домой, в общагу.';
-var aZasnulVAlektri = 'Заснул в электричке и не проснулся.';
-
-
 async function pomi_midnight() {
+    const aTiGlqdisNaCasi = 'Ты глядишь на часы и видишь: уже полночь!';
+    const aNaPosledneiAle = 'На последней электричке ты едешь домой, в общагу.';
+    const aZasnulVAlektri = 'Заснул в электричке и не проснулся.';
+
+
     ClrScr();
     TextColor(7);
     writeln(aTiGlqdisNaCasi);
@@ -5030,12 +5078,12 @@ async function pomi_midnight() {
 } // end function 1E7F8
 
 
-var aVaxtersaGlqdit = 'Вахтерша глядит на тебя странными глазами:';
-var aCtoMojetDelatB = 'что может делать бедный студент в университете в полночь?';
-var aNeZnaqOtvetNaA = 'Не зная ответ на этот вопрос, ты спешишь в общагу.';
+async function punk_midnight() {
+    const aVaxtersaGlqdit = 'Вахтерша глядит на тебя странными глазами:';
+    const aCtoMojetDelatB = 'что может делать бедный студент в университете в полночь?';
+    const aNeZnaqOtvetNaA = 'Не зная ответ на этот вопрос, ты спешишь в общагу.';
 
 
-async function obshaga_midnight() {
     ClrScr();
     TextColor(7);
     writeln(aVaxtersaGlqdit);
@@ -5068,7 +5116,7 @@ async function midnight() {
     if (current_place === Pomi) {
         await pomi_midnight();
     } else if (current_place === Punk) {
-        await obshaga_midnight();
+        await punk_midnight();
     } else if (current_place === Mavzoley) {
         await mavzoley_midnight();
     } else if (current_place === Obshaga) {
@@ -5584,20 +5632,20 @@ function show_timesheet_day(day_color, day, subj) {
 } // end function 1FD54
 
 
-var aOstalos = 'Осталось';
-var aPodoitiS = 'Подойти с';
-var aZacetkoi = 'зачеткой';
-var aZacet = 'ЗАЧЕТ';
-var a_05 = '.05';
-var aVseUjeSdano = 'Все уже сдано!';
-var aOstalsq = 'Остался ';
-var aZacet_0 = ' зачет!';
-var aOstalos_0 = 'Осталось ';
-var aZaceta_ = ' зачета.';
-var aZacetov_ = ' зачетов.';
-
-
 function show_timesheet() {
+    const aOstalos = 'Осталось';
+    const aPodoitiS = 'Подойти с';
+    const aZacetkoi = 'зачеткой';
+    const aZacet = 'ЗАЧЕТ';
+    const a_05 = '.05';
+    const aVseUjeSdano = 'Все уже сдано!';
+    const aOstalsq = 'Остался ';
+    const aZacet_0 = ' зачет!';
+    const aOstalos_0 = 'Осталось ';
+    const aZaceta_ = ' зачета.';
+    const aZacetov_ = ' зачетов.';
+
+
     for (let subj = Algebra; subj <= Fizra; ++subj) {
         TextColor(7);
         GotoXY(1, subj * 3 + 2);
