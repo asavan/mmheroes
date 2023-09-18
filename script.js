@@ -1,4 +1,5 @@
-var local_user_name = '';
+let local_user_name = '';
+let help_page = 0;
 
 function get_user_name() {
     if (local_user_name === '' &&
@@ -16,13 +17,10 @@ function set_user_name(name) {
     }
 }
 
-function send_replay(vars) {
+function send_replay() {
 
 }
 
-function get_top() {
-
-}
 
 
 /* 0xC8, size 0x44; offsets: [6]
@@ -114,7 +112,7 @@ asc_256D2
 byte_2549F
 byte_254A4
 */
-var word_2559A, word_256CE, word_256D0, asc_256D2, byte_2549F, byte_254A4;
+// var word_2559A, word_256CE, word_256D0, asc_256D2, byte_2549F, byte_254A4;
 const Algebra = 0, Matan = 1, GiT = 2, Infa = 3, English = 4, Fizra = 5;
 const NoSubj = -1;
 
@@ -238,7 +236,7 @@ function dialogShower(x, y) {
         //console.log(dialog);
         //console.log(dialog_case_count);
 
-        while (1) {
+        for (;;) {
             current_color = 0x70;
             GotoXY(x, y + current_selection);
             write(dialog[current_selection].str);
@@ -248,18 +246,18 @@ function dialogShower(x, y) {
             GotoXY(x, y + current_selection);
             write(dialog[current_selection].str);
             switch (key) {
-                case "ArrowDown":
-                    current_selection = (current_selection + 1) % dialog.length;
-                    break;
-                case "ArrowUp":
-                    current_selection = (current_selection + dialog.length - 1) % dialog.length;
-                    break;
-                case "Enter":
-                case " ": {
-                    current_color = 7;
-                    const result = dialog[current_selection].num;
-                    return result;
-                }
+            case "ArrowDown":
+                current_selection = (current_selection + 1) % dialog.length;
+                break;
+            case "ArrowUp":
+                current_selection = (current_selection + dialog.length - 1) % dialog.length;
+                break;
+            case "Enter":
+            case " ": {
+                current_color = 7;
+                const result = dialog[current_selection].num;
+                return result;
+            }
             }
         }
     }
@@ -268,7 +266,7 @@ function dialogShower(x, y) {
         dialog_run: dialog_run,
         dialog_case: dialog_case,
         dialog_case_colored: dialog_case_colored
-    }
+    };
 }
 
 function dialogShower1(y) {
@@ -312,7 +310,8 @@ function ParamCount() {
     return 0;
 }
 
-function ParamStr(num) {
+function ParamStr() {
+    // TODO parse url params
     return '';
 }
 
@@ -510,7 +509,7 @@ function RandomPhrase(phrases) {
 }
 
 function ReadKey_on() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         document.onkeydown = (e) => {
             const ignoredMeta = ["Control", "Alt", "Meta", "Tab", "Shift"];
             const ignoredKeys = ["KeyC", "KeyS"];
@@ -558,10 +557,8 @@ async function dialog_run(x, y) {
     let current_selection = 0;
     dialog_show(x, y);
 
-    //console.log(dialog);
-    //console.log(dialog_case_count);
 
-    while (1) {
+    for(;;) {
         current_color = 0x70;
         GotoXY(x, y + current_selection);
         write(dialog[current_selection].str);
@@ -571,28 +568,28 @@ async function dialog_run(x, y) {
         GotoXY(x, y + current_selection);
         write(dialog[current_selection].str);
         switch (key) {
-            case "ArrowDown":
-                if (current_selection === dialog_case_count - 1) {
-                    current_selection = 0;
-                } else {
-                    ++current_selection;
-                }
-                break;
-            case "ArrowUp":
-                if (current_selection === 0) {
-                    current_selection = dialog_case_count - 1;
-                } else {
-                    --current_selection;
-                }
-                break;
-            case "Enter":
-            case " ": {
-                current_color = 7;
-                const result = dialog[current_selection].num;
-                Replay.record_dialog(result);
-                Replay.wait_dialog(false);
-                return result;
+        case "ArrowDown":
+            if (current_selection === dialog_case_count - 1) {
+                current_selection = 0;
+            } else {
+                ++current_selection;
             }
+            break;
+        case "ArrowUp":
+            if (current_selection === 0) {
+                current_selection = dialog_case_count - 1;
+            } else {
+                --current_selection;
+            }
+            break;
+        case "Enter":
+        case " ": {
+            current_color = 7;
+            const result = dialog[current_selection].num;
+            Replay.record_dialog(result);
+            Replay.wait_dialog(false);
+            return result;
+        }
         }
     }
 } // end function 20B87
@@ -640,9 +637,9 @@ function jz(a, b) {
     return a == b;
 }
 
-function jnz(a, b) {
-    return a != b;
-}
+//function jnz(a, b) {
+//    return a != b;
+//}
 
 function jl(a, b) {
     return a < b;
@@ -1867,7 +1864,7 @@ function help_screen() {
     output_colored_string(aIPoSkaleTrebov);
     output_colored_string(aNijeNavikovMin);
     output_colored_string(aPolnoeRaspisan);
-    output_colored_string(aNakonecSlevaVN)
+    output_colored_string(aNakonecSlevaVN);
     writeln();
     output_colored_string(aSostoqnieNavik);
     output_colored_string(aSituaciq);
@@ -2169,7 +2166,7 @@ async function show_intro_git() {
     writeln(aPodkoritovMlad);
     writeln(aTiRaduesSqCtoS);
     writeln(a____2);
-    hero.health += 5
+    hero.health += 5;
     await ReadKey();
     ClrScr();
 } // end function 14EEF
@@ -2789,7 +2786,7 @@ async function go_pomi_to_punk() {
         const ax = await dialog_run(1, 0x0A);
 
         if (ax === -1) {
-            hero.money -= 5
+            hero.money -= 5;
             hero.has_ticket = 1;
         }
     }
@@ -2882,8 +2879,8 @@ var aNuVotIVse_ = 'Ну, вот и все.';
 
 
 async function update_top_gamers(score) {
-    var var_108;
-    var var_106;
+    // var var_108;
+    // svar var_106;
     var my_place = -1;
 
     /*
@@ -2979,7 +2976,7 @@ async function show_top_gamers() {
     for (let i = 0; i < top_gamers.length; ++i) {
 
         TextColor(0x0F);
-        GotoXY(4, i + 7)
+        GotoXY(4, i + 7);
         write(top_gamers[i].name);
         GotoXY(0x19, i + 7);
         write(top_gamers[i].score);
@@ -3089,7 +3086,7 @@ var aTebeZacliEse = 'Тебе зачли еще ';
 
 
 async function algebra_in_train() {
-    var var_106;
+    // var var_106;
 
     ClrScr();
     show_header_stats();
@@ -3738,7 +3735,7 @@ var aLucseIgnorirov = ' лучше игнорировать не надо.';
 
 
 async function bothers(student) {
-    var var_104;
+    // var var_104;
     var var_4;
     var var_1;
 
@@ -4313,7 +4310,7 @@ async function sasha_talk() {
             TextColor(0x0F);
             writeln(aDaUMenqSSoboiA);
             synopsis[res].hero_has = true;
-            byte_2549F = 0;
+            // byte_2549F = 0;
         } else {
             GotoXY(1, 0x0F);
             TextColor(7);
@@ -5151,9 +5148,9 @@ async function hour_pass() {
         await midnight();
     }
 
-    if (hero.charizma > Random(0x0A)) {
-        byte_254A4 = 0;
-    }
+    //    if (hero.charizma > Random(0x0A)) {
+    //        byte_254A4 = 0;
+    //    }
     init_classmates();
 
 } // end function 1EA4F
@@ -5670,7 +5667,7 @@ function show_timesheet() {
                 TextColor(7);
                 GotoXY(0x46, subj * 3 + 2);
                 write(aOstalos);
-                GotoXY(0x46, subj * 3 + 3)
+                GotoXY(0x46, subj * 3 + 3);
                 colored_output_white(subjects[subj].tasks - hero.subject[subj].tasks_done);
                 zadanie_in_case(subjects[subj].tasks - hero.subject[subj].tasks_done);
             } else {
@@ -5855,7 +5852,7 @@ async function init_hero() {
     hero.is_working_in_terkom = false;
 
     // #warning no refs
-    byte_2549F = 0;
+    // byte_2549F = 0;
 
     if (ParamCount()) {
         await init_hero_interactive();
@@ -5867,9 +5864,11 @@ async function init_hero() {
     }
 
     // #warning no refs
+    /*
     word_256CE = hero.brain;
     asc_256D2 = hero.stamina;
     word_256D0 = hero.charizma;
+*/
 
     day_of_week = 0;
     time_of_day = 8;
@@ -5879,7 +5878,7 @@ async function init_hero() {
     hero.health = Random(hero.stamina * 2) + 0x28;
 
     // #warning no refs
-    word_2559A = hero.health;
+    // word_2559A = hero.health;
 
     hero.exams_left = 6;
     hero.has_ticket = 0;
@@ -5889,7 +5888,7 @@ async function init_hero() {
     hero.is_invited = false;
 
     // #warning no refs
-    byte_254A4 = 0;
+    // byte_254A4 = 0;
 
     hero.has_inet = false;
 } // end function 206E4
@@ -6018,3 +6017,4 @@ function dialog_show(x, y) {
 
 
 Main();
+export default Main;
