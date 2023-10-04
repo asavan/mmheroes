@@ -17,6 +17,7 @@ div#bug {
 
 #screen {
     border-collapse: collapse;
+    table-layout:fixed;
 }
 
 #screen td {

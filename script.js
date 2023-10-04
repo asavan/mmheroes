@@ -1,8 +1,8 @@
-let local_user_name = '';
+let local_user_name = "";
 let help_page = 0;
 
 function get_user_name() {
-    if (local_user_name === '' &&
+    if (local_user_name === "" &&
         window.localStorage &&
         window.localStorage.nick) {
         local_user_name = window.localStorage.nick;
@@ -36,20 +36,20 @@ function send_replay() {
 0x40	0x108	subject_exam_places
 0x43	0x10B	subject_professor_sex 1=male
 */
-var subjects = [];
+let subjects = [];
 
 /* 0x478, sizes 0x1E, 5; offsets: [6][6]
 0	0x478	from
 2	0x47A	to
 4	0x47C	where
 */
-var timesheet = [];
+let timesheet = [];
 /*
 {sasha_has: true, hero_has: false} [3]
 [i + 0x52E] // is_sasha_has_synopsis
 [i + 0x55C] // synopsis_presences
 */
-var synopsis = [];
+let synopsis = [];
 /*
 [i * 2 + 0x532] // subject_tasks_done
 [i * 2 + 0x544] // subject_pass_day
@@ -80,13 +80,14 @@ const hero = {
 0x51	number
 0x53	color
 */
-var dialog = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+const dialog = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+    undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
 /*
 0x3B2, size 0x23, offsets: [5]
 0		0x3B2	name
 0x21	0x3D3	score
 */
-var top_gamers = [];
+const top_gamers = [];
 /*
 0x676, size 3, offsets: [12]
 0	0x676	current_subject
@@ -95,7 +96,7 @@ var top_gamers = [];
 0x32C, size 2
 0x344, size 2
 */
-var classmates = [];
+let classmates = [];
 
 let terkom_has_places = true; // 2549D
 let klimov_timesheet_was_modified = 0; // 25494
@@ -116,12 +117,21 @@ byte_254A4
 const Algebra = 0, Matan = 1, GiT = 2, Infa = 3, English = 4, Fizra = 5;
 const NoSubj = -1;
 
-const places = [{title: '----'}, {title: 'ПУНК '}, {title: 'ПОМИ '}, {title: 'Компы'}, {title: 'Общага'}, {title: 'Мавзолей'}];
+const places = [
+    {title: "----"},
+    {title: "ПУНК "},
+    {title: "ПОМИ "},
+    {title: "Компы"},
+    {title: "Общага"},
+    {title: "Мавзолей"}
+];
+
 const Nowhere = 0, Punk = 1, Pomi = 2, Kompy = 3, Obshaga = 4, Mavzoley = 5;
 const Male = 1, Female = 0;
 
 function _init_vars() {
-    const init_subjects = function (professor_name, title, knolege_drop, health_drop, tasks, difficulty, exam_days, exam_min_time, exam_max_time, exam_places, professor_sex) {
+    const init_subjects = function (professor_name, title, knolege_drop, health_drop, tasks, difficulty, exam_days,
+        exam_min_time, exam_max_time, exam_places, professor_sex) {
         subjects.push({
             professor: {name: professor_name, sex: professor_sex},
             title: title,
@@ -137,12 +147,12 @@ function _init_vars() {
     };
 
     subjects = [];
-    init_subjects('Всемирнов М.А.', 'Алгебра и Т.Ч.', 0xA, 0x11, 0xC, 3, 4, 2, 4, [Punk, Punk, Pomi], Male);
-    init_subjects('Дубцов Е.С.', 'Мат. Анализ', 8, 0xE, 0xA, 2, 4, 2, 3, [Punk, Punk, Punk], Male);
-    init_subjects('Подкорытов С.С.', 'Геометрия и Топология', 4, 8, 3, 3, 2, 1, 3, [Punk, Pomi, Pomi], Male);
-    init_subjects('Климов А.А.', 'Информатика', 5, 6, 2, 3, 2, 1, 2, [Kompy, Kompy, Kompy], Male);
-    init_subjects('Влащенко Н.П.', 'English', 7, 0xA, 3, 1, 2, 2, 2, [Punk, Punk, Punk], Female);
-    init_subjects('Альбинский Е.Г.', 'Физ-ра', 7, 0x14, 1, 1, 2, 1, 1, [Punk, Punk, Punk], Male);
+    init_subjects("Всемирнов М.А.", "Алгебра и Т.Ч.", 0xA, 0x11, 0xC, 3, 4, 2, 4, [Punk, Punk, Pomi], Male);
+    init_subjects("Дубцов Е.С.", "Мат. Анализ", 8, 0xE, 0xA, 2, 4, 2, 3, [Punk, Punk, Punk], Male);
+    init_subjects("Подкорытов С.С.", "Геометрия и Топология", 4, 8, 3, 3, 2, 1, 3, [Punk, Pomi, Pomi], Male);
+    init_subjects("Климов А.А.", "Информатика", 5, 6, 2, 3, 2, 1, 2, [Kompy, Kompy, Kompy], Male);
+    init_subjects("Влащенко Н.П.", "English", 7, 0xA, 3, 1, 2, 2, 2, [Punk, Punk, Punk], Female);
+    init_subjects("Альбинский Е.Г.", "Физ-ра", 7, 0x14, 1, 1, 2, 1, 1, [Punk, Punk, Punk], Male);
 
     timesheet = [];
     for (let i = 0; i < 6; ++i) {
@@ -181,23 +191,24 @@ function _init_vars() {
 
 
 // 0x74, size 7
-const days = ['22.5', '23.5', '24.5', '25.5', '26.5', '27.5'];
+const days = ["22.5", "23.5", "24.5", "25.5", "26.5", "27.5"];
 // 0x260, size 0x11
-const classmate_names = ['Коля', 'Паша', 'Diamond', 'RAI', 'Миша', 'Серж', 'Саша', 'NiL', 'Кузьменко В.Г.', 'DJuG', 'Эндрю', 'Гриша'];
+const classmate_names = ["Коля", "Паша", "Diamond", "RAI", "Миша", "Серж", "Саша", "NiL", "Кузьменко В.Г.", "DJuG",
+    "Эндрю", "Гриша"];
 
 const Kolya = 0, Pasha = 1, Diamond = 2, Rai = 3, Misha = 4, Serzg = 5, Sasha = 6, Nil = 7, Kuzmenko = 8, Djug = 9,
     Endryu = 10, Grisha = 11;
 
 
 // 0x9E, size 7
-const subject_short_titles = ['АиТЧ', 'МатАн', 'ГиТ', 'Инф', 'ИнЯз', 'Физ-ра'];
+const subject_short_titles = ["АиТЧ", "МатАн", "ГиТ", "Инф", "ИнЯз", "Физ-ра"];
 
-var dialog_case_count;
-var current_color;
+let dialog_case_count;
+let current_color;
 let is_end = false;
-var is_god_mode, is_god_mode_available;
+let is_god_mode, is_god_mode_available;
 
-var time_of_day, day_of_week, current_place, death_cause;
+let time_of_day, day_of_week, current_place, death_cause;
 
 let current_subject;
 let last_subject;
@@ -286,9 +297,9 @@ function _upper_bound(cont, val) {
 
 
 // My little and buggy implementation of pascal
-var Screen = [];
-var ScreenColor = [];
-var PositionR = 0, PositionC = 0;
+const Screen = [];
+const ScreenColor = [];
+let PositionR = 0, PositionC = 0;
 
 
 function idiv(x, y) {
@@ -312,7 +323,7 @@ function ParamCount() {
 
 function ParamStr() {
     // TODO parse url params
-    return '';
+    return "";
 }
 
 function __CrtInit() {
@@ -320,7 +331,7 @@ function __CrtInit() {
         Screen.push([]);
         ScreenColor.push([]);
         for (let j = 0; j < 80; ++j) {
-            Screen[i].push(' ');
+            Screen[i].push(" ");
             ScreenColor[i].push(0x07);
         }
     }
@@ -330,13 +341,13 @@ function TextColor(col) {
     current_color = current_color & 0xF0 | col;
 }
 
-async function Delay(pause) { /*var start = new Date().getTime(); while (new Date().getTime - start < pause);*/
+function Delay(pause) { /*var start = new Date().getTime(); while (new Date().getTime - start < pause);*/
     _update_screen();
     return new Promise(resolve => setTimeout(resolve, pause));
 }
 
 function alyarme(str) {
-    alert(str + '\r\n\r\n' + get_stack() + '\r\n\r\n' + JSON.stringify(Replay.data));
+    alert(str + "\r\n\r\n" + get_stack() + "\r\n\r\n" + JSON.stringify(Replay.data));
 }
 
 function get_stack() {
@@ -445,26 +456,26 @@ function ClrScr() {
 
     for (let i = 0; i < 25; ++i) {
         for (let j = 0; j < 80; ++j) {
-            Screen[i][j] = ' ';
+            Screen[i][j] = " ";
             ScreenColor[i][j] = 0x07;
         }
     }
 }
 
 function _update_screen() {
-    let html = '';
-    html += '<table id="screen">';
+    let html = "";
+    html += "<table id=\"screen\">";
     for (let i = 0; i < 25; ++i) {
-        html += '<tr>';
+        html += "<tr>";
         for (let j = 0; j < 80; ++j) {
-            html += '<td class="fg' + (ScreenColor[i][j] & 0xF) + ' bg' + (ScreenColor[i][j] >> 4) + '">' +
-                Screen[i][j] + '</td>';
+            html += "<td class=\"fg" + (ScreenColor[i][j] & 0xF) + " bg" + (ScreenColor[i][j] >> 4) + "\">" +
+                Screen[i][j] + "</td>";
         }
-        html += '</tr>';
+        html += "</tr>";
     }
-    html += '</table>';
+    html += "</table>";
 
-    document.getElementById('content').innerHTML = html;
+    document.getElementById("content").innerHTML = html;
 }
 
 function write(str) {
@@ -472,9 +483,9 @@ function write(str) {
         return;
     }
     if (PositionR >= 25) {
-        alyarme('write at pos ' + PositionR + ',' + PositionC);
+        alyarme("write at pos " + PositionR + "," + PositionC);
     }
-    str = '' + str;
+    str = "" + str;
     for (let i = 0; i < str.length; ++i) {
         Screen[PositionR][PositionC] = str.charAt(i);
         ScreenColor[PositionR][PositionC] = current_color;
@@ -489,13 +500,14 @@ function Random(up) {
 
         const res = Replay.next_rnd();
         if (rec_up !== up || up && res >= up || !up && res > 0) {
-            alyarme('Replay: Random(' + up + ') = rnds[' + (Replay.data.rnds_i - 1) + '] = ' + res + ', rec_up = ' + rec_up /*+ ', rec_stack = ' + rec_stack*/);
+            alyarme("Replay: Random(" + up + ") = rnds[" + (Replay.data.rnds_i - 1) + "] = " + res + ", rec_up = " +
+                rec_up /*+ ', rec_stack = ' + rec_stack*/);
         }
         return res;
     } else {
         const res = Math.floor(Math.random() * up);
         if (up && res >= up || !up && res > 0) {
-            alyarme('Random(' + up + ') = ' + res);
+            alyarme("Random(" + up + ") = " + res);
         }
 
         Replay.record_rnd(res, up);
@@ -536,7 +548,7 @@ function promt_with_delay(message, default_message) {
 
 function readln() {
     _update_screen();
-    return promt_with_delay('Enter string:', get_user_name());
+    return promt_with_delay("Enter string:", get_user_name());
 }
 
 async function dialog_run(x, y) {
@@ -558,7 +570,7 @@ async function dialog_run(x, y) {
     dialog_show(x, y);
 
 
-    for(;;) {
+    for (;;) {
         current_color = 0x70;
         GotoXY(x, y + current_selection);
         write(dialog[current_selection].str);
@@ -600,7 +612,7 @@ async function Main() {
         await PROGRAM();
     } catch (e) {
         console.dir(e);
-        alert(e + '\r\n' + e.stack);
+        alert(e + "\r\n" + e.stack);
     }
 }
 
@@ -611,7 +623,9 @@ function _crlf() {
 }
 
 function writeln(str) {
-    if (str != undefined) write(str);
+    if (str != undefined) {
+        write(str);
+    }
     _crlf();
 }
 
@@ -659,13 +673,13 @@ function ja(a, b) {
 
 
 // from dseg
-const aGamma3_14 = 'gamma3.14';
+const aGamma3_14 = "gamma3.14";
 
 
 async function prompt_for_new_game() {
-    const aXocesPoprobova = 'Хочешь попробовать еще?';
-    const aDaDaDa = 'ДА!!! ДА!!! ДА!!!';
-    const aNet___Net___Ne = 'Нет... Нет... Не-э-эт...';
+    const aXocesPoprobova = "Хочешь попробовать еще?";
+    const aDaDaDa = "ДА!!! ДА!!! ДА!!!";
+    const aNet___Net___Ne = "Нет... Нет... Не-э-эт...";
 
     ClrScr();
     writeln(aXocesPoprobova);
@@ -678,7 +692,7 @@ async function prompt_for_new_game() {
 }
 
 
-const a3decHappyBirth = '-3dec-happy-birthday-Diamond';
+const a3decHappyBirth = "-3dec-happy-birthday-Diamond";
 
 
 async function PROGRAM() {
@@ -721,16 +735,16 @@ async function PROGRAM() {
 
 
 async function show_dzin_and_timesheet() {
-    const aDzin = 'ДЗИНЬ!';
-    const aDddzzzzziiiiii = 'ДДДЗЗЗЗЗИИИИИИННННННЬ !!!!';
-    const aDdddddzzzzzzzz = 'ДДДДДДЗЗЗЗЗЗЗЗЗЗЗЗЗИИИИИИИИИИННННННННННННЬ !!!!!!!!!!';
-    const aTiProsipaesSqO = 'Ты просыпаешься от звонка будильника ';
-    const aGoMaqV800_ = '-го мая в 8:00. ';
-    const aNeojidannoTiOs = 'Неожиданно ты осознаешь, что началась зачетная неделя,';
-    const aATvoqGotovnost = 'а твоя готовность к этому моменту практически равна нулю.';
-    const aNatqgivaqNaSeb = 'Натягивая на себя скромное одеяние студента,';
-    const aTiVsmatrivaesS = 'ты всматриваешься в заботливо оставленное соседом на стене';
-    const aRaspisanieKogd = 'расписание: когда и где можно найти искомого препода ?';
+    const aDzin = "ДЗИНЬ!";
+    const aDddzzzzziiiiii = "ДДДЗЗЗЗЗИИИИИИННННННЬ !!!!";
+    const aDdddddzzzzzzzz = "ДДДДДДЗЗЗЗЗЗЗЗЗЗЗЗЗИИИИИИИИИИННННННННННННЬ !!!!!!!!!!";
+    const aTiProsipaesSqO = "Ты просыпаешься от звонка будильника ";
+    const aGoMaqV800_ = "-го мая в 8:00. ";
+    const aNeojidannoTiOs = "Неожиданно ты осознаешь, что началась зачетная неделя,";
+    const aATvoqGotovnost = "а твоя готовность к этому моменту практически равна нулю.";
+    const aNatqgivaqNaSeb = "Натягивая на себя скромное одеяние студента,";
+    const aTiVsmatrivaesS = "ты всматриваешься в заботливо оставленное соседом на стене";
+    const aRaspisanieKogd = "расписание: когда и где можно найти искомого препода ?";
 
 
     ClrScr();
@@ -760,7 +774,7 @@ async function show_dzin_and_timesheet() {
 } // end function 102EF
 
 
-const aNowhere_at_tur = 'nowhere_at_turn';
+const aNowhere_at_tur = "nowhere_at_turn";
 
 
 async function scene_router() {
@@ -793,8 +807,8 @@ async function scene_router() {
 
 
 async function game_end_death() {
-    const aLegceLbomKolot = 'Легче лбом колоть орехи,';
-    const aCemUcitSqNaMat = 'чем учиться на МАТ-МЕХе.';
+    const aLegceLbomKolot = "Легче лбом колоть орехи,";
+    const aCemUcitSqNaMat = "чем учиться на МАТ-МЕХе.";
 
     send_replay({death_cause: death_cause});
     current_color = 0x0C;
@@ -806,31 +820,31 @@ async function game_end_death() {
 } // end function 104DC
 
 
-var aUfffffVoVsqkom = 'Уффффф! Во всяком случае, ты еще живой.';
-var aYesTiSdelalAto = '********* Yes! Ты сделал это! *********';
-var aUTebqNetCelix = 'У тебя нет целых ';
-var aZacetov = ' зачетов!';
-var aTiOtcislen = 'ТЫ ОТЧИСЛЕН!';
-var aNetDvuxZacetov = 'Нет двух зачетов - плохо.';
-var aGovorqtUMexani = 'Говорят, у механиков жизнь проще...';
-var aZrqGovorqtXalq = '- Зря говорят, ХАЛЯВЫ НЕ БУДЕТ!';
-var aNetOdnogoZacet = 'Нет одного зачета.';
-var aNicegoOtAtogoE = 'Ничего, от этого еще никто не помирал.';
-var aPozdravlquTiMo = 'Поздравляю: ты можешь считать себя настоящим героем Мат-Меха!';
-var aUspesnoiTebeSe = 'Успешной тебе сессии !';
-var aUTebqNetZaceta = 'У тебя нет зачета по алгебре!';
-var aVsemirnovDokan = 'Всемирнов доканал тебя на сессии.';
-var aEstestvennoAto = 'Естественно, это повлияло на твои оценки.';
-var aUTebqNetDopusk = 'У тебя нет допуска по матану!';
-var aUTebqNetZace_0 = 'У тебя нет зачета по геометрии!';
-var aKakTebqUgorazd = 'Как тебя угораздило?';
-var aKSessiiTiGotov = 'К сессии ты "готовился", "работая" в ТЕРКОМе.';
-var aTiResilBolSeNi = 'Ты решил больше никогда так не делать.';
-var aTvoqStipuxa = 'Твоя стипуха - ';
-var aRub_ = ' руб.';
-var aVZanacke = 'В заначке ';
-var aDaTiEseIGodNet = 'Да ты еще и GOD! Нет, тебе в таблицу рекордов нельзя.';
-var aTebqOstaviliBe = 'Тебя оставили без стипухи.';
+const aUfffffVoVsqkom = "Уффффф! Во всяком случае, ты еще живой.";
+const aYesTiSdelalAto = "********* Yes! Ты сделал это! *********";
+const aUTebqNetCelix = "У тебя нет целых ";
+const aZacetov = " зачетов!";
+const aTiOtcislen = "ТЫ ОТЧИСЛЕН!";
+const aNetDvuxZacetov = "Нет двух зачетов - плохо.";
+const aGovorqtUMexani = "Говорят, у механиков жизнь проще...";
+const aZrqGovorqtXalq = "- Зря говорят, ХАЛЯВЫ НЕ БУДЕТ!";
+const aNetOdnogoZacet = "Нет одного зачета.";
+const aNicegoOtAtogoE = "Ничего, от этого еще никто не помирал.";
+const aPozdravlquTiMo = "Поздравляю: ты можешь считать себя настоящим героем Мат-Меха!";
+const aUspesnoiTebeSe = "Успешной тебе сессии !";
+const aUTebqNetZaceta = "У тебя нет зачета по алгебре!";
+const aVsemirnovDokan = "Всемирнов доканал тебя на сессии.";
+const aEstestvennoAto = "Естественно, это повлияло на твои оценки.";
+const aUTebqNetDopusk = "У тебя нет допуска по матану!";
+const aUTebqNetZace_0 = "У тебя нет зачета по геометрии!";
+const aKakTebqUgorazd = "Как тебя угораздило?";
+const aKSessiiTiGotov = "К сессии ты \"готовился\", \"работая\" в ТЕРКОМе.";
+const aTiResilBolSeNi = "Ты решил больше никогда так не делать.";
+const aTvoqStipuxa = "Твоя стипуха - ";
+const aRub_ = " руб.";
+const aVZanacke = "В заначке ";
+const aDaTiEseIGodNet = "Да ты еще и GOD! Нет, тебе в таблицу рекордов нельзя.";
+const aTebqOstaviliBe = "Тебя оставили без стипухи.";
 
 
 async function game_end_alive() {
@@ -944,18 +958,18 @@ async function game_end_alive() {
 
 
 async function show_intro_screen() {
-    const aNamPonqtenAtot = '                                                Нам понятен этот смех';
-    const aNePopavsixNaM = '                                                Не попавших на Мат-Мех';
-    const aNadpisNaParte = '                                                  (надпись на парте)';
-    const aHHEeeRrOEeeSsM = ' H H  EEE  RR    O   EEE  SS       M   M  A   A TTTTT       M   M  EEE  X   X';
-    const aHHERROOESMmMmA = ' H H  E    R R  O O  E   S         MM MM  AAAAA   T         MM MM    E   X X';
-    const aHhhEeRrOOEeSOf = ' HHH  EE   RR   O O  EE   S    OF  M M M  A   A   T    &&&  M M M   EE    X';
-    const aHHERROOESMMAAT = ' H H  E    R R  O O  E     S       M   M   A A    T         M   M    E   X X';
-    const aHHEeeRROEeeSsM = ' H H  EEE  R R   O   EEE SS        M   M    A     T         M   E  EEE  X   X';
-    const aGeroiMataIMexa = '                             ГЕРОИ МАТА И МЕХА ;)';
-    const aPCrwmmDevelopm = '(P) CrWMM Development Team, 2001.';
-    const aVersiq = 'Версия ';
-    const aZaglqniteNaNas = 'Загляните на нашу страничку: mmheroes.chat.ru !';
+    const aNamPonqtenAtot = "                                                Нам понятен этот смех";
+    const aNePopavsixNaM = "                                                Не попавших на Мат-Мех";
+    const aNadpisNaParte = "                                                  (надпись на парте)";
+    const aHHEeeRrOEeeSsM = " H H  EEE  RR    O   EEE  SS       M   M  A   A TTTTT       M   M  EEE  X   X";
+    const aHHERROOESMmMmA = " H H  E    R R  O O  E   S         MM MM  AAAAA   T         MM MM    E   X X";
+    const aHhhEeRrOOEeSOf = " HHH  EE   RR   O O  EE   S    OF  M M M  A   A   T    &&&  M M M   EE    X";
+    const aHHERROOESMMAAT = " H H  E    R R  O O  E     S       M   M   A A    T         M   M    E   X X";
+    const aHHEeeRROEeeSsM = " H H  EEE  R R   O   EEE SS        M   M    A     T         M   E  EEE  X   X";
+    const aGeroiMataIMexa = "                             ГЕРОИ МАТА И МЕХА ;)";
+    const aPCrwmmDevelopm = "(P) CrWMM Development Team, 2001.";
+    const aVersiq = "Версия ";
+    const aZaglqniteNaNas = "Загляните на нашу страничку: mmheroes.chat.ru !";
 
     ClrScr();
     TextColor(8);
@@ -981,7 +995,7 @@ async function show_intro_screen() {
     writeln(aPCrwmmDevelopm);
     write(aVersiq);
     write(aGamma3_14);
-    writeln('.');
+    writeln(".");
     writeln(aZaglqniteNaNas);
     await wait_for_key();
     ClrScr();
@@ -999,18 +1013,18 @@ async function game_end() {
 
 
 async function show_disclaimer() {
-    const aDisclaimer = 'DISCLAIMER';
-    const a1_VsePersonaji = '1.) Все персонажи реальны. Эта программа является лишь неким отражением';
-    const aMneniqEeAvtora = '    мнения ее автора об окружающей действительности.';
-    const aAvtorNeStavilC = '    Автор не ставил цели оценить чью-либо линию поведения.';
-    const a2_PoctiVseSobi = '2.) Почти все события реальны. Естественно, многие из них';
-    const aPredstavleniVN = '    представлены в несколько аллегорическом виде.';
-    const a3_VseSovpadeni = '3.) Все совпадения с другими реальными зачетными неделями,';
-    const aProvedennimiKe = '    проведенными кем-либо в каком-либо ВУЗе, лишь подчеркивают';
-    const aRealisticnostV = '    реалистичность взглядов автора на реальность.';
-    const a_EsliViNasliVD = '*.) Если вы нашли в данной программе ошибку (любую, включая опечатки),';
-    const aVasiKommentari = '    Ваши комментарии будут очень полезны.';
-    const aAvtorNeNesetOt = 'Автор не несет ответственность за психическое состояние игрока.';
+    const aDisclaimer = "DISCLAIMER";
+    const a1_VsePersonaji = "1.) Все персонажи реальны. Эта программа является лишь неким отражением";
+    const aMneniqEeAvtora = "    мнения ее автора об окружающей действительности.";
+    const aAvtorNeStavilC = "    Автор не ставил цели оценить чью-либо линию поведения.";
+    const a2_PoctiVseSobi = "2.) Почти все события реальны. Естественно, многие из них";
+    const aPredstavleniVN = "    представлены в несколько аллегорическом виде.";
+    const a3_VseSovpadeni = "3.) Все совпадения с другими реальными зачетными неделями,";
+    const aProvedennimiKe = "    проведенными кем-либо в каком-либо ВУЗе, лишь подчеркивают";
+    const aRealisticnostV = "    реалистичность взглядов автора на реальность.";
+    const a_EsliViNasliVD = "*.) Если вы нашли в данной программе ошибку (любую, включая опечатки),";
+    const aVasiKommentari = "    Ваши комментарии будут очень полезны.";
+    const aAvtorNeNesetOt = "Автор не несет ответственность за психическое состояние игрока.";
 
 
     ClrScr();
@@ -1042,14 +1056,14 @@ async function show_disclaimer() {
 } // end function 112D0
 
 
-async function goto_kompy_to_obschaga() {
+function goto_kompy_to_obschaga() {
     current_subject = -1;
     current_place = Obshaga;
 } // end function 11450
 
 
-async function goto_kompy_to_punk() {
-    const aNeSmogRasstatS = 'Не смог расстаться с компьютером.';
+function goto_kompy_to_punk() {
+    const aNeSmogRasstatS = "Не смог расстаться с компьютером.";
 
     current_place = 1;
     current_subject = -1;
@@ -1057,17 +1071,17 @@ async function goto_kompy_to_punk() {
 } // end function 11482
 
 
-var aZdraviiSmislPo = 'Здравый смысл подсказывает тебе, что в такое время';
-var aTiTamNikogoUje = 'ты там никого уже не найдешь.';
-var aNeBudemZrqTrat = 'Не будем зря тратить здоровье на поездку в ПОМИ.';
-var aVAlektrickeNas = 'В электричке нашли бездыханное тело.';
-var aDenegUTebqNetP = 'Денег у тебя нет, пришлось ехать зайцем...';
-var aTebqZaloviliKo = 'Тебя заловили контролеры!';
-var aVisadiliVKrasn = 'Высадили в Красных зорях, гады!';
-var aKontroleriJizn = 'Контролеры жизни лишили.';
-var aUfDoexal = 'Уф, доехал!';
-var aExatZaicem = 'Ехать зайцем';
-var aCestnoZaplatit = 'Честно заплатить 10 руб. за билет в оба конца';
+const aZdraviiSmislPo = "Здравый смысл подсказывает тебе, что в такое время";
+const aTiTamNikogoUje = "ты там никого уже не найдешь.";
+const aNeBudemZrqTrat = "Не будем зря тратить здоровье на поездку в ПОМИ.";
+const aVAlektrickeNas = "В электричке нашли бездыханное тело.";
+const aDenegUTebqNetP = "Денег у тебя нет, пришлось ехать зайцем...";
+const aTebqZaloviliKo = "Тебя заловили контролеры!";
+const aVisadiliVKrasn = "Высадили в Красных зорях, гады!";
+const aKontroleriJizn = "Контролеры жизни лишили.";
+const aUfDoexal = "Уф, доехал!";
+const aExatZaicem = "Ехать зайцем";
+const aCestnoZaplatit = "Честно заплатить 10 руб. за билет в оба конца";
 
 
 async function goto_kompy_to_pomi() {
@@ -1125,8 +1139,8 @@ async function goto_kompy_to_pomi() {
 
 
 async function goto_klimov() {
-    const aKlimovA_a_Sidi = 'Климов А.А. сидит и тоскует по халявному Inet\'у.';
-    const a___ = '...';
+    const aKlimovA_a_Sidi = "Климов А.А. сидит и тоскует по халявному Inet'у.";
+    const a___ = "...";
     if (Random(2) === 0) {
         ClrScr();
         TextColor(7);
@@ -1140,36 +1154,36 @@ async function goto_klimov() {
 
 
 function goto_kompy_to_mausoleum() {
-    const aUmerPoPutiVMav = 'Умер по пути в мавзолей.';
+    const aUmerPoPutiVMav = "Умер по пути в мавзолей.";
     current_subject = -1;
     current_place = Mavzoley;
     decrease_health(2, aUmerPoPutiVMav);
 } // end function 1189E
 
 
-var aDzin_0 = 'ДЗИНЬ!';
-var aDddzzzzziiii_0 = 'ДДДЗЗЗЗЗИИИИИИННННННЬ !!!!';
-var aDdddddzzzzzz_0 = 'ДДДДДДЗЗЗЗЗЗЗЗЗЗЗЗЗИИИИИИИИИИННННННННННННЬ !!!!!!!!!!';
-var aNeojidannoTi_0 = 'Неожиданно ты осознаешь, что началась зачетная неделя,';
-var aATvoqGotovno_0 = 'а твоя готовность к этому моменту практически равна нулю.';
-var aNatqgivaqNaS_0 = 'Натягивая на себя скромное одеяние студента,';
-var aTiVsmatrivae_0 = 'ты всматриваешься в заботливо оставленное соседом на стене';
-var aRaspisanieKo_0 = 'расписание: когда и где можно найти искомого препода ?';
-var aStop = '!!!!!! СТОП! !!!!!!';
-var aCtoToTakoeTiUj = 'ЧТО-ТО ТАКОЕ ТЫ УЖЕ ВИДЕЛ!!!';
-var aOglqdevsisVokr = 'Оглядевшись вокруг, ты осознаешь, что, вроде бы,';
-var aAkstraordinarn = 'экстраординарного не произошло. Ты просто играешь в компьютерную';
-var aIgruNeSamogoLu = 'игру не самого лучшего качества, в которой тебе вдруг предложили...';
-var aSigratVAtuSamu = 'СЫГРАТЬ В ЭТУ САМУЮ ИГРУ! [...]';
-var aRazdvoenieLojn = 'Раздвоение ложной личности.';
-var aNeKajdiiSposob = 'Не каждый способен пережить такое потрясение.';
-var aPostepennoKTeb = 'Постепенно к тебе приходит осознание того, что';
-var aNaSamomDeleVse = 'на самом деле, все это - компьютерная игра, и, следовательно,';
-var aAtiSobitiqProi = 'эти события происходят только в твоем воображении.';
-var aVovremqViidqIz = 'Вовремя выйдя из странного трансцендентального состояния,';
-var aTiObnarujivaes = 'ты обнаруживаешь себя в компьютерном классе Мат-Меха.';
-var aPravdaMirVokru = 'Правда, мир вокруг тебя, похоже, несколько иной,';
-var aNejeliOnBilCas = 'нежели он был час минут назад...';
+const aDzin_0 = "ДЗИНЬ!";
+const aDddzzzzziiii_0 = "ДДДЗЗЗЗЗИИИИИИННННННЬ !!!!";
+const aDdddddzzzzzz_0 = "ДДДДДДЗЗЗЗЗЗЗЗЗЗЗЗЗИИИИИИИИИИННННННННННННЬ !!!!!!!!!!";
+const aNeojidannoTi_0 = "Неожиданно ты осознаешь, что началась зачетная неделя,";
+const aATvoqGotovno_0 = "а твоя готовность к этому моменту практически равна нулю.";
+const aNatqgivaqNaS_0 = "Натягивая на себя скромное одеяние студента,";
+const aTiVsmatrivae_0 = "ты всматриваешься в заботливо оставленное соседом на стене";
+const aRaspisanieKo_0 = "расписание: когда и где можно найти искомого препода ?";
+const aStop = "!!!!!! СТОП! !!!!!!";
+const aCtoToTakoeTiUj = "ЧТО-ТО ТАКОЕ ТЫ УЖЕ ВИДЕЛ!!!";
+const aOglqdevsisVokr = "Оглядевшись вокруг, ты осознаешь, что, вроде бы,";
+const aAkstraordinarn = "экстраординарного не произошло. Ты просто играешь в компьютерную";
+const aIgruNeSamogoLu = "игру не самого лучшего качества, в которой тебе вдруг предложили...";
+const aSigratVAtuSamu = "СЫГРАТЬ В ЭТУ САМУЮ ИГРУ! [...]";
+const aRazdvoenieLojn = "Раздвоение ложной личности.";
+const aNeKajdiiSposob = "Не каждый способен пережить такое потрясение.";
+const aPostepennoKTeb = "Постепенно к тебе приходит осознание того, что";
+const aNaSamomDeleVse = "на самом деле, все это - компьютерная игра, и, следовательно,";
+const aAtiSobitiqProi = "эти события происходят только в твоем воображении.";
+const aVovremqViidqIz = "Вовремя выйдя из странного трансцендентального состояния,";
+const aTiObnarujivaes = "ты обнаруживаешь себя в компьютерном классе Мат-Меха.";
+const aPravdaMirVokru = "Правда, мир вокруг тебя, похоже, несколько иной,";
+const aNejeliOnBilCas = "нежели он был час минут назад...";
 
 
 async function play_mmheroes() {
@@ -1227,7 +1241,7 @@ async function play_mmheroes() {
 } // end function 11CD5
 
 
-var aUxTiTiNaselPro = 'Ух ты! Ты нашел програмку, которая нужна для Климова!';
+const aUxTiTiNaselPro = "Ух ты! Ты нашел програмку, которая нужна для Климова!";
 
 
 async function surf_inet() {
@@ -1244,17 +1258,17 @@ async function surf_inet() {
 } // end function 11FA2
 
 
-var aKlassZakrivaet = 'Класс закрывается. Пошли домой!';
-var aUmerPoPutiDomo = 'Умер по пути домой. Бывает.';
-var aTiVKompUternom = 'Ты в компьютерном классе. Что делать?';
-var aKlimovA_a_ = 'Климов А.А.';
-var aPoitiVObsagu = 'Пойти в общагу';
-var aPokinutKlass = 'Покинуть класс';
-var aPoexatVPomi = 'Поехать в ПОМИ';
-var aPoitiVMavzolei = 'Пойти в мавзолей';
-var aProvesti1CasVI = 'Провести 1 час в Inet\'е';
-var aPoigratVMmhero = 'Поиграть в MMHEROES';
-var aSMenqXvatit = 'С меня хватит!';
+const aKlassZakrivaet = "Класс закрывается. Пошли домой!";
+const aUmerPoPutiDomo = "Умер по пути домой. Бывает.";
+const aTiVKompUternom = "Ты в компьютерном классе. Что делать?";
+const aKlimovA_a_ = "Климов А.А.";
+const aPoitiVObsagu = "Пойти в общагу";
+const aPokinutKlass = "Покинуть класс";
+const aPoexatVPomi = "Поехать в ПОМИ";
+const aPoitiVMavzolei = "Пойти в мавзолей";
+const aProvesti1CasVI = "Провести 1 час в Inet'е";
+const aPoigratVMmhero = "Поиграть в MMHEROES";
+const aSMenqXvatit = "С меня хватит!";
 
 
 async function scene_kompy() {
@@ -1316,7 +1330,7 @@ async function scene_kompy() {
 
 
 function goto_mausoleum_to_punk() {
-    const aUmerPoPutiNaFa = 'Умер по пути на факультет.';
+    const aUmerPoPutiNaFa = "Умер по пути на факультет.";
     decrease_health(3, aUmerPoPutiNaFa);
     current_subject = -1;
     current_place = 1;
@@ -1329,13 +1343,13 @@ function goto_mausoleum_to_obschaga() {
 } // end function 12307
 
 
-var aViberiSebeSpos = 'Выбери себе способ "культурного отдыха".';
-var aStakanKoliZa4R = 'Стакан колы за 4 р.';
-var aSup6R_VseUdovo = 'Суп, 6 р. все удовольствие';
-var a05PivaZa8R_ = '0,5 пива за 8 р.';
-var aRasslablqtSqBu = 'Расслабляться будем своими силами.';
-var aNetOtdixatAtoQ = 'Нет, отдыхать - это я зря сказал.';
-var aPivnoiAlkogoli = 'Пивной алкоголизм, батенька...';
+const aViberiSebeSpos = "Выбери себе способ \"культурного отдыха\".";
+const aStakanKoliZa4R = "Стакан колы за 4 р.";
+const aSup6R_VseUdovo = "Суп, 6 р. все удовольствие";
+const a05PivaZa8R_ = "0,5 пива за 8 р.";
+const aRasslablqtSqBu = "Расслабляться будем своими силами.";
+const aNetOtdixatAtoQ = "Нет, отдыхать - это я зря сказал.";
+const aPivnoiAlkogoli = "Пивной алкоголизм, батенька...";
 
 
 async function rest_in_mausoleum() {
@@ -1388,12 +1402,12 @@ async function rest_in_mausoleum() {
 } // end function 123E4
 
 
-var aTiVMavzolee_Ct = 'Ты в мавзолее. Что делать?';
-var aIdtiVPunk = 'Идти в ПУНК';
-var aPoexatVPomi_0 = 'Поехать в ПОМИ';
-var aIdtiVObsagu = 'Идти в общагу';
-var aOtdixat = 'Отдыхать';
-var aSMenqXvatit_0 = 'С меня хватит!';
+const aTiVMavzolee_Ct = "Ты в мавзолее. Что делать?";
+const aIdtiVPunk = "Идти в ПУНК";
+const aPoexatVPomi_0 = "Поехать в ПОМИ";
+const aIdtiVObsagu = "Идти в общагу";
+const aOtdixat = "Отдыхать";
+const aSMenqXvatit_0 = "С меня хватит!";
 
 
 async function scene_mausoleum() {
@@ -1434,13 +1448,13 @@ async function scene_mausoleum() {
 } // end function 12595
 
 
-var aKCemuGotovitSq = 'К чему готовиться?';
-var aK = ' (к)';
-var aNiKCemu = 'Ни к чему';
-var aVospolZuusKons = 'Воспользуюсь конспектом';
-var aBuduUcitSqKakU = 'Буду учиться, как умею';
-var aZaucilsq_ = 'Заучился.';
-var aZubrejkaDoDobr = 'Зубрежка до добра не доводит!';
+const aKCemuGotovitSq = "К чему готовиться?";
+const aK = " (к)";
+const aNiKCemu = "Ни к чему";
+const aVospolZuusKons = "Воспользуюсь конспектом";
+const aBuduUcitSqKakU = "Буду учиться, как умею";
+const aZaucilsq_ = "Заучился.";
+const aZubrejkaDoDobr = "Зубрежка до добра не доводит!";
 
 
 async function botva() {
@@ -1452,7 +1466,7 @@ async function botva() {
 
     dialog_start();
     for (let i = 0; i <= 5; ++i) {
-        dialog_case(subjects[i].title + (i <= 2 && synopsis[i].hero_has ? aK : ''), i);
+        dialog_case(subjects[i].title + (i <= 2 && synopsis[i].hero_has ? aK : ""), i);
     }
     dialog_case(aNiKCemu, -1);
 
@@ -1512,7 +1526,7 @@ async function botva() {
 } // end function 12719
 
 
-var aUmerPoPutiNa_0 = 'Умер по пути на факультет.';
+const aUmerPoPutiNa_0 = "Умер по пути на факультет.";
 
 
 function goto_obschaga_to_punk() {
@@ -1522,17 +1536,17 @@ function goto_obschaga_to_punk() {
 } // end function 12995
 
 
-var aZdraviiSmisl_0 = 'Здравый смысл подсказывает тебе, что в такое время';
-var aTiTamNikogoU_0 = 'ты там никого уже не найдешь.';
-var aNeBudemZrqTr_0 = 'Не будем зря тратить здоровье на поездку в ПОМИ.';
-var aVAlektrickeN_0 = 'В электричке нашли бездыханное тело.';
-var aDenegUTebqNe_0 = 'Денег у тебя нет, пришлось ехать зайцем...';
-var aTebqZalovili_0 = 'Тебя заловили контролеры!';
-var aVisadiliVKra_0 = 'Высадили в Красных зорях, гады!';
-var aKontroleriJi_0 = 'Контролеры жизни лишили.';
-var aUfDoexal_0 = 'Уф, доехал!';
-var aExatZaicem_0 = 'Ехать зайцем';
-var aCestnoZaplat_0 = 'Честно заплатить 10 руб. за билет в оба конца';
+const aZdraviiSmisl_0 = "Здравый смысл подсказывает тебе, что в такое время";
+const aTiTamNikogoU_0 = "ты там никого уже не найдешь.";
+const aNeBudemZrqTr_0 = "Не будем зря тратить здоровье на поездку в ПОМИ.";
+const aVAlektrickeN_0 = "В электричке нашли бездыханное тело.";
+const aDenegUTebqNe_0 = "Денег у тебя нет, пришлось ехать зайцем...";
+const aTebqZalovili_0 = "Тебя заловили контролеры!";
+const aVisadiliVKra_0 = "Высадили в Красных зорях, гады!";
+const aKontroleriJi_0 = "Контролеры жизни лишили.";
+const aUfDoexal_0 = "Уф, доехал!";
+const aExatZaicem_0 = "Ехать зайцем";
+const aCestnoZaplat_0 = "Честно заплатить 10 руб. за билет в оба конца";
 
 
 async function goto_obschaga_to_pomi() {
@@ -1594,7 +1608,7 @@ async function goto_obschaga_to_pomi() {
 } // end function 12B1E
 
 
-var aUmerPoPutiVM_0 = 'Умер по пути в мавзолей.';
+const aUmerPoPutiVM_0 = "Умер по пути в мавзолей.";
 
 
 function goto_obschaga_to_mausoleum() {
@@ -1612,7 +1626,7 @@ async function see_timesheet() {
 } // end function 12D46
 
 
-var aTebqCegoToNeTq = 'Тебя чего-то не тянет по-спать...';
+const aTebqCegoToNeTq = "Тебя чего-то не тянет по-спать...";
 
 
 async function try_sleep() {
@@ -1631,15 +1645,15 @@ function clamp0(arg_2) {
 } // end function 12DC1
 
 
-var aKTebeLomitsqSo = 'К тебе ломится сосед и приглашает тебя ';
-var aNaSvoiDenRojde = 'на свой День Рожденья.';
-var aNaDiskotekuVSa = 'на дискотеку в "Шайбе".';
-var aPoigratVMafiu_ = 'поиграть в мафию.';
-var aPoQuakat_ = 'по-Quakать.';
-var aUguQSeicas = '"Угу, я сейчас!!!"';
-var aNeIzviniMneGot = '"Не, извини, мне готовиться надо..."';
-var aPosliOttqgivat = '"Пошли оттягиваться!"';
-var aNuIZrq = '"Ну и зря!"';
+const aKTebeLomitsqSo = "К тебе ломится сосед и приглашает тебя ";
+const aNaSvoiDenRojde = "на свой День Рожденья.";
+const aNaDiskotekuVSa = "на дискотеку в \"Шайбе\".";
+const aPoigratVMafiu_ = "поиграть в мафию.";
+const aPoQuakat_ = "по-Quakать.";
+const aUguQSeicas = "\"Угу, я сейчас!!!\"";
+const aNeIzviniMneGot = "\"Не, извини, мне готовиться надо...\"";
+const aPosliOttqgivat = "\"Пошли оттягиваться!\"";
+const aNuIZrq = "\"Ну и зря!\"";
 
 
 async function invite_from_neighbor() {
@@ -1659,7 +1673,7 @@ async function invite_from_neighbor() {
 
         for (let var_2 = 2, var_6 = Random(3) + 4; var_2 <= var_6; ++var_2) {
             await hour_pass();
-            var subj = random_from_to(0, 5);
+            const subj = random_from_to(0, 5);
             hero.subject[subj].knowledge -=
                 Random(Math.round(Math.sqrt(hero.subject[subj].knowledge * 2.0)));
 
@@ -1690,17 +1704,17 @@ async function invite_from_neighbor() {
 } // end function 12EB2
 
 
-var aTebqNeumolimoK = 'Тебя неумолимо клонит ко сну ...';
-var aTiVObsage_CtoD = 'Ты в общаге. Что делать?';
-var aGotovitSq = 'Готовиться';
-var aPosmotretRaspi = 'Посмотреть расписание';
-var aOtdixat_0 = 'Отдыхать';
-var aLecSpat = 'Лечь спать';
-var aPoitiNaFakulTe = 'Пойти на факультет';
-var aPoexatVPomi_1 = 'Поехать в ПОМИ';
-var aPoitiVMavzol_0 = 'Пойти в мавзолей';
-var aSMenqXvatit_1 = 'С меня хватит!';
-var aCtoDelat = 'ЧТО ДЕЛАТЬ ???';
+const aTebqNeumolimoK = "Тебя неумолимо клонит ко сну ...";
+const aTiVObsage_CtoD = "Ты в общаге. Что делать?";
+const aGotovitSq = "Готовиться";
+const aPosmotretRaspi = "Посмотреть расписание";
+const aOtdixat_0 = "Отдыхать";
+const aLecSpat = "Лечь спать";
+const aPoitiNaFakulTe = "Пойти на факультет";
+const aPoexatVPomi_1 = "Поехать в ПОМИ";
+const aPoitiVMavzol_0 = "Пойти в мавзолей";
+const aSMenqXvatit_1 = "С меня хватит!";
+const aCtoDelat = "ЧТО ДЕЛАТЬ ???";
 
 
 async function scene_obschaga() {
@@ -1776,14 +1790,14 @@ function output_colored_string(s) {
 } // end function 13339
 
 
-var aACtoVoobseDela = ' А что вообще делать? ';
-var aObAkrane = ' Об экране            ';
-var aKudaIZacemXodi = ' Куда и зачем ходить? ';
-var aOPrepodavatelq = ' О преподавателях     ';
-var aOPersonajax = ' О персонажах         ';
-var aObAtoiProgramm = ' Об этой программе    ';
-var aSpasiboNicego = ' Спасибо, ничего      ';
-var aCtoTebqInteres = 'Что тебя интересует?';
+const aACtoVoobseDela = " А что вообще делать? ";
+const aObAkrane = " Об экране            ";
+const aKudaIZacemXodi = " Куда и зачем ходить? ";
+const aOPrepodavatelq = " О преподавателях     ";
+const aOPersonajax = " О персонажах         ";
+const aObAtoiProgramm = " Об этой программе    ";
+const aSpasiboNicego = " Спасибо, ничего      ";
+const aCtoTebqInteres = "Что тебя интересует?";
 
 
 async function select_help_page() {
@@ -1819,15 +1833,15 @@ async function select_help_page() {
 } // end function 1346B
 
 
-var aEstVsego6Dnei_ = '\x07Есть всего \x0E6 дней\x07. За это время надо успеть получить \x0E6 зачетов\x07.';
-var aCtobiPolucitZa = 'Чтобы получить \x0Eзачет\x07, можно успешно сдать сколько-то \x0Eзаданий\x07.';
-var aCtobiSdatNesko = 'Чтобы сдать несколько заданий, можно чего-то знать и \x0Eприйти к преподу\x07.';
-var aCtobiCegoToZna = 'Чтобы чего-то знать, можно \x0Eготовиться\x07.';
-var aPrepodavatelei = 'Преподавателей надо искать по \x0Eрасписанию\x07.';
-var aPokaGotovisSqI = 'Пока готовишься или сдаешь, \x0Eсамочуствие\x07 ухудшается.';
-var aCtobiUlucsitSa = 'Чтобы улучшить самочуствие, можно \x0Eотдыхать\x07.';
-var aVsqkieDopolnit = 'Всякие \x0Eдополнительные персонажи\x07 могут помогать, а могут мешать.';
-var aAlTernativnieV = '\x0CАльтернативные варианты есть почти везде, но они тоже чего-то стоят\x07.';
+const aEstVsego6Dnei_ = "\x07Есть всего \x0E6 дней\x07. За это время надо успеть получить \x0E6 зачетов\x07.";
+const aCtobiPolucitZa = "Чтобы получить \x0Eзачет\x07, можно успешно сдать сколько-то \x0Eзаданий\x07.";
+const aCtobiSdatNesko = "Чтобы сдать несколько заданий, можно чего-то знать и \x0Eприйти к преподу\x07.";
+const aCtobiCegoToZna = "Чтобы чего-то знать, можно \x0Eготовиться\x07.";
+const aPrepodavatelei = "Преподавателей надо искать по \x0Eрасписанию\x07.";
+const aPokaGotovisSqI = "Пока готовишься или сдаешь, \x0Eсамочуствие\x07 ухудшается.";
+const aCtobiUlucsitSa = "Чтобы улучшить самочуствие, можно \x0Eотдыхать\x07.";
+const aVsqkieDopolnit = "Всякие \x0Eдополнительные персонажи\x07 могут помогать, а могут мешать.";
+const aAlTernativnieV = "\x0CАльтернативные варианты есть почти везде, но они тоже чего-то стоят\x07.";
 
 
 function help_overview() {
@@ -1843,17 +1857,17 @@ function help_overview() {
 } // end function 1375C
 
 
-var aVLevomVerxnemU = '\x07В левом верхнем углу - игровые \x0Eдата\x07 и \x0Eвремя\x07,';
-var aTvoeSostoqnieZ = '\x07твое состояние (\x0Eздоровье\x07, \x0Eкачества\x07), \x0Eденьги\x07.';
-var aVPravomVerxnem = '\x07В правом верхнем углу - твои \x0Eнавыки\x07 по предметам.';
-var aNavikiOcenivau = '\x07Навыки оцениваются двояко: по \x0E"общей шкале"\x07 (число)';
-var aIPoSkaleTrebov = '\x07и по \x0Eшкале требований конкретного преподавателя\x07 ("оценка").';
-var aNijeNavikovMin = '\x07Ниже навыков - мини-расписание на этот день + сданные задачи.';
-var aPolnoeRaspisan = '\x07Полное расписание можно посмотреть в общаге (выбрать в меню).';
-var aNakonecSlevaVN = '\x07Наконец, слева в нижней половине экрана - текущее меню.';
-var aSostoqnieNavik = ' \x0AСОСТОЯНИЕ     \x0FНАВЫКИ';
-var aSituaciq = ' \x0EСИТУАЦИЯ';
-var aMenuRaspisanie = ' \x0BМЕНЮ          \x0CРАСПИСАНИЕ';
+const aVLevomVerxnemU = "\x07В левом верхнем углу - игровые \x0Eдата\x07 и \x0Eвремя\x07,";
+const aTvoeSostoqnieZ = "\x07твое состояние (\x0Eздоровье\x07, \x0Eкачества\x07), \x0Eденьги\x07.";
+const aVPravomVerxnem = "\x07В правом верхнем углу - твои \x0Eнавыки\x07 по предметам.";
+const aNavikiOcenivau = "\x07Навыки оцениваются двояко: по \x0E\"общей шкале\"\x07 (число)";
+const aIPoSkaleTrebov = "\x07и по \x0Eшкале требований конкретного преподавателя\x07 (\"оценка\").";
+const aNijeNavikovMin = "\x07Ниже навыков - мини-расписание на этот день + сданные задачи.";
+const aPolnoeRaspisan = "\x07Полное расписание можно посмотреть в общаге (выбрать в меню).";
+const aNakonecSlevaVN = "\x07Наконец, слева в нижней половине экрана - текущее меню.";
+const aSostoqnieNavik = " \x0AСОСТОЯНИЕ     \x0FНАВЫКИ";
+const aSituaciq = " \x0EСИТУАЦИЯ";
+const aMenuRaspisanie = " \x0BМЕНЮ          \x0CРАСПИСАНИЕ";
 
 
 function help_screen() {
@@ -1873,16 +1887,16 @@ function help_screen() {
 } // end function 139B9
 
 
-var aVObsageTiGotov = '\x07В \x0Eобщаге\x07 ты готовишься и отдыхаешь.';
-var aNaFakulTetePun = 'На \x0Eфакультете(~=ПУНК)\x07 ты бегаешь по преподам и ищешь приятелей.';
-var aCtobiPopastVKo = 'Чтобы попасть в \x0Eкомпьюетрный класс\x07, надо прийти на факультет.';
-var aVKompUternomKl = 'В компьютерном классе ты сдаешь зачет по информатике и ищешь друзей.';
-var aMavzoleiAtoTak = '\x0EМавзолей\x07 - это такая столовая. Там ты отдыхаешь и ищешь приятелей.';
-var aPomiPeterburgs = '\x0EПОМИ\x07 - Петербургское Отделение Математического Института РАН.';
-var aVPomiTiBudesIs = 'В ПОМИ ты будешь искать преподов и приятелей.';
-var aVPomiNadoExatN = 'В ПОМИ надо ехать на электричке, это занимает \x0E1 час\x07.';
-var aEsliExatZaicem = 'Если ехать зайцем - то может оказаться, что и \x0E2 часа\x07.';
-var aKromeTogoPoezd = 'Кроме того, \x0Cпоездка отнимает и здоровье тоже\x07.';
+const aVObsageTiGotov = "\x07В \x0Eобщаге\x07 ты готовишься и отдыхаешь.";
+const aNaFakulTetePun = "На \x0Eфакультете(~=ПУНК)\x07 ты бегаешь по преподам и ищешь приятелей.";
+const aCtobiPopastVKo = "Чтобы попасть в \x0Eкомпьюетрный класс\x07, надо прийти на факультет.";
+const aVKompUternomKl = "В компьютерном классе ты сдаешь зачет по информатике и ищешь друзей.";
+const aMavzoleiAtoTak = "\x0EМавзолей\x07 - это такая столовая. Там ты отдыхаешь и ищешь приятелей.";
+const aPomiPeterburgs = "\x0EПОМИ\x07 - Петербургское Отделение Математического Института РАН.";
+const aVPomiTiBudesIs = "В ПОМИ ты будешь искать преподов и приятелей.";
+const aVPomiNadoExatN = "В ПОМИ надо ехать на электричке, это занимает \x0E1 час\x07.";
+const aEsliExatZaicem = "Если ехать зайцем - то может оказаться, что и \x0E2 часа\x07.";
+const aKromeTogoPoezd = "Кроме того, \x0Cпоездка отнимает и здоровье тоже\x07.";
 
 
 function help_places() {
@@ -1899,18 +1913,18 @@ function help_places() {
 } // end function 13C75
 
 
-var aVsemirnovM_a_A = 'Всемирнов М.А., алгебра';
-var aOcenSerEzniiIV = ' - очень серьезный и весьма строгий.';
-var aDubcovE_s_Mata = 'Дубцов Е.С., матан';
-var aNeOcenStrogiiI = ' - не очень строгий и с некоторой халявой.';
-var aPodkoritovS_s_ = 'Подкорытов С.С., геометрия';
-var aZamesaetDutkev = ' - замещает Дуткевича Ю.Г.. Почти без проблем.';
-var aKlimovA_a_Info = 'Климов А.А., информатика';
-var aBezProblemNoTr = ' - без проблем, но трудно найти.';
-var aVlasenkoN_p_En = 'Влащенко Н.П., English';
-var aBezProblemNoSN = ' - без проблем, но с некоторым своеобразием.';
-var aAlBinskiiE_g_F = 'Альбинский Е.Г., Физ-ра';
-var aBezProblemNoOt = ' - без проблем, но от физ-ры сильно устаешь.';
+const aVsemirnovM_a_A = "Всемирнов М.А., алгебра";
+const aOcenSerEzniiIV = " - очень серьезный и весьма строгий.";
+const aDubcovE_s_Mata = "Дубцов Е.С., матан";
+const aNeOcenStrogiiI = " - не очень строгий и с некоторой халявой.";
+const aPodkoritovS_s_ = "Подкорытов С.С., геометрия";
+const aZamesaetDutkev = " - замещает Дуткевича Ю.Г.. Почти без проблем.";
+const aKlimovA_a_Info = "Климов А.А., информатика";
+const aBezProblemNoTr = " - без проблем, но трудно найти.";
+const aVlasenkoN_p_En = "Влащенко Н.П., English";
+const aBezProblemNoSN = " - без проблем, но с некоторым своеобразием.";
+const aAlBinskiiE_g_F = "Альбинский Е.Г., Физ-ра";
+const aBezProblemNoOt = " - без проблем, но от физ-ры сильно устаешь.";
 
 
 function help_professors() {
@@ -1923,30 +1937,30 @@ function help_professors() {
 } // end function 13E5C
 
 
-var aDiamond = 'Diamond';
-var aAvtorIgriGeroi = ' - автор игры "Герои Мата и Меха" (MMHEROES), знает всё о ее "фичах".';
-var aMisa = 'Миша';
-var aKogdaToAlFaTes = ' - когда-то альфа-тестер; понимает в стратегии получения зачетов.';
-var aSerj = 'Серж';
-var aEseOdinAksAlFa = ' - еще один экс-альфа-тестер и просто хороший товарищ.';
-var aPasa = 'Паша';
-var aStarosta_Samii = ' - староста. Самый нужный в конце семестра человек.';
-var aRai = 'RAI';
-var aProstoiStudent = ' - простой студент. Не любит, когда кто-то НЕ ХОЧЕТ ему помогать.';
-var aAndru = 'Эндрю';
-var aToJeStudent_Mo = ' - то же студент. Можно попробовать обратиться к нему за помощью.';
-var aSasa = 'Саша';
-var aEseOdinStudent = ' - еще один студент; подробно и разборчиво конспектирует лекции.';
-var aNil = 'NiL';
-var aDevuskaIzVolNo = ' - девушка из вольнослушателей. Часто эксплуатирует чужие мозги.';
-var aKolq = 'Коля';
-var aStudentBolSoiL = ' - студент, большой любитель алгебры и выпивки.';
-var aGrisa = 'Гриша';
-var aStudentPofigis = ' - студент-пофигист. Любит пиво и халяву.';
-var aKuzMenkoV_g_ = 'Кузьменко В.Г.';
-var aPrepodaetInfor = ' - преподает информатику у другой половины 19-й группы.';
-var aDjug = 'DJuG';
-var aUgadaiteKto = ' - угадайте, кто ;)';
+const aDiamond = "Diamond";
+const aAvtorIgriGeroi = " - автор игры \"Герои Мата и Меха\" (MMHEROES), знает всё о ее \"фичах\".";
+const aMisa = "Миша";
+const aKogdaToAlFaTes = " - когда-то альфа-тестер; понимает в стратегии получения зачетов.";
+const aSerj = "Серж";
+const aEseOdinAksAlFa = " - еще один экс-альфа-тестер и просто хороший товарищ.";
+const aPasa = "Паша";
+const aStarosta_Samii = " - староста. Самый нужный в конце семестра человек.";
+const aRai = "RAI";
+const aProstoiStudent = " - простой студент. Не любит, когда кто-то НЕ ХОЧЕТ ему помогать.";
+const aAndru = "Эндрю";
+const aToJeStudent_Mo = " - то же студент. Можно попробовать обратиться к нему за помощью.";
+const aSasa = "Саша";
+const aEseOdinStudent = " - еще один студент; подробно и разборчиво конспектирует лекции.";
+const aNil = "NiL";
+const aDevuskaIzVolNo = " - девушка из вольнослушателей. Часто эксплуатирует чужие мозги.";
+const aKolq = "Коля";
+const aStudentBolSoiL = " - студент, большой любитель алгебры и выпивки.";
+const aGrisa = "Гриша";
+const aStudentPofigis = " - студент-пофигист. Любит пиво и халяву.";
+const aKuzMenkoV_g_ = "Кузьменко В.Г.";
+const aPrepodaetInfor = " - преподает информатику у другой половины 19-й группы.";
+const aDjug = "DJuG";
+const aUgadaiteKto = " - угадайте, кто ;)";
 
 
 function help_characters() {
@@ -1965,16 +1979,16 @@ function help_characters() {
 } // end function 1419D
 
 
-var aCrwmmDevelopme = '\x0FCrWMM Development Team:\x07';
-var aDmitriiPetrovA = '\x0EДмитрий Петров (aka Diamond)\x07 - автор идеи, главный программист';
-var aKonstantinBule = '\x0EКонстантин Буленков \x07- портирование';
-var aVanqPavlikTest = '\x0EВаня Павлик \x07- тестирование, веб-страничка';
-var aAlekseiRumqnce = '\x0EАлексей Румянцев (aka RAI) \x07- retired веб-мастер';
-var aMnenieAvtorovN = '\x07Мнение авторов не всегда совпадает с высказываниями персонажей.';
-var aEsliZapustitMm = '\x0BЕсли запустить \x0Fmmheroes\x0B с хоть каким параметром, у тебя будет возможность';
-var aVibratLicniiPr = 'выбрать личный профиль своего "героя"; например,';
-var aMmheroesZ11 = '           \x0Ammheroes z#11';
-var aPoqvitsqMenusk = '\x0BПоявится менюшка, в которой все и так ясно.';
+const aCrwmmDevelopme = "\x0FCrWMM Development Team:\x07";
+const aDmitriiPetrovA = "\x0EДмитрий Петров (aka Diamond)\x07 - автор идеи, главный программист";
+const aKonstantinBule = "\x0EКонстантин Буленков \x07- портирование";
+const aVanqPavlikTest = "\x0EВаня Павлик \x07- тестирование, веб-страничка";
+const aAlekseiRumqnce = "\x0EАлексей Румянцев (aka RAI) \x07- retired веб-мастер";
+const aMnenieAvtorovN = "\x07Мнение авторов не всегда совпадает с высказываниями персонажей.";
+const aEsliZapustitMm = "\x0BЕсли запустить \x0Fmmheroes\x0B с хоть каким параметром, у тебя будет возможность";
+const aVibratLicniiPr = "выбрать личный профиль своего \"героя\"; например,";
+const aMmheroesZ11 = "           \x0Ammheroes z#11";
+const aPoqvitsqMenusk = "\x0BПоявится менюшка, в которой все и так ясно.";
 
 
 function help_about() {
@@ -2009,17 +2023,17 @@ function goto_punk_to_obschaga() {
 } // end function 14500
 
 
-var aZdraviiSmisl_1 = 'Здравый смысл подсказывает тебе, что в такое время';
-var aTiTamNikogoU_1 = 'ты там никого уже не найдешь.';
-var aNeBudemZrqTr_1 = 'Не будем зря тратить здоровье на поездку в ПОМИ.';
-var aVAlektrickeN_1 = 'В электричке нашли бездыханное тело.';
-var aDenegUTebqNe_1 = 'Денег у тебя нет, пришлось ехать зайцем...';
-var aTebqZalovili_1 = 'Тебя заловили контролеры!';
-var aVisadiliVKra_1 = 'Высадили в Красных зорях, гады!';
-var aKontroleriJi_1 = 'Контролеры жизни лишили.';
-var aUfDoexal_1 = 'Уф, доехал!';
-var aExatZaicem_1 = 'Ехать зайцем';
-var aCestnoZaplat_1 = 'Честно заплатить 10 руб. за билет в оба конца';
+const aZdraviiSmisl_1 = "Здравый смысл подсказывает тебе, что в такое время";
+const aTiTamNikogoU_1 = "ты там никого уже не найдешь.";
+const aNeBudemZrqTr_1 = "Не будем зря тратить здоровье на поездку в ПОМИ.";
+const aVAlektrickeN_1 = "В электричке нашли бездыханное тело.";
+const aDenegUTebqNe_1 = "Денег у тебя нет, пришлось ехать зайцем...";
+const aTebqZalovili_1 = "Тебя заловили контролеры!";
+const aVisadiliVKra_1 = "Высадили в Красных зорях, гады!";
+const aKontroleriJi_1 = "Контролеры жизни лишили.";
+const aUfDoexal_1 = "Уф, доехал!";
+const aExatZaicem_1 = "Ехать зайцем";
+const aCestnoZaplat_1 = "Честно заплатить 10 руб. за билет в оба конца";
 
 
 async function goto_punk_or_mausoleum_to_pomi() {
@@ -2082,20 +2096,20 @@ async function goto_punk_or_mausoleum_to_pomi() {
 } // end function 1467C
 
 
-var aBolsaqRasscita = 'Болшая, рассчитанная на поток аудитория кажется забитой народом.';
-var aZdesPrisutstvu = 'Здесь присутствуют не только твои одногруппники,';
-var aNoIKakieToNeOc = 'но и какие-то не очень знакомые тебе люди';
-var aKajetsqPriklad = '(кажется, прикладники со второго курса).';
-var aZaStolomOkoloD = 'За столом около доски сидит М. А. Всемирнов';
-var aIPrinimaetZace = 'и принимает зачет у студентов.';
-var aTiResaesNeTerq = 'Ты решаешь не терять времени даром и присоединиться к остальным.';
-var aTiZaxodisVNebo = 'Ты заходишь в небольшую аудиторию, забитую народом.';
-var aOkoloDoskiSidi = 'Около доски сидит весьма своеобразный преподаватель.';
-var aSieSvoebrazieP = 'Сие своебразие проявляется, в первую очередь, значком';
-var aSNadpisUNeStre = 'с надписью: "НЕ СТРЕЛЯЕЙТЕ В ПРЕПОДА - ОБУЧАЕТ КАК УМЕЕТ".';
-var aAViKKomu = '"А вы к кому? Максим Александрович в аудитории напротив!"';
-var aPoxojeTiNeTuda = 'Похоже, ты не туда попал. Ты извиняешься и идешь к Всемирнову.';
-var a____0 = '...';
+const aBolsaqRasscita = "Болшая, рассчитанная на поток аудитория кажется забитой народом.";
+const aZdesPrisutstvu = "Здесь присутствуют не только твои одногруппники,";
+const aNoIKakieToNeOc = "но и какие-то не очень знакомые тебе люди";
+const aKajetsqPriklad = "(кажется, прикладники со второго курса).";
+const aZaStolomOkoloD = "За столом около доски сидит М. А. Всемирнов";
+const aIPrinimaetZace = "и принимает зачет у студентов.";
+const aTiResaesNeTerq = "Ты решаешь не терять времени даром и присоединиться к остальным.";
+const aTiZaxodisVNebo = "Ты заходишь в небольшую аудиторию, забитую народом.";
+const aOkoloDoskiSidi = "Около доски сидит весьма своеобразный преподаватель.";
+const aSieSvoebrazieP = "Сие своебразие проявляется, в первую очередь, значком";
+const aSNadpisUNeStre = "с надписью: \"НЕ СТРЕЛЯЕЙТЕ В ПРЕПОДА - ОБУЧАЕТ КАК УМЕЕТ\".";
+const aAViKKomu = "\"А вы к кому? Максим Александрович в аудитории напротив!\"";
+const aPoxojeTiNeTuda = "Похоже, ты не туда попал. Ты извиняешься и идешь к Всемирнову.";
+const a____0 = "...";
 
 
 async function show_intro_algebra() {
@@ -2125,11 +2139,11 @@ async function show_intro_algebra() {
 } // end function 14B36
 
 
-var aVObicnoiGruppo = 'В обычной "групповой" аудитории сидят около 15 человек.';
-var aVCentreIxVnima = 'В центре их внимания находится Е.С. Дубцов,';
-var aPrinimausiiZac = 'принимающий зачет по матанализу.';
-var aTiPolucaesZada = 'Ты получаешь задание и садишься за свободную парту.';
-var a____1 = '...';
+const aVObicnoiGruppo = "В обычной \"групповой\" аудитории сидят около 15 человек.";
+const aVCentreIxVnima = "В центре их внимания находится Е.С. Дубцов,";
+const aPrinimausiiZac = "принимающий зачет по матанализу.";
+const aTiPolucaesZada = "Ты получаешь задание и садишься за свободную парту.";
+const a____1 = "...";
 
 
 async function show_intro_matan() {
@@ -2145,14 +2159,14 @@ async function show_intro_matan() {
 } // end function 14D55
 
 
-var aNebolSaqPolupu = 'Небольшая, полупустая аудитория.';
-var aIDoskaISteniIP = 'И доска, и стены, и, похоже, даже пол';
-var aIspisaniRazlic = 'исписаны различными геометрическими утверждениями.';
-var aVCentreVsegoAt = 'В центре всего этого хаоса находится';
-var aIliSkoreePosto = '(или, скорее, постоянно перемещается)';
-var aPodkoritovMlad = 'Подкорытов-младший.';
-var aTiRaduesSqCtoS = 'Ты радуешься, что смог застать его на факультете!';
-var a____2 = '...';
+const aNebolSaqPolupu = "Небольшая, полупустая аудитория.";
+const aIDoskaISteniIP = "И доска, и стены, и, похоже, даже пол";
+const aIspisaniRazlic = "исписаны различными геометрическими утверждениями.";
+const aVCentreVsegoAt = "В центре всего этого хаоса находится";
+const aIliSkoreePosto = "(или, скорее, постоянно перемещается)";
+const aPodkoritovMlad = "Подкорытов-младший.";
+const aTiRaduesSqCtoS = "Ты радуешься, что смог застать его на факультете!";
+const a____2 = "...";
 
 
 async function show_intro_git() {
@@ -2172,15 +2186,15 @@ async function show_intro_git() {
 } // end function 14EEF
 
 
-var aNaTretEmAtajeU = 'На третьем этаже учебного корпуса Мат-Меха';
-var aVOdnoiIzAudito = 'в одной из аудиторий, закрепленных за кафедрой иностранных языков,';
-var aRaspolojilasN_ = 'расположилась Н.П. Влащенко.';
-var aSteniKabinetaV = 'Стены кабинета выглядят как-то странно.';
-var aRqdomSNebolSoi = 'Рядом с небольшой доской висит изображение Эйфелевой башни,';
-var aCutDalSeStrann = 'чуть дальше - странное изображение,';
-var aObladauseeNepo = 'обладающее непостижимым метафизическим смыслом.';
-var aPoxojeSeicasTi = 'Похоже, сейчас ты будешь сдавать зачет по английскому.';
-var a____3 = '...';
+const aNaTretEmAtajeU = "На третьем этаже учебного корпуса Мат-Меха";
+const aVOdnoiIzAudito = "в одной из аудиторий, закрепленных за кафедрой иностранных языков,";
+const aRaspolojilasN_ = "расположилась Н.П. Влащенко.";
+const aSteniKabinetaV = "Стены кабинета выглядят как-то странно.";
+const aRqdomSNebolSoi = "Рядом с небольшой доской висит изображение Эйфелевой башни,";
+const aCutDalSeStrann = "чуть дальше - странное изображение,";
+const aObladauseeNepo = "обладающее непостижимым метафизическим смыслом.";
+const aPoxojeSeicasTi = "Похоже, сейчас ты будешь сдавать зачет по английскому.";
+const a____3 = "...";
 
 
 async function show_intro_english() {
@@ -2200,20 +2214,21 @@ async function show_intro_english() {
 } // end function 1513F
 
 
-var aAlBinskiiProvo = 'Альбинский проводит лекцию о пользе бега';
-var aDlqNarodnogoXo = 'для народного хозяйства.';
-var aDlqLicnoiJizni = 'для личной жизни.';
-var aDlqNaucnoiRabo = 'для научной работы.';
-var aDlqKommunistic = 'для коммунистического строительства.';
-var aDlqUcebiIDosug = 'для учебы и досуга.';
-var aDlqSpaseniqOtK = 'для спасения от контроллеров.';
-var aPoxojeOnKakVse = 'Похоже, он, как всегда, немного увлекся.';
-var aNemnogoVNasemS = 'Немного в нашем случае - 1 час.';
 
 
 async function show_intro_fizra_lecture() {
+    const aAlBinskiiProvo = "Альбинский проводит лекцию о пользе бега";
+    const aDlqNarodnogo = "для народного хозяйства.";
+    const aDlqLicnoiJizni = "для личной жизни.";
+    const aDlqNaucnoi = "для научной работы.";
+    const aDlqKommunistic = "для коммунистического строительства.";
+    const aDlqUcebiIDosug = "для учебы и досуга.";
+    const aDlqSpaseniqOtK = "для спасения от контроллеров.";
+    const aPoxojeOnKakVse = "Похоже, он, как всегда, немного увлекся.";
+    const aNemnogoVNasemS = "Немного в нашем случае - 1 час.";
+
     writeln(aAlBinskiiProvo);
-    const phrases = [aDlqNarodnogoXo, aDlqLicnoiJizni, aDlqNaucnoiRabo, aDlqKommunistic, aDlqUcebiIDosug, aDlqSpaseniqOtK];
+    const phrases = [aDlqNarodnogo, aDlqLicnoiJizni, aDlqNaucnoi, aDlqKommunistic, aDlqUcebiIDosug, aDlqSpaseniqOtK];
     writeln(RandomPhrase(phrases));
     ++timesheet[day_of_week][Fizra].to;
     writeln();
@@ -2224,11 +2239,11 @@ async function show_intro_fizra_lecture() {
 } // end function 1532A
 
 
-var aAlBinskiiProsi = 'Альбинский просит тебя замерить пульс.';
-var aNazvavPervoePr = 'Назвав первое пришедшее в замученную математикой голову число,';
-var aTiOtpravlqesSq = 'ты отправляешься мотать круги в парке,';
-var aVKotoromVoobse = 'в котором, вообще-то, "запрещены спортивные мероприятия".';
-var a____4 = '...';
+const aAlBinskiiProsi = "Альбинский просит тебя замерить пульс.";
+const aNazvavPervoePr = "Назвав первое пришедшее в замученную математикой голову число,";
+const aTiOtpravlqesSq = "ты отправляешься мотать круги в парке,";
+const aVKotoromVoobse = "в котором, вообще-то, \"запрещены спортивные мероприятия\".";
+const a____4 = "...";
 
 
 async function show_intro_fizra() {
@@ -2262,8 +2277,8 @@ async function goto_exam_with_intro(subj) {
 } // end function 155AF
 
 
-var aTiSeicasNaFaku = 'Ты сейчас на факультете. К кому идти?';
-var aNiKKomu = 'Ни к кому';
+const aTiSeicasNaFaku = "Ты сейчас на факультете. К кому идти?";
+const aNiKKomu = "Ни к кому";
 
 
 async function select_professor_punk() {
@@ -2292,7 +2307,7 @@ async function look_baobab_punk() {
 } // end function 156B8
 
 
-var aUmerPoPutiVM_1 = 'Умер по пути в мавзолей.';
+const aUmerPoPutiVM_1 = "Умер по пути в мавзолей.";
 
 
 function goto_punk_to_mausoleum() {
@@ -2302,7 +2317,7 @@ function goto_punk_to_mausoleum() {
 } // end function 156DB
 
 
-var aUpalSLestniciU = 'Упал с лестницы у главного входа.';
+const aUpalSLestniciU = "Упал с лестницы у главного входа.";
 
 
 function goto_punk_to_kompy() {
@@ -2312,15 +2327,15 @@ function goto_punk_to_kompy() {
 } // end function 15719
 
 
-var aIk = ' <йк> ';
+const aIk = " <йк> ";
 
 
 function output_ik_string(s) {
-    var terkom_line = [0xA, 0xE, 0x10, 0x12];
-    var iks = 5 - _upper_bound(terkom_line, time_of_day);
+    const terkom_line = [0xA, 0xE, 0x10, 0x12];
+    let iks = 5 - _upper_bound(terkom_line, time_of_day);
 
     for (let i = 1; i <= s.length; ++i) {
-        if (s[i - 1] == ' ' && Random(iks) == 0) {
+        if (s[i - 1] == " " && Random(iks) == 0) {
             write(aIk);
             --iks;
             if (iks < 1) {
@@ -2334,31 +2349,31 @@ function output_ik_string(s) {
 } // end function 1573C
 
 
-var aSkazanoJeNetSv = '"Сказано же, нет свободных компов!"';
-var aIzviniParenSvo = '"Извини, парень, свободных кумпутеров нет.';
-var aPoidiPoucisPok = 'Пойди поучись пока."';
-var aTiSidisZaSvobo = 'Ты сидишь за свободным компом';
-var aVTerexovskoiKo = 'в тереховской "конторе".';
-var aCtoDelatBudem = 'Что делать будем?';
-var aSidetIZarabati = 'Сидеть и зарабатывать деньги';
-var aPoigratVMmhe_0 = 'Поиграть в MMHEROES';
-var aPosidetCasokVI = 'Посидеть часок в Inet\'e';
-var aViitiOtsudaNaS = 'Выйти отсюда на "свежий воздух"';
-var aTebeNakapalo = 'Тебе накапало ';
-var aRub__0 = ' руб.';
-var aSgorelNaRabote = 'Сгорел на работе.';
-var aUxodim___ = 'Уходим ...';
-var aPoNeizvestnoiP = 'По неизвестной причине, в помещении ТЕРКОМА';
-var aMmheroesNeOkaz = 'MMHEROES не оказывают никакого метафизического воздействия';
-var aNaOkrujausiiMi = 'на окружающий мир...';
-var aOglqdevsisVo_0 = 'Оглядевшись вокруг, ты обнаруживаешь,';
-var aCtoVseTovarisi = 'что все товарищи, здесь собравшиеся,';
-var aRubqtsqVMmhero = 'РУБЯТСЯ В MMHEROES!';
-var aVozmojnoOniVse = 'Возможно, они все пытаются халявить,';
-var aPitautsqIgratP = 'пытаются играть по "тривиальному" алгоритму,';
-var aKotoriiSrabati = 'который срабатывает, увы, далеко, не всегда...';
-var aVotZdorovoMiSi = 'Вот здорово - мы сидим, а денежки-то идут!';
-var aRabociiDenZako = 'Рабочий день закончился, все по домам.';
+const aSkazanoJeNetSv = "\"Сказано же, нет свободных компов!\"";
+const aIzviniParenSvo = "\"Извини, парень, свободных кумпутеров нет.";
+const aPoidiPoucisPok = "Пойди поучись пока.\"";
+const aTiSidisZaSvobo = "Ты сидишь за свободным компом";
+const aVTerexovskoiKo = "в тереховской \"конторе\".";
+const aCtoDelatBudem = "Что делать будем?";
+const aSidetIZarabati = "Сидеть и зарабатывать деньги";
+const aPoigratVMmhe_0 = "Поиграть в MMHEROES";
+const aPosidetCasokVI = "Посидеть часок в Inet'e";
+const aViitiOtsudaNaS = "Выйти отсюда на \"свежий воздух\"";
+const aTebeNakapalo = "Тебе накапало ";
+const aRub__0 = " руб.";
+const aSgorelNaRabote = "Сгорел на работе.";
+const aUxodim___ = "Уходим ...";
+const aPoNeizvestnoiP = "По неизвестной причине, в помещении ТЕРКОМА";
+const aMmheroesNeOkaz = "MMHEROES не оказывают никакого метафизического воздействия";
+const aNaOkrujausiiMi = "на окружающий мир...";
+const aOglqdevsisVo_0 = "Оглядевшись вокруг, ты обнаруживаешь,";
+const aCtoVseTovarisi = "что все товарищи, здесь собравшиеся,";
+const aRubqtsqVMmhero = "РУБЯТСЯ В MMHEROES!";
+const aVozmojnoOniVse = "Возможно, они все пытаются халявить,";
+const aPitautsqIgratP = "пытаются играть по \"тривиальному\" алгоритму,";
+const aKotoriiSrabati = "который срабатывает, увы, далеко, не всегда...";
+const aVotZdorovoMiSi = "Вот здорово - мы сидим, а денежки-то идут!";
+const aRabociiDenZako = "Рабочий день закончился, все по домам.";
 
 
 // =============================================================================
@@ -2504,12 +2519,12 @@ async function go_to_terkom() {
 } // end function 15B3A
 
 
-var aCtoBratBudem = 'Что брать будем?';
-var aCaiZa2R_ = 'Чай за 2 р.';
-var aKeksZa4R_ = 'Кекс за 4 р.';
-var aCaiIVipecku6R_ = 'Чай и выпечку, 6 р.';
-var aProstoPosijuSP = 'Просто посижу с приятелями.';
-var aQVoobseZrqSuda = 'Я вообще зря сюда зашел.';
+const aCtoBratBudem = "Что брать будем?";
+const aCaiZa2R_ = "Чай за 2 р.";
+const aKeksZa4R_ = "Кекс за 4 р.";
+const aCaiIVipecku6R_ = "Чай и выпечку, 6 р.";
+const aProstoPosijuSP = "Просто посижу с приятелями.";
+const aQVoobseZrqSuda = "Я вообще зря сюда зашел.";
 
 
 async function go_to_cafe() {
@@ -2555,16 +2570,16 @@ async function go_to_cafe() {
 } // end function 15F9B
 
 
-var aTiNaFakulTete_ = 'Ты на факультете. Что делать?';
-var aIdtiKPrepodu = 'Идти к преподу';
-var aPosmotretNaBao = 'Посмотреть на баобаб';
-var aPoitiVObsagu_0 = 'Пойти в общагу';
-var aPoexatVPomi_2 = 'Поехать в ПОМИ';
-var aPoitiVMavzol_1 = 'Пойти в мавзолей';
-var aPoitiVKompUter = 'Пойти в компьютерный класс';
-var aSxoditVKafe = 'Сходить в кафе';
-var aPoitiVTerkomPo = 'Пойти в ТЕРКОМ, поработать';
-var aSMenqXvatit_2 = 'С меня хватит!';
+const aTiNaFakulTete_ = "Ты на факультете. Что делать?";
+const aIdtiKPrepodu = "Идти к преподу";
+const aPosmotretNaBao = "Посмотреть на баобаб";
+const aPoitiVObsagu_0 = "Пойти в общагу";
+const aPoexatVPomi_2 = "Поехать в ПОМИ";
+const aPoitiVMavzol_1 = "Пойти в мавзолей";
+const aPoitiVKompUter = "Пойти в компьютерный класс";
+const aSxoditVKafe = "Сходить в кафе";
+const aPoitiVTerkomPo = "Пойти в ТЕРКОМ, поработать";
+const aSMenqXvatit_2 = "С меня хватит!";
 
 
 async function scene_punk() {
@@ -2633,11 +2648,11 @@ async function scene_punk() {
 
 
 async function algebra_pomi_intro() {
-    const aMalenKiiKabine = 'Маленький кабинет в ПОМИ заполнен людьми.';
-    const aIKakNiStrannoP = 'И, как ни странно, почти все они хотят одного и того же.';
-    const aPoxojeTiTojeXo = 'Похоже, ты тоже хочешь именно этого -';
-    const aRazdelatSqNako = 'РАЗДЕЛАТЬСЯ НАКОНЕЦ С ЗАЧЕТОМ ПО АЛГЕБРЕ!';
-    const a____5 = '...';
+    const aMalenKiiKabine = "Маленький кабинет в ПОМИ заполнен людьми.";
+    const aIKakNiStrannoP = "И, как ни странно, почти все они хотят одного и того же.";
+    const aPoxojeTiTojeXo = "Похоже, ты тоже хочешь именно этого -";
+    const aRazdelatSqNako = "РАЗДЕЛАТЬСЯ НАКОНЕЦ С ЗАЧЕТОМ ПО АЛГЕБРЕ!";
+    const a____5 = "...";
 
     ClrScr();
     TextColor(0x0C);
@@ -2652,12 +2667,12 @@ async function algebra_pomi_intro() {
 
 
 async function git_pomi_intro() {
-    const aVNebolSomPomis = 'В небольшом ПОМИшном кабинете собралось человек 10 студентов.';
-    const aKromeNixVKomna = 'Кроме них, в комнате ты видишь Подкорытова-младшего,';
-    const aATakjePolnogoS = 'а также - полного седоволосого лысеющего господина,';
-    const aIzdausegoXarak = 'издающего характерные пыхтящие звуки.';
-    const aTiNadeesSqCtoV = 'Ты надеешься, что все это скоро кончится...';
-    const a____6 = '...';
+    const aVNebolSomPomis = "В небольшом ПОМИшном кабинете собралось человек 10 студентов.";
+    const aKromeNixVKomna = "Кроме них, в комнате ты видишь Подкорытова-младшего,";
+    const aATakjePolnogoS = "а также - полного седоволосого лысеющего господина,";
+    const aIzdausegoXarak = "издающего характерные пыхтящие звуки.";
+    const aTiNadeesSqCtoV = "Ты надеешься, что все это скоро кончится...";
+    const a____6 = "...";
 
     ClrScr();
     writeln(aVNebolSomPomis);
@@ -2681,8 +2696,8 @@ async function pomi_intro(subj) {
 
 
 async function select_professor_pomi() {
-    const aTiSeicasVPomi_ = 'Ты сейчас в ПОМИ. К кому идти?';
-    const aNiKKomu_0 = 'Ни к кому';
+    const aTiSeicasVPomi_ = "Ты сейчас в ПОМИ. К кому идти?";
+    const aNiKKomu_0 = "Ни к кому";
 
     show_header_stats();
     TextColor(7);
@@ -2710,12 +2725,12 @@ async function look_board_pomi() {
 } // end function 166B7
 
 
-var aCtoBratBudem_0 = 'Что брать будем?';
-var aKofeZa2R_ = 'Кофе за 2 р.';
-var aKorjZa4R_ = 'Корж за 4 р.';
-var aKofeIVipecku6R = 'Кофе и выпечку, 6 р.';
-var aNicegoProstoPr = 'Ничего, просто просидеть здесь часок.';
-var aSovsemNicego_B = 'Совсем ничего. Бывает.';
+const aCtoBratBudem_0 = "Что брать будем?";
+const aKofeZa2R_ = "Кофе за 2 р.";
+const aKorjZa4R_ = "Корж за 4 р.";
+const aKofeIVipecku6R = "Кофе и выпечку, 6 р.";
+const aNicegoProstoPr = "Ничего, просто просидеть здесь часок.";
+const aSovsemNicego_B = "Совсем ничего. Бывает.";
 
 
 async function pomi_cafe() {
@@ -2741,7 +2756,7 @@ async function pomi_cafe() {
     dialog_case(aNicegoProstoPr, -4);
     dialog_case(aSovsemNicego_B, 0);
 
-    var ax = await dialog_run(1, 0x0A);
+    const ax = await dialog_run(1, 0x0A);
     if (ax == -1) {
         hero.money -= 2;
         hero.health += Random(hero.charizma) + 3;
@@ -2762,13 +2777,13 @@ async function pomi_cafe() {
 } // end function 1673E
 
 
-var aEdemVPunkBilet = 'Едем в ПУНК, билета нет. Будем покупать билет (5 рублей)?';
-var aDaBudem = 'Да, будем';
-var aNetNeBudem = 'Нет, не будем';
-var aVAlektrickeN_2 = 'В электричке нашли бездыханное тело.';
-var aEdemZaicem___ = 'Едем зайцем... ';
-var aKontroleriPoim = 'Контролеры поймали! Высадили в Красных Зорях!';
-var aKontroleriJi_2 = 'Контролеры жизни лишили.';
+const aEdemVPunkBilet = "Едем в ПУНК, билета нет. Будем покупать билет (5 рублей)?";
+const aDaBudem = "Да, будем";
+const aNetNeBudem = "Нет, не будем";
+const aVAlektrickeN_2 = "В электричке нашли бездыханное тело.";
+const aEdemZaicem___ = "Едем зайцем... ";
+const aKontroleriPoim = "Контролеры поймали! Высадили в Красных Зорях!";
+const aKontroleriJi_2 = "Контролеры жизни лишили.";
 
 
 async function go_pomi_to_punk() {
@@ -2811,12 +2826,12 @@ async function go_pomi_to_punk() {
 } // end function 16914
 
 
-var aTiVPomi_CtoDel = 'Ты в ПОМИ. Что делать?';
-var aIdtiKPrepodu_0 = 'Идти к преподу';
-var aPosmotretNaDos = 'Посмотреть на доску объявлений';
-var aPoitiVKafe = 'Пойти в кафе';
-var aPoexatVPunk = 'Поехать в ПУНК';
-var aSMenqXvatit_3 = 'С меня хватит!';
+const aTiVPomi_CtoDel = "Ты в ПОМИ. Что делать?";
+const aIdtiKPrepodu_0 = "Идти к преподу";
+const aPosmotretNaDos = "Посмотреть на доску объявлений";
+const aPoitiVKafe = "Пойти в кафе";
+const aPoexatVPunk = "Поехать в ПУНК";
+const aSMenqXvatit_3 = "С меня хватит!";
 
 
 async function scene_pomi() {
@@ -2856,13 +2871,14 @@ async function scene_pomi() {
 
 } // end function 16A91
 
-
-var aMmheroes_hi = 'mmheroes.hi';
-var aKolq_0 = 'Коля';
-var aSasa_0 = 'Саша';
-var aAndru_0 = 'Эндрю';
-var aPasa_0 = 'Паша';
-var aGrisa_0 = 'Гриша';
+/* unused
+const aMmheroes_hi = "mmheroes.hi";
+const aKolq_0 = "Коля";
+const aSasa_0 = "Саша";
+const aAndru_0 = "Эндрю";
+const aPasa_0 = "Паша";
+const aGrisa_0 = "Гриша";
+*/
 
 
 function read_top_gamers() {
@@ -2870,20 +2886,20 @@ function read_top_gamers() {
 } // end function 16BD7
 
 
-var aPozdravlqu = '********************** ПОЗДРАВЛЯЮ! ***************************';
-var aTiPopalVSkrija = 'Ты попал в скрижали Мат-Меха! Сейчас тебя будут увековечивать!';
-var aNeBoisqAtoNeBo = 'Не бойся, это не больно.';
-var aKakTebqZovutGe = 'Как тебя зовут, герой? ';
-var aNeXocesUvekove = 'Не хочешь увековечиваться - не надо!';
-var aNuVotIVse_ = 'Ну, вот и все.';
+const aPozdravlqu = "********************** ПОЗДРАВЛЯЮ! ***************************";
+const aTiPopalVSkrija = "Ты попал в скрижали Мат-Меха! Сейчас тебя будут увековечивать!";
+const aNeBoisqAtoNeBo = "Не бойся, это не больно.";
+const aKakTebqZovutGe = "Как тебя зовут, герой? ";
+const aNeXocesUvekove = "Не хочешь увековечиваться - не надо!";
+const aNuVotIVse_ = "Ну, вот и все.";
 
 
 async function update_top_gamers(score) {
     // var var_108;
     // svar var_106;
-    var my_place = -1;
 
     /*
+    const my_place = -1;
 	for (let i = 4; i >= 0; --i) {
 		if (top_gamers[i].score >= score) {
 			my_place = i;
@@ -2934,7 +2950,6 @@ async function update_top_gamers(score) {
 } // end function 16D8E
 
 
-const aMmheroes_hi_0 = 'mmheroes.hi';
 
 
 function write_top_gamers() {
@@ -2942,6 +2957,7 @@ function write_top_gamers() {
 	var var_82;
 	var var_80;
 
+    const aMmheroes_hi_0 = "mmheroes.hi";
 	Assign(var_80, aMmheroes_hi_0);
 	Rewrite(var_80, 0x23);
 
@@ -2954,12 +2970,12 @@ function write_top_gamers() {
 } // end function 16F39
 
 
-var asc_16F8F = '******                                           ******';
-var asc_16FC7 = '      *********                         *********';
-var asc_16FF9 = '               *************************';
-var aVotImenaTexKto = 'Вот имена тех, кто прошел это наводящее ужас испытание:';
-var aGeroiZarabotal = '    ГЕРОЙ            ЗАРАБОТАЛ';
-var aRub__1 = ' руб.';
+const asc_16F8F = "******                                           ******";
+const asc_16FC7 = "      *********                         *********";
+const asc_16FF9 = "               *************************";
+const aVotImenaTexKto = "Вот имена тех, кто прошел это наводящее ужас испытание:";
+const aGeroiZarabotal = "    ГЕРОЙ            ЗАРАБОТАЛ";
+const aRub__1 = " руб.";
 
 
 async function show_top_gamers() {
@@ -2991,8 +3007,8 @@ async function show_top_gamers() {
 
 
 async function exam_ends_common() {
-    const aZaderjivaetsqE = ' задерживается еще на час.';
-    const aUxodit_ = ' уходит.';
+    const aZaderjivaetsqE = " задерживается еще на час.";
+    const aUxodit_ = " уходит.";
 
     if (hero.health <= 0) {
         return;
@@ -3021,16 +3037,16 @@ async function exam_ends_common() {
 } // end function 171C4
 
 
-var aUviPomiUjeZakr = 'Увы, ПОМИ уже закрыто, поэтому придется ехать домой...';
-var aTiVPitereNaBal = 'Ты в Питере, на Балтийском вокзале.';
-var aKudaNapravlqem = 'Куда направляемся?';
-var aDomoiVPunk = 'Домой, в ПУНК!';
-var aXocuVPomi = 'Хочу в ПОМИ!';
-var aXorosoBiletEst = 'Хорошо, билет есть...';
-var aTebqZalovili_2 = 'Тебя заловили контролеры!';
-var aVisadiliVKra_2 = 'Высадили в Красных зорях, гады!';
-var aKontroleriJi_3 = 'Контролеры жизни лишили.';
-var aUfDoexal___ = 'Уф, доехал...';
+const aUviPomiUjeZakr = "Увы, ПОМИ уже закрыто, поэтому придется ехать домой...";
+const aTiVPitereNaBal = "Ты в Питере, на Балтийском вокзале.";
+const aKudaNapravlqem = "Куда направляемся?";
+const aDomoiVPunk = "Домой, в ПУНК!";
+const aXocuVPomi = "Хочу в ПОМИ!";
+const aXorosoBiletEst = "Хорошо, билет есть...";
+const aTebqZalovili_2 = "Тебя заловили контролеры!";
+const aVisadiliVKra_2 = "Высадили в Красных зорях, гады!";
+const aKontroleriJi_3 = "Контролеры жизни лишили.";
+const aUfDoexal___ = "Уф, доехал...";
 
 
 async function na_vokzale() {
@@ -3076,13 +3092,13 @@ async function na_vokzale() {
 } // end function 173B6
 
 
-var aVsemirnovPrini = 'Всемирнов принимает зачет даже в электричке!';
-var aMucaesSq___ = 'Мучаешься ...';
-var aZamucil = ' замучил';
-var aA = 'а';
-var a_ = '.';
-var aTvoiMuceniqBil = 'Твои мучения были напрасны.';
-var aTebeZacliEse = 'Тебе зачли еще ';
+const aVsemirnovPrini = "Всемирнов принимает зачет даже в электричке!";
+const aMucaesSq___ = "Мучаешься ...";
+const aZamucil = " замучил";
+const aA = "а";
+const a_ = ".";
+const aTvoiMuceniqBil = "Твои мучения были напрасны.";
+const aTebeZacliEse = "Тебе зачли еще ";
 
 
 async function algebra_in_train() {
@@ -3097,7 +3113,8 @@ async function algebra_in_train() {
     TextColor(7);
     writeln();
 
-    let task_done = idiv((hero.subject[current_subject].knowledge - subjects[current_subject].member0xFA + Random(hero.brain)) * 3, 4);
+    const smart = hero.subject[current_subject].knowledge - subjects[current_subject].member0xFA + Random(hero.brain);
+    let task_done = idiv(smart * 3, 4);
 
     if (hero.health <= 5) {
         task_done -= Random(5 - hero.health);
@@ -3147,7 +3164,7 @@ async function algebra_in_train() {
             colored_output_white(task_done);
             TextColor(0x0A);
             zadanie_in_case(task_done);
-            write('!');
+            write("!");
             TextColor(7);
         }
 
@@ -3160,20 +3177,20 @@ async function algebra_in_train() {
 } // end function 175A6
 
 
-var aM_a_Vsemirnov = 'М.А. Всемирнов :';
-var aNetSegodnqQBol = '"Нет, сегодня я больше никому ничего не засчитаю..."';
-var aUslisavAtuFraz = 'Услышав эту фразу, ты осознаешь беспочвенность своих мечтаний';
-var aOSdaceZacetaPo = 'о сдаче зачета по алгебре в электричке.';
-var aEstNadejdaCtoV = 'Есть надежда, что в электричке удастся что-то еще решить.';
-var aPravdaZacetnoi = 'Правда, зачетной ведомости с собой туда не взять...';
-var aDenegUTebqNe_2 = 'Денег у тебя нет, пришлось ехать зайцем...';
-var aTebqZalovili_3 = 'Тебя заловили контролеры!';
-var aVisadiliVKra_3 = 'Высадили в Красных зорях, гады!';
-var aKontroleriJi_4 = 'Контролеры жизни лишили.';
-var aExatZaicem_2 = 'Ехать зайцем';
-var aCestnoZaplat_2 = 'Честно заплатить 10 руб. за билет в оба конца';
-var aKontrolleriKon = 'Контроллеры, контроллеры, контроллеры...';
-var aISoVsemirnovim = 'И со Всемирновым ты ничего не успел...';
+const aM_a_Vsemirnov = "М.А. Всемирнов :";
+const aNetSegodnqQBol = "\"Нет, сегодня я больше никому ничего не засчитаю...\"";
+const aUslisavAtuFraz = "Услышав эту фразу, ты осознаешь беспочвенность своих мечтаний";
+const aOSdaceZacetaPo = "о сдаче зачета по алгебре в электричке.";
+const aEstNadejdaCtoV = "Есть надежда, что в электричке удастся что-то еще решить.";
+const aPravdaZacetnoi = "Правда, зачетной ведомости с собой туда не взять...";
+const aDenegUTebqNe_2 = "Денег у тебя нет, пришлось ехать зайцем...";
+const aTebqZalovili_3 = "Тебя заловили контролеры!";
+const aVisadiliVKra_3 = "Высадили в Красных зорях, гады!";
+const aKontroleriJi_4 = "Контролеры жизни лишили.";
+const aExatZaicem_2 = "Ехать зайцем";
+const aCestnoZaplat_2 = "Честно заплатить 10 руб. за билет в оба конца";
+const aKontrolleriKon = "Контроллеры, контроллеры, контроллеры...";
+const aISoVsemirnovim = "И со Всемирновым ты ничего не успел...";
 
 
 async function go_to_train() {
@@ -3245,10 +3262,10 @@ async function go_to_train() {
 
 
 async function algebra_ends() {
-    const aVseminovM_a_Ux = 'Всеминов М.А. уходит.';
-    const aPoitiZaNimNaAl = 'Пойти за ним на электричку?';
-    const aDaQXocuEsePomu = 'Да, я хочу еще помучаться';
-    const aNuUjNetSpasibo = 'Ну уж нет, спасибо!';
+    const aVseminovM_a_Ux = "Всеминов М.А. уходит.";
+    const aPoitiZaNimNaAl = "Пойти за ним на электричку?";
+    const aDaQXocuEsePomu = "Да, я хочу еще помучаться";
+    const aNuUjNetSpasibo = "Ну уж нет, спасибо!";
 
     ClrScr();
     show_header_stats();
@@ -3287,7 +3304,7 @@ async function exam_ends(subject) {
 
 
 async function common_exam_done() {
-    const aTvoqZacetkaPop = 'Твоя зачетка пополнилась еще одной записью.';
+    const aTvoqZacetkaPop = "Твоя зачетка пополнилась еще одной записью.";
     writeln();
     TextColor(0x0A);
     writeln(aTvoqZacetkaPop);
@@ -3298,11 +3315,11 @@ async function common_exam_done() {
 } // end function 17E1A
 
 
-var aVsemirnovMedle = 'Всемирнов медленно рисует минус ...';
-var aITakJeMedlenno = 'И так же медленно пририсовывает к нему вертикальную палочку!';
-var aUfNuISutockiUN = 'Уф! Ну и шуточки у него!';
-var aXorosoXotZacet = 'Хорошо хоть, зачет поставил...';
-var aVsemirnovM_a_I = 'Всемирнов М.А. изничтожил.';
+const aVsemirnovMedle = "Всемирнов медленно рисует минус ...";
+const aITakJeMedlenno = "И так же медленно пририсовывает к нему вертикальную палочку!";
+const aUfNuISutockiUN = "Уф! Ну и шуточки у него!";
+const aXorosoXotZacet = "Хорошо хоть, зачет поставил...";
+const aVsemirnovM_a_I = "Всемирнов М.А. изничтожил.";
 
 
 async function algebra_done() {
@@ -3328,29 +3345,29 @@ function random_color_output(text) {
 } // end function 17FAD
 
 
-var aVlasenkoN_p_ = 'Влащенко Н.П.:';
-var aZakroiteGlaza_ = '"Закройте глаза ..."';
-var aTiPoslusnoZakr = 'Ты послушно закрываешь глаза.';
-var aOktroiteGlaza_ = '"Октройте глаза ..."';
-var aTiVidisVlasenk = 'Ты видишь Влащенко Н.П. в костюме сказочной феи.';
-var aVlasenkoN_p_Ka = 'Влащенко Н.П. касается тебя указкой (она же - волшебная палочка ...)';
-var aTiCuvstvuesCto = 'Ты чувствуешь, что с тобой происходит что-то сверхъестественное.';
-var aTebeSilNoPoplo = 'Тебе сильно поплохело.';
-var aFeqBilaQvnoNeV = 'Фея была явно не в настроении.';
-var aTiPocuvstvoval = 'Ты почувствовал себя где-то в другом месте.';
-var aTiCuvstvuesC_0 = 'Ты чувствуешь, что подзабыл алгебру...';
-var aTiCuvstvuesC_1 = 'Ты чувствуешь, что анализ придется учить заново.';
-var aVGolovuPostoqn = 'В голову постоянно лезут мысли о всяких феях...';
-var aTiCuvstvuesC_2 = 'Ты чувствуешь, что все вокруг жаждут твоей смерти.';
-var aKudaToPodevala = 'Куда-то подевалась твоя уверенность в себе.';
-var aGolovaStalaRab = 'Голова стала работать заметно лучше.';
-var aTiProniksqLubo = 'Ты проникся любовью к окружающему миру.';
-var aTiGotovKLubimI = 'Ты готов к любым испытаниям.';
-var aPokaTvoiGlazaB = 'Пока твои глаза были закрыты, кто-то утащил твои деньги!!!';
-var aTiNaselVSvoemK = 'Ты нашел в своем кармане какие-то деньги!';
-var aTiCuvstvuesC_3 = 'Ты чувствуешь, что от тебя сильно несет чесноком.';
-var aNeZnauVivetrit = 'Не знаю, выветрится ли такой сильный запах...';
-var aStrannoeCuvstv = 'Странное чувство быстро прошло.';
+const aVlasenkoN_p_ = "Влащенко Н.П.:";
+const aZakroiteGlaza_ = "\"Закройте глаза ...\"";
+const aTiPoslusnoZakr = "Ты послушно закрываешь глаза.";
+const aOktroiteGlaza_ = "\"Октройте глаза ...\"";
+const aTiVidisVlasenk = "Ты видишь Влащенко Н.П. в костюме сказочной феи.";
+const aVlasenkoN_p_Ka = "Влащенко Н.П. касается тебя указкой (она же - волшебная палочка ...)";
+const aTiCuvstvuesCto = "Ты чувствуешь, что с тобой происходит что-то сверхъестественное.";
+const aTebeSilNoPoplo = "Тебе сильно поплохело.";
+const aFeqBilaQvnoNeV = "Фея была явно не в настроении.";
+const aTiPocuvstvoval = "Ты почувствовал себя где-то в другом месте.";
+const aTiCuvstvuesC_0 = "Ты чувствуешь, что подзабыл алгебру...";
+const aTiCuvstvuesC_1 = "Ты чувствуешь, что анализ придется учить заново.";
+const aVGolovuPostoqn = "В голову постоянно лезут мысли о всяких феях...";
+const aTiCuvstvuesC_2 = "Ты чувствуешь, что все вокруг жаждут твоей смерти.";
+const aKudaToPodevala = "Куда-то подевалась твоя уверенность в себе.";
+const aGolovaStalaRab = "Голова стала работать заметно лучше.";
+const aTiProniksqLubo = "Ты проникся любовью к окружающему миру.";
+const aTiGotovKLubimI = "Ты готов к любым испытаниям.";
+const aPokaTvoiGlazaB = "Пока твои глаза были закрыты, кто-то утащил твои деньги!!!";
+const aTiNaselVSvoemK = "Ты нашел в своем кармане какие-то деньги!";
+const aTiCuvstvuesC_3 = "Ты чувствуешь, что от тебя сильно несет чесноком.";
+const aNeZnauVivetrit = "Не знаю, выветрится ли такой сильный запах...";
+const aStrannoeCuvstv = "Странное чувство быстро прошло.";
 
 
 async function english_done() {
@@ -3431,14 +3448,14 @@ async function exam_done(subject) {
 } // end function 185C9
 
 
-var aMucaesSq____0 = 'Мучаешься ...';
-var aPodkoritov = 'Подкорытов:';
-var aCegoToQNePonim = '"Чего-то я не понимаю... Похоже, Вы меня лечите..."';
-var aTvoiMuceniqB_0 = 'Твои мучения были напрасны.';
-var aTebeZacliEse_0 = 'Тебе зачли еще ';
-var aZamucil_0 = ' замучил';
-var aA_0 = 'а';
-var a__0 = '.';
+const aMucaesSq____0 = "Мучаешься ...";
+const aPodkoritov = "Подкорытов:";
+const aCegoToQNePonim = "\"Чего-то я не понимаю... Похоже, Вы меня лечите...\"";
+const aTvoiMuceniqB_0 = "Твои мучения были напрасны.";
+const aTebeZacliEse_0 = "Тебе зачли еще ";
+const aZamucil_0 = " замучил";
+const aA_0 = "а";
+const a__0 = ".";
 
 
 async function continue_exam() {
@@ -3487,7 +3504,7 @@ async function continue_exam() {
         colored_output_white(task_done);
         TextColor(0x0A);
         zadanie_in_case(task_done);
-        write('!');
+        write("!");
         TextColor(7);
     }
 
@@ -3511,30 +3528,30 @@ async function continue_exam() {
 } // end function 18677
 
 
-var aUVasVseZacteno = 'У вас все зачтено, можете быть свободны.';
-var aSeicasTebqIstq = 'Сейчас тебя истязает ';
-var aKromeTebqZdesE = 'Кроме тебя, здесь еще сид';
-var aIt = 'ит ';
-var aQt = 'ят ';
-var aI = ' и ';
-var asc_18A07 = ', ';
-var aUTebqEseNicego = 'У тебя еще ничего не зачтено.';
-var aZacteno = 'Зачтено ';
-var aZadacIz = ' задач из ';
-var aUTebqUjeVseZac = 'У тебя уже все зачтено.';
-var aMucatSqDalSe = 'Мучаться дальше';
-var aBrositAtoDelo = 'Бросить это дело';
+const aUVasVseZacteno = "У вас все зачтено, можете быть свободны.";
+const aSeicasTebqIstq = "Сейчас тебя истязает ";
+const aKromeTebqZdesE = "Кроме тебя, здесь еще сид";
+const aIt = "ит ";
+const aQt = "ят ";
+const aI = " и ";
+const asc_18A07 = ", ";
+const aUTebqEseNicego = "У тебя еще ничего не зачтено.";
+const aZacteno = "Зачтено ";
+const aZadacIz = " задач из ";
+const aUTebqUjeVseZac = "У тебя уже все зачтено.";
+const aMucatSqDalSe = "Мучаться дальше";
+const aBrositAtoDelo = "Бросить это дело";
 
 
 async function scene_exam() {
-    var var_15;
-    var var_14;
-    var var_12 = [];
+    // let var_15;
+    let var_14;
+    const var_12 = [];
     let classmates_bitset = 0;
 
     last_subject = current_subject;
 
-    var_15 = 0;
+    // var_15 = 0;
     for (let var_2 = 0; var_2 <= 0xB; ++var_2) {
         // #warning
         //[bp+var_2+var_12] = 0;
@@ -3591,7 +3608,7 @@ async function scene_exam() {
     TextColor(0x0E);
     write(aSeicasTebqIstq);
     write(subjects[current_subject].professor.name);
-    writeln('.');
+    writeln(".");
 
     let classmates_count = 0;
     for (let i = 0; i <= 0xB; ++i) {
@@ -3624,7 +3641,7 @@ async function scene_exam() {
                 --classmates_count;
 
                 if (classmates_count === 0) {
-                    writeln('.');
+                    writeln(".");
                 } else if (classmates_count === 1) {
                     write(aI);
                 } else {
@@ -3637,7 +3654,7 @@ async function scene_exam() {
         }
     }
 
-    var_15 = 1;
+    // var_15 = 1;
     do {
 
         if (!jg(idiv(hero.charizma, 2), var_14)) {
@@ -3727,17 +3744,17 @@ async function scene_exam() {
 } // end function 18A75
 
 
-var aKTebePristaet = 'К тебе пристает ';
-var a_CtoBudesDelat = '. Что будешь делать?';
-var aPitatSqIgnorir = 'Пытаться игнорировать';
-var aTebeKakToNexor = 'Тебе как-то нехорошо ...';
-var aLucseIgnorirov = ' лучше игнорировать не надо.';
+const aKTebePristaet = "К тебе пристает ";
+const a_CtoBudesDelat = ". Что будешь делать?";
+const aPitatSqIgnorir = "Пытаться игнорировать";
+const aTebeKakToNexor = "Тебе как-то нехорошо ...";
+const aLucseIgnorirov = " лучше игнорировать не надо.";
 
 
 async function bothers(student) {
     // var var_104;
-    var var_4;
-    var var_1;
+    let var_4;
+    let var_1;
 
     if (student !== Rai || current_place !== Kompy) {
 
@@ -3777,18 +3794,18 @@ async function bothers(student) {
 
 
 async function kolya_talk() {
-    const aKolqSmotritNaT = 'Коля смотрит на тебя немного окосевшими глазами.';
-    const aUTebqOstalisNe = '"У тебя остались нерешенные задачи по Всемирнову? Давай сюда!"';
-    const aKolqResilTebeE = 'Коля решил тебе еще ';
-    const aZadaciPoAlgebr = ' задачи по алгебре!';
-    const aZnaesPivoKonec = '"Знаешь, пиво, конечно, хорошо, но настойка овса - лучше!"';
-    const aZakazatKoleNas = 'Заказать Коле настойку овса?';
-    const aDa = 'Да';
-    const aNet = 'Нет';
-    const aTvoiAlTruizmNa = 'Твой альтруизм навсегда останется в памяти потомков.';
-    const aZrqOiZrq___ = '"Зря, ой, зря ..."';
-    const aKolqDostaetTor = 'Коля достает тормозную жидкость, и вы распиваете еще по стакану.';
-    const aSpilsq_ = 'Спился.';
+    const aKolqSmotritNaT = "Коля смотрит на тебя немного окосевшими глазами.";
+    const aUTebqOstalisNe = "\"У тебя остались нерешенные задачи по Всемирнову? Давай сюда!\"";
+    const aKolqResilTebeE = "Коля решил тебе еще ";
+    const aZadaciPoAlgebr = " задачи по алгебре!";
+    const aZnaesPivoKonec = "\"Знаешь, пиво, конечно, хорошо, но настойка овса - лучше!\"";
+    const aZakazatKoleNas = "Заказать Коле настойку овса?";
+    const aDa = "Да";
+    const aNet = "Нет";
+    const aTvoiAlTruizmNa = "Твой альтруизм навсегда останется в памяти потомков.";
+    const aZrqOiZrq___ = "\"Зря, ой, зря ...\"";
+    const aKolqDostaetTor = "Коля достает тормозную жидкость, и вы распиваете еще по стакану.";
+    const aSpilsq_ = "Спился.";
 
 
     ClrScr();
@@ -3866,44 +3883,44 @@ async function kolya_talk() {
 } // end function 19259
 
 
-var aWowTiTolKoCtoV = 'Wow! Ты только что встретил автора !';
-var aDiamond_0 = 'Diamond:';
-var aKolqPomojetSAl = '"Коля поможет с алгеброй."';
-var aMisaRasskajetV = '"Миша расскажет всем, какой ты хороший."';
-var aPasaTvoiStaros = '"Паша - твой староста."';
-var aSDjugomLucseNe = '"С DJuGом лучше не сталкиваться."';
-var aRaiNeOtstanetL = '"RAI не отстанет, лучше решить ему чего-нибудь."';
-var aKolqVseVremqSi = '"Коля все время сидит в мавзолее и оттягивается."';
-var aSlediZaSvoimZd = '"Следи за своим здоровьем!!!"';
-var aEsliVstretisSa = '"Если встретишь Сашу - ОБЯЗАТЕЛЬНО заговори с ним."';
-var aEsliPloxoDumae = '"Если плохо думается, попробуй поговорить с RAI."';
-var aIdqKKoleBudUve = '"Идя к Коле, будь уверен, что можешь пить с ним."';
-var aPolucaqZacetPo = '"Получая зачет по английскому, будь готов к неожиданностям."';
-var aInogdaRazgovor = '"Иногда разговоры с Сержем приносят ощутимую пользу."';
-var aAndruMojetPomo = '"Эндрю может помочь, но не всегда..."';
-var aKuzMenkoInogda = '"Кузьменко иногда знает о Климове больше, чем сам Климов."';
-var aNeSpesiSlatGne = '"Не спеши слать гневные письма о багах:';
-var aZaglqniNaMmher = 'загляни на mmheroes.chat.ru,';
-var aMojetBitVseUje = 'может быть, все уже в порядке!"';
-var aSerjTojeInogda = '"Серж тоже иногда забегает в мавзолей."';
-var aNePereuciTopol = '"Не переучи топологию, а то Подкорытов-младший не поймет."';
-var aMojesUstroitSq = '"Можешь устроиться в ТЕРКОМ по знакомству."';
-var aGrisaRabotaetV = '"Гриша работает ( ;*) ) в ТЕРКОМе."';
-var aVTerkomeMojnoZ = '"В ТЕРКОМЕ можно заработать какие-то деньги."';
-var aGrisaInogdaBiv = '"Гриша иногда бывает в Мавзолее."';
-var aNeNravitsqRasp = '"Не нравится расписание? Подумай о чем-нибудь парадоксальном."';
-var aNilDaetDenGiZa = '"NiL дает деньги за помощь, но..."';
-var aCestnoNeZnauKo = '"Честно, не знаю, когда будет готов порт под Linux..."';
-var aSrocnoNujniNov = '"Срочно! Нужны новые фишки для "Зачетной недели" !"';
-var aPojelaniqIdeiB = '"Пожелания, идеи, bug report\'ы шлите на mmheroes@chat.ru !"';
-var aVstretisKostuB = '"Встретишь Костю Буленкова - передай ему большой привет!"';
-var aBolSoeSpasiboV = '"Большое спасибо Ване Павлику за mmheroes.chat.ru !"';
-var aDiamondUbegaet = 'Diamond убегает по своим делам ...';
-var aXocesPoTestitN = '"Хочешь по-тестить новую версию Heroes of MAT-MEX?"';
-var aDaKonecnoOcenX = 'ДА, КОНЕЧНО, ОЧЕНЬ ХОЧУ!';
-var aNetUMenqNetNaA = 'Нет, у меня нет на это времени...';
-var aNuILaduskiVotT = '"Ну и ладушки! Вот тебе дискетка..."';
-var aIzviniCtoPobes = '"Извини, что побеспокоил."';
+const aWowTiTolKoCtoV = "Wow! Ты только что встретил автора !";
+const aDiamond_0 = "Diamond:";
+const aKolqPomojetSAl = "\"Коля поможет с алгеброй.\"";
+const aMisaRasskajetV = "\"Миша расскажет всем, какой ты хороший.\"";
+const aPasaTvoiStaros = "\"Паша - твой староста.\"";
+const aSDjugomLucseNe = "\"С DJuGом лучше не сталкиваться.\"";
+const aRaiNeOtstanetL = "\"RAI не отстанет, лучше решить ему чего-нибудь.\"";
+const aKolqVseVremqSi = "\"Коля все время сидит в мавзолее и оттягивается.\"";
+const aSlediZaSvoimZd = "\"Следи за своим здоровьем!!!\"";
+const aEsliVstretisSa = "\"Если встретишь Сашу - ОБЯЗАТЕЛЬНО заговори с ним.\"";
+const aEsliPloxoDumae = "\"Если плохо думается, попробуй поговорить с RAI.\"";
+const aIdqKKoleBudUve = "\"Идя к Коле, будь уверен, что можешь пить с ним.\"";
+const aPolucaqZacetPo = "\"Получая зачет по английскому, будь готов к неожиданностям.\"";
+const aInogdaRazgovor = "\"Иногда разговоры с Сержем приносят ощутимую пользу.\"";
+const aAndruMojetPomo = "\"Эндрю может помочь, но не всегда...\"";
+const aKuzMenkoInogda = "\"Кузьменко иногда знает о Климове больше, чем сам Климов.\"";
+const aNeSpesiSlatGne = "\"Не спеши слать гневные письма о багах:";
+const aZaglqniNaMmher = "загляни на mmheroes.chat.ru,";
+const aMojetBitVseUje = "может быть, все уже в порядке!\"";
+const aSerjTojeInogda = "\"Серж тоже иногда забегает в мавзолей.\"";
+const aNePereuciTopol = "\"Не переучи топологию, а то Подкорытов-младший не поймет.\"";
+const aMojesUstroitSq = "\"Можешь устроиться в ТЕРКОМ по знакомству.\"";
+const aGrisaRabotaetV = "\"Гриша работает ( ;*) ) в ТЕРКОМе.\"";
+const aVTerkomeMojnoZ = "\"В ТЕРКОМЕ можно заработать какие-то деньги.\"";
+const aGrisaInogdaBiv = "\"Гриша иногда бывает в Мавзолее.\"";
+const aNeNravitsqRasp = "\"Не нравится расписание? Подумай о чем-нибудь парадоксальном.\"";
+const aNilDaetDenGiZa = "\"NiL дает деньги за помощь, но...\"";
+const aCestnoNeZnauKo = "\"Честно, не знаю, когда будет готов порт под Linux...\"";
+const aSrocnoNujniNov = "\"Срочно! Нужны новые фишки для \"Зачетной недели\" !\"";
+const aPojelaniqIdeiB = "\"Пожелания, идеи, bug report'ы шлите на mmheroes@chat.ru !\"";
+const aVstretisKostuB = "\"Встретишь Костю Буленкова - передай ему большой привет!\"";
+const aBolSoeSpasiboV = "\"Большое спасибо Ване Павлику за mmheroes.chat.ru !\"";
+const aDiamondUbegaet = "Diamond убегает по своим делам ...";
+const aXocesPoTestitN = "\"Хочешь по-тестить новую версию Heroes of MAT-MEX?\"";
+const aDaKonecnoOcenX = "ДА, КОНЕЧНО, ОЧЕНЬ ХОЧУ!";
+const aNetUMenqNetNaA = "Нет, у меня нет на это времени...";
+const aNuILaduskiVotT = "\"Ну и ладушки! Вот тебе дискетка...\"";
+const aIzviniCtoPobes = "\"Извини, что побеспокоил.\"";
 
 
 async function diamond_dialog() {
@@ -3939,7 +3956,8 @@ async function diamond_dialog() {
     const phrases = [
         aKolqPomojetSAl, aMisaRasskajetV, aPasaTvoiStaros, aSDjugomLucseNe, aRaiNeOtstanetL,
         aKolqVseVremqSi, aSlediZaSvoimZd, aEsliVstretisSa, aEsliPloxoDumae, aIdqKKoleBudUve,
-        aPolucaqZacetPo, aInogdaRazgovor, aAndruMojetPomo, aKuzMenkoInogda, aNeSpesiSlatGne + '\n' + aZaglqniNaMmher + '\n' + aMojetBitVseUje,
+        aPolucaqZacetPo, aInogdaRazgovor, aAndruMojetPomo, aKuzMenkoInogda,
+        aNeSpesiSlatGne + "\n" + aZaglqniNaMmher + "\n" + aMojetBitVseUje,
         aSerjTojeInogda, aNePereuciTopol, aMojesUstroitSq, aGrisaRabotaetV, aVTerkomeMojnoZ,
         aGrisaInogdaBiv, aNeNravitsqRasp, aNilDaetDenGiZa, aCestnoNeZnauKo, aSrocnoNujniNov,
         aPojelaniqIdeiB, aVstretisKostuB, aBolSoeSpasiboV];
@@ -3959,16 +3977,16 @@ async function diamond_dialog() {
 
 
 async function rai_talk() {
-    const aRai_0 = 'RAI:';
-    const aTiMnePomojes = '"Ты мне поможешь?"';
-    const aDaKonecno = '"Да, конечно"';
-    const aNetIzvini___ = '"Нет, извини..."';
-    const aTiPomogRai_ = 'Ты помог RAI.';
-    const aNicegoNeVislo_ = 'Ничего не вышло.';
-    const aAxTakPolucaiPo = '"Ах, так! Получай! Получай!"';
-    const aRaiDelaetTebeB = 'RAI делает тебе больно ...';
-    const aRaiZamocil_ = 'RAI замочил.';
-    const aRaiNeReagiruet = 'RAI не реагирует на твои позывы.';
+    const aRai_0 = "RAI:";
+    const aTiMnePomojes = "\"Ты мне поможешь?\"";
+    const aDaKonecno = "\"Да, конечно\"";
+    const aNetIzvini___ = "\"Нет, извини...\"";
+    const aTiPomogRai_ = "Ты помог RAI.";
+    const aNicegoNeVislo_ = "Ничего не вышло.";
+    const aAxTakPolucaiPo = "\"Ах, так! Получай! Получай!\"";
+    const aRaiDelaetTebeB = "RAI делает тебе больно ...";
+    const aRaiZamocil_ = "RAI замочил.";
+    const aRaiNeReagiruet = "RAI не реагирует на твои позывы.";
 
     if (current_subject >= 3 || current_subject === -1) {
         ClrScr();
@@ -4019,39 +4037,39 @@ async function rai_talk() {
 
 
 async function misha_talk() {
-    const aMisa_0 = 'Миша : ';
-    const aSlusaiXvatitMu = '"Слушай, хватит мучаться! Прервись!';
-    const aDavaiVKlopodav = 'Давай в клоподавку сыграем!"';
-    const aDavai = '"Давай!"';
-    const aNetNeBuduQVKlo = '"Нет, не буду я в клоподавку ..."';
-    const aTiSigralSMisei = 'Ты сыграл с Мишей партию в клоподавку.';
-    const aZrqOcenZrq = '"Зря, очень зря!"';
-    const aSlusaiAVedVTer = '"Слушай, а ведь в ТЕРКОМе есть столик для тенниса. Сыграем?"';
-    const aObqzatelNo = '"Обязательно!"';
-    const aIzviniPotom_ = '"Извини, потом."';
-    const aTiSigralSMis_0 = 'Ты сыграл с Мишей в теннис.';
-    const aZagonqlTebqMis = 'Загонял тебя Миша.';
-    const aNicegoQNaTebqN = '"Ничего, я на тебя не в обиде."';
-    const aMisa_1 = 'Миша:';
-    const aAxJalNegdeSigr = '"Эх, жаль, негде сыграть в клоподавку!"';
-    const aVsegdaSlediZaZ = '"Всегда следи за здоровьем!"';
-    const aMozgiVliqutNaP = '"Мозги влияют на подготовку и сдачу зачетов."';
-    const aCemBolSeVinosl = '"Чем больше выносливость, тем меньше здоровья ты тратишь."';
-    const aCemBolSeTvoqXa = '"Чем больше твоя харизма, тем лучше у тебя отношения с людьми."';
-    const aVajnostKonkret = '"Важность конкретного качества сильно зависит от стиля игры."';
-    const aXarizmaPomogae = '"Харизма помогает получить что угодно от кого угодно."';
-    const aCemBolSeXarizm = '"Чем больше харизма, тем чаще к тебе пристают."';
-    const aCemMenSeVinosl = '"Чем меньше выносливость, тем больнее учиться."';
-    const aCemBolSeMozgiT = '"Чем больше мозги, тем легче готовиться."';
-    const aSidenieVInetEI = '"Сидение в Inet\'e иногда развивает мозги."';
-    const aEsliTebeNadoel = '"Если тебе надоело умирать - попробуй другую стратегию."';
-    const aXocesXalqviNab = '"Хочешь халявы - набирай харизму."';
-    const aXocesDobitSqVs = '"Хочешь добиться всего сам - развивай мозги."';
-    const aVMavzoleeVajno = '"В "Мавзолее" важно знать меру..."';
-    const aOtRazdvoeniqLi = '"От раздвоения личности спасают харизма и выносливость."';
-    const aOtLubogoObseni = '"От любого общения с NiL ты тупеешь!"';
-    const aGrisaMojetPomo = '"Гриша может помочь с трудоустройством."';
-    const aPeremeseniqStu = '"Перемещения студентов предсказуемы."';
+    const aMisa_0 = "Миша : ";
+    const aSlusaiXvatitMu = "\"Слушай, хватит мучаться! Прервись!";
+    const aDavaiVKlopodav = "Давай в клоподавку сыграем!\"";
+    const aDavai = "\"Давай!\"";
+    const aNetNeBuduQVKlo = "\"Нет, не буду я в клоподавку ...\"";
+    const aTiSigralSMisei = "Ты сыграл с Мишей партию в клоподавку.";
+    const aZrqOcenZrq = "\"Зря, очень зря!\"";
+    const aSlusaiAVedVTer = "\"Слушай, а ведь в ТЕРКОМе есть столик для тенниса. Сыграем?\"";
+    const aObqzatelNo = "\"Обязательно!\"";
+    const aIzviniPotom_ = "\"Извини, потом.\"";
+    const aTiSigralSMis_0 = "Ты сыграл с Мишей в теннис.";
+    const aZagonqlTebqMis = "Загонял тебя Миша.";
+    const aNicegoQNaTebqN = "\"Ничего, я на тебя не в обиде.\"";
+    const aMisa_1 = "Миша:";
+    const aAxJalNegdeSigr = "\"Эх, жаль, негде сыграть в клоподавку!\"";
+    const aVsegdaSlediZaZ = "\"Всегда следи за здоровьем!\"";
+    const aMozgiVliqutNaP = "\"Мозги влияют на подготовку и сдачу зачетов.\"";
+    const aCemBolSeVinosl = "\"Чем больше выносливость, тем меньше здоровья ты тратишь.\"";
+    const aCemBolSeTvoqXa = "\"Чем больше твоя харизма, тем лучше у тебя отношения с людьми.\"";
+    const aVajnostKonkret = "\"Важность конкретного качества сильно зависит от стиля игры.\"";
+    const aXarizmaPomogae = "\"Харизма помогает получить что угодно от кого угодно.\"";
+    const aCemBolSeXarizm = "\"Чем больше харизма, тем чаще к тебе пристают.\"";
+    const aCemMenSeVinosl = "\"Чем меньше выносливость, тем больнее учиться.\"";
+    const aCemBolSeMozgiT = "\"Чем больше мозги, тем легче готовиться.\"";
+    const aSidenieVInetEI = "\"Сидение в Inet'e иногда развивает мозги.\"";
+    const aEsliTebeNadoel = "\"Если тебе надоело умирать - попробуй другую стратегию.\"";
+    const aXocesXalqviNab = "\"Хочешь халявы - набирай харизму.\"";
+    const aXocesDobitSqVs = "\"Хочешь добиться всего сам - развивай мозги.\"";
+    const aVMavzoleeVajno = "\"В \"Мавзолее\" важно знать меру...\"";
+    const aOtRazdvoeniqLi = "\"От раздвоения личности спасают харизма и выносливость.\"";
+    const aOtLubogoObseni = "\"От любого общения с NiL ты тупеешь!\"";
+    const aGrisaMojetPomo = "\"Гриша может помочь с трудоустройством.\"";
+    const aPeremeseniqStu = "\"Перемещения студентов предсказуемы.\"";
 
     ClrScr();
     show_header_stats();
@@ -4154,32 +4172,32 @@ async function misha_talk() {
 
 
 async function serg_talk() {
-    const aSerj_0 = 'Серж: ';
-    const aNaGlotniKefirc = '"На, глотни кефирчику."';
-    const aQZnauGdeSrezat = '"Я знаю, где срезать в парке на физ-ре!"';
-    const aPomnitsqKogdaT = '"Помнится, когда-то была еще графическая версия mmHeroes..."';
-    const aQBilBetaTester = '"Я был бета-тестером первой версии mmHeroes (тогда еще CRWMM19)!"';
-    const aKakZdorovoCtoD = '"Как здорово, что Diamond написал новую версию!"';
-    const aTiUjePolucilDe = '"Ты уже получил деньги у Паши?"';
-    const aPoprobuiDlqNac = '"Попробуй для начала легкие зачеты."';
-    const aTiEseNePolucil = '"Ты еще не получил зачет по английскому?"';
-    const aXocesOtdixatGd = '"Хочешь отдыхать, где угодно? Заимей деньги!"';
-    const aNeVDenGaxScast = '"Не в деньгах счастье. Но они действуют успокаивающе."';
-    const aNaVsemirnoveVs = '"На Всемирнове всегда толпа народу."';
-    const aVlasenkoDamaVe = '"Влащенко - дама весьма оригинальная."';
-    const aInteresnoKogda = '"Интересно, когда будет готова следующая версия?"';
-    const aZdorovEVKafePo = '"Здоровье в кафе повышается в зависимости от наличия денег."';
-    const aEsliBiQZnalAdr = '"Если бы я знал адрес хорошего proxy..."';
-    const aStarVremennoNa = '"STAR временно накрылся. Хорошо бы узнать адрес другого proxy..."';
-    const aQPodozrevauCto = '"Я подозреваю, что Гриша знает адресок теркомовского proxy."';
-    const aADiamondVseSvo = '"А Diamond все свободное время дописывает свою игрушку!"';
-    const aVSleduusemSeme = '"В следующем семестре информатику будет вести Терехов-младший."';
-    const aDiamondXocetPe = '"Diamond хочет переписать это все на Java."';
-    const aMisaProkonsulT = '"Миша проконсультирует тебя о стратегии."';
-    const aPogovoriSDiamo = '"Поговори с Diamond\'ом, он много ценного скажет."';
-    const aBorisDoKonca = '"Борись до конца!"';
-    const aUDubcovaInogda = '"У Дубцова иногда бывает халява."';
-    const aSerjUxoditKuda = 'Серж уходит куда-то по своим делам ...';
+    const aSerj_0 = "Серж: ";
+    const aNaGlotniKefirc = "\"На, глотни кефирчику.\"";
+    const aQZnauGdeSrezat = "\"Я знаю, где срезать в парке на физ-ре!\"";
+    const aPomnitsqKogdaT = "\"Помнится, когда-то была еще графическая версия mmHeroes...\"";
+    const aQBilBetaTester = "\"Я был бета-тестером первой версии mmHeroes (тогда еще CRWMM19)!\"";
+    const aKakZdorovoCtoD = "\"Как здорово, что Diamond написал новую версию!\"";
+    const aTiUjePolucilDe = "\"Ты уже получил деньги у Паши?\"";
+    const aPoprobuiDlqNac = "\"Попробуй для начала легкие зачеты.\"";
+    const aTiEseNePolucil = "\"Ты еще не получил зачет по английскому?\"";
+    const aXocesOtdixatGd = "\"Хочешь отдыхать, где угодно? Заимей деньги!\"";
+    const aNeVDenGaxScast = "\"Не в деньгах счастье. Но они действуют успокаивающе.\"";
+    const aNaVsemirnoveVs = "\"На Всемирнове всегда толпа народу.\"";
+    const aVlasenkoDamaVe = "\"Влащенко - дама весьма оригинальная.\"";
+    const aInteresnoKogda = "\"Интересно, когда будет готова следующая версия?\"";
+    const aZdorovEVKafePo = "\"Здоровье в кафе повышается в зависимости от наличия денег.\"";
+    const aEsliBiQZnalAdr = "\"Если бы я знал адрес хорошего proxy...\"";
+    const aStarVremennoNa = "\"STAR временно накрылся. Хорошо бы узнать адрес другого proxy...\"";
+    const aQPodozrevauCto = "\"Я подозреваю, что Гриша знает адресок теркомовского proxy.\"";
+    const aADiamondVseSvo = "\"А Diamond все свободное время дописывает свою игрушку!\"";
+    const aVSleduusemSeme = "\"В следующем семестре информатику будет вести Терехов-младший.\"";
+    const aDiamondXocetPe = "\"Diamond хочет переписать это все на Java.\"";
+    const aMisaProkonsulT = "\"Миша проконсультирует тебя о стратегии.\"";
+    const aPogovoriSDiamo = "\"Поговори с Diamond'ом, он много ценного скажет.\"";
+    const aBorisDoKonca = "\"Борись до конца!\"";
+    const aUDubcovaInogda = "\"У Дубцова иногда бывает халява.\"";
+    const aSerjUxoditKuda = "Серж уходит куда-то по своим делам ...";
 
     ClrScr();
     show_header_stats();
@@ -4235,10 +4253,10 @@ async function serg_talk() {
 
 
 async function pawa_talk() {
-    const aPasaVrucaetTeb = 'Паша вручает тебе твою стипуху за май: ';
-    const aRub__2 = ' руб.';
-    const aPasaVoodusevlq = 'Паша воодушевляет тебя на великие дела.';
-    const aVmesteSAtimOnN = 'Вместе с этим он немного достает тебя.';
+    const aPasaVrucaetTeb = "Паша вручает тебе твою стипуху за май: ";
+    const aRub__2 = " руб.";
+    const aPasaVoodusevlq = "Паша воодушевляет тебя на великие дела.";
+    const aVmesteSAtimOnN = "Вместе с этим он немного достает тебя.";
 
 
     ClrScr();
@@ -4273,13 +4291,13 @@ async function pawa_talk() {
 
 
 async function sasha_talk() {
-    const aTiVstretilSasu = 'Ты встретил Сашу! Говорят, у него классные конспекты ...';
-    const aNicegoNeNado = 'Ничего не надо';
-    const aCegoTebeNadoOt = 'Чего тебе надо от Саши?';
-    const aKakZnaes___ = 'Как знаешь...';
-    const aSasa_1 = 'Саша:';
-    const aDaUMenqSSoboiA = '"Да, у меня с собой этот конспект ..."';
-    const aOxIzviniKtoToD = '"Ох, извини, кто-то другой уже позаимствовал ..."';
+    const aTiVstretilSasu = "Ты встретил Сашу! Говорят, у него классные конспекты ...";
+    const aNicegoNeNado = "Ничего не надо";
+    const aCegoTebeNadoOt = "Чего тебе надо от Саши?";
+    const aKakZnaes___ = "Как знаешь...";
+    const aSasa_1 = "Саша:";
+    const aDaUMenqSSoboiA = "\"Да, у меня с собой этот конспект ...\"";
+    const aOxIzviniKtoToD = "\"Ох, извини, кто-то другой уже позаимствовал ...\"";
 
     ClrScr();
     show_header_stats();
@@ -4326,17 +4344,17 @@ async function sasha_talk() {
 } // end function 1B6B7
 
 
-var aMaladoiCilavek = '"Маладой чилавек, вы мне не паможите решить задачу?';
-var aAToQSigodnqNiV = 'А то я сигодня ни в зуб нагой ..."';
-var aDaKonecno_0 = '"Да, конечно"';
-var aIzviniVDrugoiR = '"Извини, в другой раз"';
-var aOiSpasiboVotVa = '"Ой, спасибо! Вот вам ';
-var aRub_ZaAto___ = ' руб. за это..."';
-var aAlTruizmNeDove = 'Альтруизм не довел до добра.';
-var aUTebqNicegoNeV = 'У тебя ничего не вышло.';
-var aTiZavodisSNilS = 'Ты заводишь с NiL светскую беседу.';
-var aTebePoploxelo_ = 'Тебе поплохело.';
-var aObsenieSNilOka = 'Общение с NiL оказалось выше человеческих сил.';
+const aMaladoiCilavek = "\"Маладой чилавек, вы мне не паможите решить задачу?";
+const aAToQSigodnqNiV = "А то я сигодня ни в зуб нагой ...\"";
+const aDaKonecno_0 = "\"Да, конечно\"";
+const aIzviniVDrugoiR = "\"Извини, в другой раз\"";
+const aOiSpasiboVotVa = "\"Ой, спасибо! Вот вам ";
+const aRub_ZaAto___ = " руб. за это...\"";
+const aAlTruizmNeDove = "Альтруизм не довел до добра.";
+const aUTebqNicegoNeV = "У тебя ничего не вышло.";
+const aTiZavodisSNilS = "Ты заводишь с NiL светскую беседу.";
+const aTebePoploxelo_ = "Тебе поплохело.";
+const aObsenieSNilOka = "Общение с NiL оказалось выше человеческих сил.";
 
 
 async function nil_talk() {
@@ -4374,7 +4392,8 @@ async function nil_talk() {
                 writeln(aRub_ZaAto___);
 
                 hero.money += hero.subject[current_subject].knowledge;
-                hero.subject[current_subject].knowledge -= subjects[current_subject].member0x100 + Random(subjects[current_subject].member0xFC);
+                const knowledge = subjects[current_subject].member0x100 + Random(subjects[current_subject].member0xFC);
+                hero.subject[current_subject].knowledge -= knowledge;
 
                 decrease_health(subjects[current_subject].member0xFC, aAlTruizmNeDove);
                 await hour_pass();
@@ -4403,19 +4422,19 @@ async function nil_talk() {
 
 
 function kuzmenko_speech() {
-    const aKuzMenko = 'Кузьменко:';
-    const a___Otformatiro = '"... отформатировать дискету так, чтобы 1ый сектор был 5ым ..."';
-    const aAViNigdeNeVide = '"А Вы нигде не видели литературы по фильтрам в Windows?"';
-    const a___NapisatVizu = '"... написать визуализацию байта на ассемблере за 11 байт ..."';
-    const aUVasOlegPlissV = '"У вас Олег Плисс ведет какие-нибудь занятия?"';
-    const aBillGatesMustD = '"Bill Gates = must die = кабысдох (рус.)."';
-    const aViCitaliJurnal = '"Вы читали журнал "Монитор"? Хотя вряд ли..."';
-    const aQSlisalCtoMmhe = '"Я слышал, что mmHeroes написана на BP 7.0."';
-    const aZapisivaitesNa = '"Записывайтесь на мой семинар по языку Си!"';
-    const aNaTretEmKurseQ = '"На третьем курсе я буду вести у вас спецвычпрактикум."';
-    const aInteresnoKog_0 = '"Интересно, когда они снова наладят STAR?"';
-    const aPoluciteSebeQs = '"Получите себе ящик rambler\'e или на mail.ru !"';
-    const aARazveTerexovS = '"А разве Терехов-старший ничего не рассказывает про IBM PC?"';
+    const aKuzMenko = "Кузьменко:";
+    const a___Otformatiro = "\"... отформатировать дискету так, чтобы 1ый сектор был 5ым ...\"";
+    const aAViNigdeNeVide = "\"А Вы нигде не видели литературы по фильтрам в Windows?\"";
+    const a___NapisatVizu = "\"... написать визуализацию байта на ассемблере за 11 байт ...\"";
+    const aUVasOlegPlissV = "\"У вас Олег Плисс ведет какие-нибудь занятия?\"";
+    const aBillGatesMustD = "\"Bill Gates = must die = кабысдох (рус.).\"";
+    const aViCitaliJurnal = "\"Вы читали журнал \"Монитор\"? Хотя вряд ли...\"";
+    const aQSlisalCtoMmhe = "\"Я слышал, что mmHeroes написана на BP 7.0.\"";
+    const aZapisivaitesNa = "\"Записывайтесь на мой семинар по языку Си!\"";
+    const aNaTretEmKurseQ = "\"На третьем курсе я буду вести у вас спецвычпрактикум.\"";
+    const aInteresnoKog_0 = "\"Интересно, когда они снова наладят STAR?\"";
+    const aPoluciteSebeQs = "\"Получите себе ящик rambler'e или на mail.ru !\"";
+    const aARazveTerexovS = "\"А разве Терехов-старший ничего не рассказывает про IBM PC?\"";
 
     GotoXY(1, 8);
     TextColor(7);
@@ -4429,11 +4448,11 @@ function kuzmenko_speech() {
 } // end function 1BE39
 
 
-var aKuzMenko_0 = 'Кузьменко:';
-var aViZnaeteKlimov = '"Вы знаете, Климова можно найти в компьютерном классе';
-var aGoMaqS = '-го мая с ';
-var aPo = ' по ';
-var aC__ = 'ч.."';
+const aKuzMenko_0 = "Кузьменко:";
+const aViZnaeteKlimov = "\"Вы знаете, Климова можно найти в компьютерном классе";
+const aGoMaqS = "-го мая с ";
+const aPo = " по ";
+const aC__ = "ч..\"";
 
 
 async function kuzmenko_talk() {
@@ -4487,9 +4506,9 @@ async function kuzmenko_talk() {
 
 
 async function djug_talk() {
-    const aDjug_0 = 'DJuG:';
-    const aUVasKakoiToSko = '"У Вас какой-то школьный метод решения задач..."';
-    const aNeObsaisqSTorm = 'Не общайся с тормозами!';
+    const aDjug_0 = "DJuG:";
+    const aUVasKakoiToSko = "\"У Вас какой-то школьный метод решения задач...\"";
+    const aNeObsaisqSTorm = "Не общайся с тормозами!";
 
 
     ClrScr();
@@ -4511,33 +4530,33 @@ async function djug_talk() {
 } // end function 1C1FF
 
 
-var aAndru_1 = 'Эндрю: ';
-var aSkajiDiamondUC = '"Скажи Diamond\'у, что маловато описалова!"';
-var aAEseDiamondDum = '"А еще Diamond думал переписать это на JavaScript."';
-var aAQZnauViigrisn = '"А я знаю выигрышную стратегию! Если только не замочат..."';
-var aVoobseToVseAto = '"Вообще-то, все это происходит в мае 1998 г."';
-var aQVidelNadpisNa = '"Я видел надпись на парте: ЗАКОН ВСЕМИРНОВА ТЯГОТЕНИЯ"';
-var aZaglqniNaMmh_0 = '"Загляни на mmheroes.chat.ru!"';
-var aTolKoNePredlag = '"Только не предлагай Diamond\'у переписать все на Прологе!"';
-var aNuKogdaJeBudet = '"Ну когда же будет порт под Linux?"';
-var aVmwareSuxx___N = '"VMWARE - SUXX... Но под ним идут Heroes of Mat & Mech!"';
-var aPoxojeCtoMoqSt = '"Похоже, что моя стратегия обламывается..."';
-var aUxTiGamma3_14V = '"Ух ты! Гамма 3.14 - в этом что-то есть."';
-var aMojetBitDiamon = '"Может быть, Diamond\'а просто заклинило на многоточиях?"';
-var aGovorqtMojnoZa = '"Говорят, можно зарабатывать деньги, почти ничего не делая."';
-var aVotInogdaMnePr = '"Вот, иногда мне приходится тяжко - когда пристают всякие..."';
-var aXorosoLiCtoMno = '"Хорошо ли, что многие реплики персонажей посвящены самой игре?"';
-var aPomogiteMneXoc = '"Помогите мне! Хочу в Inet!"';
-var aACto = '"А что? А ничего."';
-var aEsliOnoCvetaBo = '"Если оно цвета бордо - значит, оно тебе снится."';
-var aVsexSDnemMatMe = '"Всех с ДНЕМ МАТ-МЕХА!"';
-var aPridumaiSvouFr = '"Придумай свою фразу для персонажа!"';
-var a120kIsxodnikov = '"120К исходников - вот что такое mmHeroes!"';
-var a120kVesMaKrivi = '"120К весьма кривых исходников - вот что такое mmHeroes!"';
-var aQPodozrevauC_0 = '"Я подозреваю, что ';
-var aNicegoTebeNeZa = ' ничего тебе не засчитает."';
-var aZactetTebeZa1Z = ' зачтет тебе за 1 заход ';
-var a__1 = '."';
+const aAndru_1 = "Эндрю: ";
+const aSkajiDiamondUC = "\"Скажи Diamond'у, что маловато описалова!\"";
+const aAEseDiamondDum = "\"А еще Diamond думал переписать это на JavaScript.\"";
+const aAQZnauViigrisn = "\"А я знаю выигрышную стратегию! Если только не замочат...\"";
+const aVoobseToVseAto = "\"Вообще-то, все это происходит в мае 1998 г.\"";
+const aQVidelNadpisNa = "\"Я видел надпись на парте: ЗАКОН ВСЕМИРНОВА ТЯГОТЕНИЯ\"";
+const aZaglqniNaMmh_0 = "\"Загляни на mmheroes.chat.ru!\"";
+const aTolKoNePredlag = "\"Только не предлагай Diamond'у переписать все на Прологе!\"";
+const aNuKogdaJeBudet = "\"Ну когда же будет порт под Linux?\"";
+const aVmwareSuxx___N = "\"VMWARE - SUXX... Но под ним идут Heroes of Mat & Mech!\"";
+const aPoxojeCtoMoqSt = "\"Похоже, что моя стратегия обламывается...\"";
+const aUxTiGamma3_14V = "\"Ух ты! Гамма 3.14 - в этом что-то есть.\"";
+const aMojetBitDiamon = "\"Может быть, Diamond'а просто заклинило на многоточиях?\"";
+const aGovorqtMojnoZa = "\"Говорят, можно зарабатывать деньги, почти ничего не делая.\"";
+const aVotInogdaMnePr = "\"Вот, иногда мне приходится тяжко - когда пристают всякие...\"";
+const aXorosoLiCtoMno = "\"Хорошо ли, что многие реплики персонажей посвящены самой игре?\"";
+const aPomogiteMneXoc = "\"Помогите мне! Хочу в Inet!\"";
+const aACto = "\"А что? А ничего.\"";
+const aEsliOnoCvetaBo = "\"Если оно цвета бордо - значит, оно тебе снится.\"";
+const aVsexSDnemMatMe = "\"Всех с ДНЕМ МАТ-МЕХА!\"";
+const aPridumaiSvouFr = "\"Придумай свою фразу для персонажа!\"";
+const a120kIsxodnikov = "\"120К исходников - вот что такое mmHeroes!\"";
+const a120kVesMaKrivi = "\"120К весьма кривых исходников - вот что такое mmHeroes!\"";
+const aQPodozrevauC_0 = "\"Я подозреваю, что ";
+const aNicegoTebeNeZa = " ничего тебе не засчитает.\"";
+const aZactetTebeZa1Z = " зачтет тебе за 1 заход ";
+const a__1 = ".\"";
 
 
 function andrew_speech(subject) {
@@ -4595,17 +4614,17 @@ function andrew_speech(subject) {
 } // end function 1C6DC
 
 
-var aObratitSqKAndr = 'Обратиться к Эндрю за помощью?';
-var aDaCemQXujeDrug = 'Да, чем я хуже других?';
-var aNetQUjKakNibud = 'Нет, я уж как-нибудь сам...';
-var aAndruVglqdivae = 'Эндрю вглядывается в твои задачки,';
-var aINacinaetDumat = 'и начинает думать очень громко...';
-var aPokaAndruTakNa = 'Пока Эндрю так напрягается, ты не можешь ни на чем сосредоточиться!';
-var aUAndruNicegoNe = 'У Эндрю ничего не вышло...';
-var aAndruResilTebe = 'Эндрю решил тебе ';
-var aNadoBudetPodoi = 'Надо будет подойти с зачеткой!';
-var aAndruTebqIgnor = 'Эндрю тебя игнорирует!';
-var aAndruTojeUmeet = 'Эндрю тоже умеет отбиваться от разных нехороших людей.';
+const aObratitSqKAndr = "Обратиться к Эндрю за помощью?";
+const aDaCemQXujeDrug = "Да, чем я хуже других?";
+const aNetQUjKakNibud = "Нет, я уж как-нибудь сам...";
+const aAndruVglqdivae = "Эндрю вглядывается в твои задачки,";
+const aINacinaetDumat = "и начинает думать очень громко...";
+const aPokaAndruTakNa = "Пока Эндрю так напрягается, ты не можешь ни на чем сосредоточиться!";
+const aUAndruNicegoNe = "У Эндрю ничего не вышло...";
+const aAndruResilTebe = "Эндрю решил тебе ";
+const aNadoBudetPodoi = "Надо будет подойти с зачеткой!";
+const aAndruTebqIgnor = "Эндрю тебя игнорирует!";
+const aAndruTojeUmeet = "Эндрю тоже умеет отбиваться от разных нехороших людей.";
 
 
 async function andrew_talk() {
@@ -4631,7 +4650,8 @@ async function andrew_talk() {
                 writeln(aINacinaetDumat);
                 writeln(aPokaAndruTakNa);
 
-                let task_done = Trunc(Sqrt(Random(subjects[current_subject].tasks - hero.subject[current_subject].tasks_done)));
+                const toSolve = subjects[current_subject].tasks - hero.subject[current_subject].tasks_done;
+                let task_done = Trunc(Sqrt(Random(toSolve)));
 
                 if (task_done > 2) {
                     task_done = 0;
@@ -4648,7 +4668,7 @@ async function andrew_talk() {
                     write(task_done);
                     TextColor(7);
                     zadanie_in_case(task_done);
-                    writeln('!');
+                    writeln("!");
 
                     hero.subject[current_subject].tasks_done += task_done;
                     if (!jl(hero.subject[current_subject].tasks_done, subjects[current_subject].tasks)) {
@@ -4678,32 +4698,32 @@ async function andrew_talk() {
 } // end function 1CC94
 
 
-var aATiNeXocesUstr = '"А ты не хочешь устроиться в ТЕРКОМ? Может, кое-чего подзаработаешь..."';
-var aDaMneBiNePomes = 'Да, мне бы не помешало.';
-var aNetQLucsePoucu = 'Нет, я лучше поучусь уще чуток.';
-var aPozdravlquTepe = '"Поздравляю, теперь ты можешь идти в "контору"!"';
-var aKakXoces_TolKo = '"Как хочешь. Только смотри, не заучись там ..."';
-var aKstatiQTutZnau = '"Кстати, я тут знаю один качественно работающий прокси-сервер..."';
-var aTiZapisivaesAd = 'Ты записываешь адрес. Вдруг пригодится?';
-var aGrisa_1 = 'Гриша:';
-var aXocuXalqvi = '"Хочу халявы!"';
-var aPriidiJeOXalqv = '"Прийди же, о халява!"';
-var aXalqvaEstEeNeM = '"Халява есть - ее не может не быть."';
-var aDavaiOrganizue = '"Давай организуем клуб любетелей халявы!"';
-var aCtobiPolucitDi = '"Чтобы получить диплом, учиться совершенно необязательно!"';
-var aNuVotTiGotovil = '"Ну вот, ты готовился... Помогло это тебе?"';
-var aNaTretEmKurseN = '"На третьем курсе на лекции уже никто не ходит. Почти никто."';
-var aVotBeriPrimerS = '"Вот, бери пример с Коли."';
-var aNenavijuLVaTol = '"Ненавижу Льва Толстого! Вчера "Войну и мир" <йк> ксерил..."';
-var aAVPomiLucseVoo = '"А в ПОМИ лучше вообще не ездить!"';
-var aImenaGlavnixXa = '"Имена главных халявчиков и алкоголиков висят на баобабе."';
-var aPravilNoLucseP = '"Правильно, лучше посидим здесь и оттянемся!"';
-var aKonspektirovat = '"Конспектировать ничего не надо. В мире есть ксероксы!"';
-var aASCetvertogoKu = '"А с четвертого курса вылететь уже почти невозможно."';
-var aVotUMexanikovU = '"Вот у механиков - у них халява!"';
-var aIEsePoPivu___ = 'И еще по пиву...';
-var aGubitLudeiNePi = 'Губит людей не пиво, а избыток пива.';
-var aIEseOdinCasPro = 'И еще один час прошел в бесплодных разговорах...';
+const aATiNeXocesUstr = "\"А ты не хочешь устроиться в ТЕРКОМ? Может, кое-чего подзаработаешь...\"";
+const aDaMneBiNePomes = "Да, мне бы не помешало.";
+const aNetQLucsePoucu = "Нет, я лучше поучусь уще чуток.";
+const aPozdravlquTepe = "\"Поздравляю, теперь ты можешь идти в \"контору\"!\"";
+const aKakXoces_TolKo = "\"Как хочешь. Только смотри, не заучись там ...\"";
+const aKstatiQTutZnau = "\"Кстати, я тут знаю один качественно работающий прокси-сервер...\"";
+const aTiZapisivaesAd = "Ты записываешь адрес. Вдруг пригодится?";
+const aGrisa_1 = "Гриша:";
+const aXocuXalqvi = "\"Хочу халявы!\"";
+const aPriidiJeOXalqv = "\"Прийди же, о халява!\"";
+const aXalqvaEstEeNeM = "\"Халява есть - ее не может не быть.\"";
+const aDavaiOrganizue = "\"Давай организуем клуб любетелей халявы!\"";
+const aCtobiPolucitDi = "\"Чтобы получить диплом, учиться совершенно необязательно!\"";
+const aNuVotTiGotovil = "\"Ну вот, ты готовился... Помогло это тебе?\"";
+const aNaTretEmKurseN = "\"На третьем курсе на лекции уже никто не ходит. Почти никто.\"";
+const aVotBeriPrimerS = "\"Вот, бери пример с Коли.\"";
+const aNenavijuLVaTol = "\"Ненавижу Льва Толстого! Вчера \"Войну и мир\" <йк> ксерил...\"";
+const aAVPomiLucseVoo = "\"А в ПОМИ лучше вообще не ездить!\"";
+const aImenaGlavnixXa = "\"Имена главных халявчиков и алкоголиков висят на баобабе.\"";
+const aPravilNoLucseP = "\"Правильно, лучше посидим здесь и оттянемся!\"";
+const aKonspektirovat = "\"Конспектировать ничего не надо. В мире есть ксероксы!\"";
+const aASCetvertogoKu = "\"А с четвертого курса вылететь уже почти невозможно.\"";
+const aVotUMexanikovU = "\"Вот у механиков - у них халява!\"";
+const aIEsePoPivu___ = "И еще по пиву...";
+const aGubitLudeiNePi = "Губит людей не пиво, а избыток пива.";
+const aIEseOdinCasPro = "И еще один час прошел в бесплодных разговорах...";
 
 
 async function grisha_talk() {
@@ -4788,25 +4808,25 @@ async function talk_with_classmate(classmate) {
 
 
 async function week_brain_dream() {
-    const aRozovieSloniki = 'Розовые слоники с блестящими крылышками';
-    const aZelenieCelovec = 'Зеленые человечки с длинными антеннами';
-    const aOveckiSOslepit = 'Овечки с ослепительно-белой шерстью';
-    const aSidqtSOkosevsi = 'сидят с окосевшими глазами в Мавзолее';
-    const aIScitautOprede = 'и считают определитель матрицы 10 на 10';
-    const aIIsutJordanovu = 'и ищут Жорданову форму матрицы';
-    const aIVozvodqtMatri = 'и возводят матрицы в 239-ю степень';
-    const aIResautLineinu = 'и решают линейную систему уравнений с параметрами';
-    const aIDokazivautNep = 'и доказывают неприводимость многочлена 10-й степени над Z';
-    const aIDokazivautSxo = 'и доказывают сходимость неопределенного интеграла с параметрами';
-    const aIScitautSummuR = 'и считают сумму ряда с параметрами';
-    const aIDifferenciruu = 'и дифференцируют, дифференцируют, дифференцируют';
-    const aIBerutIntergal = 'и берут интергалы не отдают их';
-    const aIResautZadaciP = 'и решают задачи по математической болтологии';
-    const a____7 = '...';
-    const aGospodiNuIPris = 'Господи! Ну и присниться же такое!';
-    const aZaToTeperTiToc = 'За то теперь ты точно знаешь,';
-    const aCtoSnitsqStude = 'что снится студентам-математикам,';
-    const aKogdaOniVneKon = 'когда они вне кондиции';
+    const aRozovieSloniki = "Розовые слоники с блестящими крылышками";
+    const aZelenieCelovec = "Зеленые человечки с длинными антеннами";
+    const aOveckiSOslepit = "Овечки с ослепительно-белой шерстью";
+    const aSidqtSOkosevsi = "сидят с окосевшими глазами в Мавзолее";
+    const aIScitautOprede = "и считают определитель матрицы 10 на 10";
+    const aIIsutJordanovu = "и ищут Жорданову форму матрицы";
+    const aIVozvodqtMatri = "и возводят матрицы в 239-ю степень";
+    const aIResautLineinu = "и решают линейную систему уравнений с параметрами";
+    const aIDokazivautNep = "и доказывают неприводимость многочлена 10-й степени над Z";
+    const aIDokazivautSxo = "и доказывают сходимость неопределенного интеграла с параметрами";
+    const aIScitautSummuR = "и считают сумму ряда с параметрами";
+    const aIDifferenciruu = "и дифференцируют, дифференцируют, дифференцируют";
+    const aIBerutIntergal = "и берут интергалы не отдают их";
+    const aIResautZadaciP = "и решают задачи по математической болтологии";
+    const a____7 = "...";
+    const aGospodiNuIPris = "Господи! Ну и присниться же такое!";
+    const aZaToTeperTiToc = "За то теперь ты точно знаешь,";
+    const aCtoSnitsqStude = "что снится студентам-математикам,";
+    const aKogdaOniVneKon = "когда они вне кондиции";
 
     ClrScr();
     TextColor(0x0D);
@@ -4835,23 +4855,23 @@ async function week_brain_dream() {
 
 
 async function zauchilsya_dream() {
-    const aTiSlisisMqgkii = 'Ты слышишь мягкий, ненавязчивый голос:';
-    const aAViDeistvitelN = '"А Вы действительно правильно выбрали';
-    const aSebeSpecialNos = ' себе специальность?"';
-    const aIntegral___ = '"Интеграл..."';
-    const aKakoiIntegral = '"Какой интеграл?"';
-    const aDaVotJeOnMiEgo = '"Да вот же он, мы его только что стерли!"';
-    const aViKonecnoVelik = '"Вы, конечно, великий парильщик.';
-    const aNoAtuZadacuQVa = ' Но эту задачу я Вам засчитаю."';
-    const aACtoUNasSegodn = '"А что, у нас сегодня разве аудиторное занятие?"';
-    const aWellLastTimeIF = '"Well, last time I found a pencil left by one of you.';
-    const aIWillReturnItT = ' I will return it to the owner, if he or she';
-    const aCanTellMeSomeN = ' can tell me some nice and pleasant words.';
-    const aIAmALadyNotYou = ' I am a lady, not your computer!"';
-    const aVSleduusemSe_0 = '"В следующем семестре вы должны будете написать реферат';
-    const aNaTemuBegVMiro = ' на тему "Бег в мировой литературе". В качестве первоисточника';
-    const aMojeteVzqtOdno = ' можете взять одноименный роман Булгакова."';
-    const aNuVsePoxojeZau = 'Ну все, похоже, заучился - если преподы по ночам снятся...';
+    const aTiSlisisMqgkii = "Ты слышишь мягкий, ненавязчивый голос:";
+    const aAViDeistvitelN = "\"А Вы действительно правильно выбрали";
+    const aSebeSpecialNos = " себе специальность?\"";
+    const aIntegral___ = "\"Интеграл...\"";
+    const aKakoiIntegral = "\"Какой интеграл?\"";
+    const aDaVotJeOnMiEgo = "\"Да вот же он, мы его только что стерли!\"";
+    const aViKonecnoVelik = "\"Вы, конечно, великий парильщик.";
+    const aNoAtuZadacuQVa = " Но эту задачу я Вам засчитаю.\"";
+    const aACtoUNasSegodn = "\"А что, у нас сегодня разве аудиторное занятие?\"";
+    const aWellLastTimeIF = "\"Well, last time I found a pencil left by one of you.";
+    const aIWillReturnItT = " I will return it to the owner, if he or she";
+    const aCanTellMeSomeN = " can tell me some nice and pleasant words.";
+    const aIAmALadyNotYou = " I am a lady, not your computer!\"";
+    const aVSleduusemSe_0 = "\"В следующем семестре вы должны будете написать реферат";
+    const aNaTemuBegVMiro = " на тему \"Бег в мировой литературе\". В качестве первоисточника";
+    const aMojeteVzqtOdno = " можете взять одноименный роман Булгакова.\"";
+    const aNuVsePoxojeZau = "Ну все, похоже, заучился - если преподы по ночам снятся...";
 
     ClrScr();
     TextColor(0x0D);
@@ -4886,25 +4906,25 @@ async function zauchilsya_dream() {
 } // end function 1DF40
 
 
-var aZdravstvuite__ = '"Здравствуйте!" ...';
-var aOnoBolSoe___ = 'Оно большое ...';
-var aOnoPixtit___ = 'Оно пыхтит! ...';
-var aOnoMedlennoPol = 'Оно медленно ползет прямо на тебя!!! ...';
-var aOnoGovoritCelo = 'Оно говорит человеческим голосом:';
-var aMolodoiCelovek = '"Молодой человек. Когда-нибудь Вы вырастете';
-var aIBudeteRabotat = 'и будете работать на большой машине.';
-var aVamNadoBudetNa = 'Вам надо будет нажать кнопку жизни,';
-var aAViNajmeteKnop = 'а Вы нажмете кнопку смерти ..."';
-var aAtoVSredneveko = '"Это в средневековье ученые спорили,';
-var aSkolKoCerteiMo = 'сколько чертей может поместиться';
-var aNaKoncikeIgli_ = 'на кончике иглы..."';
-var aZadaciMojnoRes = '"Задачи можно решать по-разному.';
-var aMojnoUstnoMojn = 'Можно устно, можно на бумажке,';
-var aMojnoIgraqVKre = 'можно - играя в крестики-нолики...';
-var aAMojnoProstoSp = 'А можно - просто списать ответ в конце задачника!"';
-var a____8 = '...';
-var aUfff___CtoToSe = 'Уффф... Что-то сегодня опять какие-то гадости снятся.';
-var aVsePoraZavqziv = 'Все, пора завязывать с этим. Нельзя так много учиться.';
+const aZdravstvuite__ = "\"Здравствуйте!\" ...";
+const aOnoBolSoe___ = "Оно большое ...";
+const aOnoPixtit___ = "Оно пыхтит! ...";
+const aOnoMedlennoPol = "Оно медленно ползет прямо на тебя!!! ...";
+const aOnoGovoritCelo = "Оно говорит человеческим голосом:";
+const aMolodoiCelovek = "\"Молодой человек. Когда-нибудь Вы вырастете";
+const aIBudeteRabotat = "и будете работать на большой машине.";
+const aVamNadoBudetNa = "Вам надо будет нажать кнопку жизни,";
+const aAViNajmeteKnop = "а Вы нажмете кнопку смерти ...\"";
+const aAtoVSredneveko = "\"Это в средневековье ученые спорили,";
+const aSkolKoCerteiMo = "сколько чертей может поместиться";
+const aNaKoncikeIgli_ = "на кончике иглы...\"";
+const aZadaciMojnoRes = "\"Задачи можно решать по-разному.";
+const aMojnoUstnoMojn = "Можно устно, можно на бумажке,";
+const aMojnoIgraqVKre = "можно - играя в крестики-нолики...";
+const aAMojnoProstoSp = "А можно - просто списать ответ в конце задачника!\"";
+const a____8 = "...";
+const aUfff___CtoToSe = "Уффф... Что-то сегодня опять какие-то гадости снятся.";
+const aVsePoraZavqziv = "Все, пора завязывать с этим. Нельзя так много учиться.";
 
 
 async function knows_djug_dream() {
@@ -4950,7 +4970,7 @@ async function knows_djug_dream() {
 
 
 async function hero_dream() {
-    const aPrevratilsqVOv = 'Превратился в овощ.';
+    const aPrevratilsqVOv = "Превратился в овощ.";
     let dream_scenario = 0;
 
     for (let i = 0; i < 3; ++i) {
@@ -5002,7 +5022,7 @@ async function request_exit() {
 
 
 async function goto_sleep() {
-    const aVremqVislo_ = 'Время вышло.';
+    const aVremqVislo_ = "Время вышло.";
 
     current_subject = -1;
     current_place = Obshaga;
@@ -5025,7 +5045,7 @@ async function goto_sleep() {
 
     health_addition -= hero.health;
     hero.health += health_addition;
-    let sleep_time = Random(idiv(health_addition, 4)) + 7;
+    const sleep_time = Random(idiv(health_addition, 4)) + 7;
     time_of_day += sleep_time;
 
     if (time_of_day > 23) {
@@ -5057,9 +5077,9 @@ async function goto_sleep() {
 
 
 async function pomi_midnight() {
-    const aTiGlqdisNaCasi = 'Ты глядишь на часы и видишь: уже полночь!';
-    const aNaPosledneiAle = 'На последней электричке ты едешь домой, в общагу.';
-    const aZasnulVAlektri = 'Заснул в электричке и не проснулся.';
+    const aTiGlqdisNaCasi = "Ты глядишь на часы и видишь: уже полночь!";
+    const aNaPosledneiAle = "На последней электричке ты едешь домой, в общагу.";
+    const aZasnulVAlektri = "Заснул в электричке и не проснулся.";
 
 
     ClrScr();
@@ -5076,9 +5096,9 @@ async function pomi_midnight() {
 
 
 async function punk_midnight() {
-    const aVaxtersaGlqdit = 'Вахтерша глядит на тебя странными глазами:';
-    const aCtoMojetDelatB = 'что может делать бедный студент в университете в полночь?';
-    const aNeZnaqOtvetNaA = 'Не зная ответ на этот вопрос, ты спешишь в общагу.';
+    const aVaxtersaGlqdit = "Вахтерша глядит на тебя странными глазами:";
+    const aCtoMojetDelatB = "что может делать бедный студент в университете в полночь?";
+    const aNeZnaqOtvetNaA = "Не зная ответ на этот вопрос, ты спешишь в общагу.";
 
 
     ClrScr();
@@ -5093,8 +5113,8 @@ async function punk_midnight() {
 } // end function 1E907
 
 
-var aMavzoleiZakriv = 'Мавзолей закрывается.';
-var aPoraDomoi = 'Пора домой!';
+const aMavzoleiZakriv = "Мавзолей закрывается.";
+const aPoraDomoi = "Пора домой!";
 
 
 async function mavzoley_midnight() {
@@ -5122,8 +5142,8 @@ async function midnight() {
 } // end function 1E9E7
 
 
-var aDjugAtoSmertel = 'DJuG - это смертельно!';
-var aBurnoProgressi = 'Бурно прогрессирующая паранойя.';
+const aDjugAtoSmertel = "DJuG - это смертельно!";
+const aBurnoProgressi = "Бурно прогрессирующая паранойя.";
 
 
 async function hour_pass() {
@@ -5157,11 +5177,11 @@ async function hour_pass() {
 
 
 async function prompt_exit() {
-    const aNuMojetNeNadoT = 'Ну, может не надо так резко...';
-    const aTiCtoSerEznoXo = 'Ты что, серьезно хочешь закончить игру?';
-    const aNetNeXocu = 'Нет, не хочу!';
-    const aQJeSkazalSMenq = 'Я же сказал: с меня хватит!';
-    const aViselSam_ = 'Вышел сам.';
+    const aNuMojetNeNadoT = "Ну, может не надо так резко...";
+    const aTiCtoSerEznoXo = "Ты что, серьезно хочешь закончить игру?";
+    const aNetNeXocu = "Нет, не хочу!";
+    const aQJeSkazalSMenq = "Я же сказал: с меня хватит!";
+    const aViselSam_ = "Вышел сам.";
 
     ClrScr();
     writeln(aNuMojetNeNadoT);
@@ -5430,9 +5450,9 @@ function declOfNum(number, titles) {
 
 
 function zadanie_in_case(number) {
-    const aZadanie = ' задание';
-    const aZadaniq = ' задания';
-    const aZadanii = ' заданий';
+    const aZadanie = " задание";
+    const aZadaniq = " задания";
+    const aZadanii = " заданий";
 
     const word = declOfNum(number, [aZadanie, aZadaniq, aZadanii]);
     write(word);
@@ -5469,51 +5489,51 @@ function colored_output_white(str) {
 } // end function 1F335
 
 
-var aSegodnq = 'Сегодня ';
-var aEMaq = 'е мая; ';
-var asc_1F36E = '';
-var a00 = ':00';
-var aVersiq_0 = 'Версия ';
-var aSamocuvstvie = 'Самочувствие: ';
-var aJivoiTrup = 'живой труп';
-var aPoraPomirat___ = 'пора помирать ...';
-var aPloxoe = 'плохое';
-var aTakSebe = 'так себе';
-var aSrednee = 'среднее';
-var aXorosee = 'хорошее';
-var aOtlicnoe = 'отличное';
-var aPloxo = 'Плохо';
-var aUdovl_ = 'Удовл.';
-var aXoroso = 'Хорошо';
-var aOtlicno = 'Отлично';
-var aFinansi = 'Финансы: ';
-var aRub__3 = ' руб.';
-var aNadoPolucitDen = 'Надо получить деньги за май...';
-var aTiUspelPotrati = 'Ты успел потратить все деньги.';
-var aKliniceskaqSme = 'Клиническая смерть мозга';
-var aGolovaProstoNi = 'Голова просто никакая';
-var aDumatPraktices = 'Думать практически невозможно';
-var aDumatTrudno = 'Думать трудно';
-var aGolovaPoctiVNo = 'Голова почти в норме';
-var aGolovaVNorme = 'Голова в норме';
-var aGolovaSvejaq = 'Голова свежая';
-var aLegkostVMislqx = 'Легкость в мыслях необыкновенная';
-var aObratitesKRazr = 'Обратитесь к разработчику ;)';
-var aMamaRodiMenqOb = 'Мама, роди меня обратно!';
-var aOkoncatelNoZau = 'Окончательно заучился';
-var aQTakBolSeNemog = 'Я так больше немогууу!';
-var aSkoreeBiVseAto = 'Скорее бы все это кончилось...';
-var aEseNemnogoIPor = 'Еще немного и пора отдыхать';
-var aNemnogoUstal = 'Немного устал';
-var aGotovKTruduIOb = 'Готов к труду и обороне';
-var aNasJdutVelikie = 'Нас ждут великие дела';
-var aOcenZamknutiiT = 'Очень замкнутый товарищ';
-var aPredpocitaesOd = 'Предпочитаешь одиночество';
-var aTebeTrudnoObsa = 'Тебе трудно общаться с людьми';
-var aTebeNeprostoOb = 'Тебе непросто общаться с людьми';
-var aTiNormalNoOtno = 'Ты нормально относишься к окружающим';
-var aUTebqMnogoDruz = 'У тебя много друзей';
-var aUTebqOcenMnogo = 'У тебя очень много друзей';
+const aSegodnq = "Сегодня ";
+const aEMaq = "е мая; ";
+const asc_1F36E = "";
+const a00 = ":00";
+const aVersiq_0 = "Версия ";
+const aSamocuvstvie = "Самочувствие: ";
+const aJivoiTrup = "живой труп";
+const aPoraPomirat___ = "пора помирать ...";
+const aPloxoe = "плохое";
+const aTakSebe = "так себе";
+const aSrednee = "среднее";
+const aXorosee = "хорошее";
+const aOtlicnoe = "отличное";
+const aPloxo = "Плохо";
+const aUdovl_ = "Удовл.";
+const aXoroso = "Хорошо";
+const aOtlicno = "Отлично";
+const aFinansi = "Финансы: ";
+const aRub__3 = " руб.";
+const aNadoPolucitDen = "Надо получить деньги за май...";
+const aTiUspelPotrati = "Ты успел потратить все деньги.";
+const aKliniceskaqSme = "Клиническая смерть мозга";
+const aGolovaProstoNi = "Голова просто никакая";
+const aDumatPraktices = "Думать практически невозможно";
+const aDumatTrudno = "Думать трудно";
+const aGolovaPoctiVNo = "Голова почти в норме";
+const aGolovaVNorme = "Голова в норме";
+const aGolovaSvejaq = "Голова свежая";
+const aLegkostVMislqx = "Легкость в мыслях необыкновенная";
+const aObratitesKRazr = "Обратитесь к разработчику ;)";
+const aMamaRodiMenqOb = "Мама, роди меня обратно!";
+const aOkoncatelNoZau = "Окончательно заучился";
+const aQTakBolSeNemog = "Я так больше немогууу!";
+const aSkoreeBiVseAto = "Скорее бы все это кончилось...";
+const aEseNemnogoIPor = "Еще немного и пора отдыхать";
+const aNemnogoUstal = "Немного устал";
+const aGotovKTruduIOb = "Готов к труду и обороне";
+const aNasJdutVelikie = "Нас ждут великие дела";
+const aOcenZamknutiiT = "Очень замкнутый товарищ";
+const aPredpocitaesOd = "Предпочитаешь одиночество";
+const aTebeTrudnoObsa = "Тебе трудно общаться с людьми";
+const aTebeNeprostoOb = "Тебе непросто общаться с людьми";
+const aTiNormalNoOtno = "Ты нормально относишься к окружающим";
+const aUTebqMnogoDruz = "У тебя много друзей";
+const aUTebqOcenMnogo = "У тебя очень много друзей";
 
 
 function show_header_stats() {
@@ -5582,7 +5602,8 @@ function show_header_stats() {
 
     GotoXY(1, 4);
     const brain_line = [0, 1, 2, 3, 4, 5, 6, 0x65];
-    const brain_str = [aKliniceskaqSme, aGolovaProstoNi, aDumatPraktices, aDumatTrudno, aGolovaPoctiVNo, aGolovaVNorme, aGolovaSvejaq, aLegkostVMislqx, aObratitesKRazr];
+    const brain_str = [aKliniceskaqSme, aGolovaProstoNi, aDumatPraktices, aDumatTrudno, aGolovaPoctiVNo,
+        aGolovaVNorme, aGolovaSvejaq, aLegkostVMislqx, aObratitesKRazr];
     const brain_col = [5, 5, 0xC, 0xC, 0xE, 0xE, 0xA, 0xA, 0xB];
     const brain_i = _upper_bound(brain_line, hero.brain);
     colored_output(brain_col[brain_i], brain_str[brain_i]);
@@ -5590,14 +5611,16 @@ function show_header_stats() {
 
     GotoXY(1, 5);
     const stamina_line = [0, 1, 2, 3, 4, 5, 6];
-    const stamina_str = [aMamaRodiMenqOb, aOkoncatelNoZau, aQTakBolSeNemog, aSkoreeBiVseAto, aEseNemnogoIPor, aNemnogoUstal, aGotovKTruduIOb, aNasJdutVelikie];
+    const stamina_str = [aMamaRodiMenqOb, aOkoncatelNoZau, aQTakBolSeNemog, aSkoreeBiVseAto, aEseNemnogoIPor,
+        aNemnogoUstal, aGotovKTruduIOb, aNasJdutVelikie];
     const stamina_col = [5, 5, 0xC, 0xC, 0xE, 0xE, 0xA, 0xA];
     const stamina_i = _upper_bound(stamina_line, hero.stamina);
     colored_output(stamina_col[stamina_i], stamina_str[stamina_i]);
 
     GotoXY(1, 6);
     const charizma_line = [1, 2, 3, 4, 5, 6];
-    const charizma_str = [aOcenZamknutiiT, aPredpocitaesOd, aTebeTrudnoObsa, aTebeNeprostoOb, aTiNormalNoOtno, aUTebqMnogoDruz, aUTebqOcenMnogo];
+    const charizma_str = [aOcenZamknutiiT, aPredpocitaesOd, aTebeTrudnoObsa, aTebeNeprostoOb,
+        aTiNormalNoOtno, aUTebqMnogoDruz, aUTebqOcenMnogo];
     const charizma_col = [5, 5, 0xC, 0xC, 0xE, 0xA, 0xA];
     const charizma_i = _upper_bound(charizma_line, hero.charizma);
     colored_output(charizma_col[charizma_i], charizma_str[charizma_i]);
@@ -5605,7 +5628,7 @@ function show_header_stats() {
 
 
 function show_timesheet_day(day_color, day, subj) {
-    const asc_1FD4D = '██████';
+    const asc_1FD4D = "██████";
     TextColor(hero.subject[subj].passed ? 1 : day_color);
 
     const ts = timesheet[day][subj];
@@ -5614,7 +5637,7 @@ function show_timesheet_day(day_color, day, subj) {
         write(places[ts.where].title);
         GotoXY(day * 7 + 0x18, subj * 3 + 3);
         write(ts.from);
-        write('-');
+        write("-");
         write(ts.to);
     } else {
         TextColor(day_color > 8 ? 6 : 8);
@@ -5630,17 +5653,17 @@ function show_timesheet_day(day_color, day, subj) {
 
 
 function show_timesheet() {
-    const aOstalos = 'Осталось';
-    const aPodoitiS = 'Подойти с';
-    const aZacetkoi = 'зачеткой';
-    const aZacet = 'ЗАЧЕТ';
-    const a_05 = '.05';
-    const aVseUjeSdano = 'Все уже сдано!';
-    const aOstalsq = 'Остался ';
-    const aZacet_0 = ' зачет!';
-    const aOstalos_0 = 'Осталось ';
-    const aZaceta_ = ' зачета.';
-    const aZacetov_ = ' зачетов.';
+    const aOstalos = "Осталось";
+    const aPodoitiS = "Подойти с";
+    const aZacetkoi = "зачеткой";
+    const aZacet = "ЗАЧЕТ";
+    const a_05 = ".05";
+    const aVseUjeSdano = "Все уже сдано!";
+    const aOstalsq = "Остался ";
+    const aZacet_0 = " зачет!";
+    const aOstalos_0 = "Осталось ";
+    const aZaceta_ = " зачета.";
+    const aZacetov_ = " зачетов.";
 
 
     for (let subj = Algebra; subj <= Fizra; ++subj) {
@@ -5720,7 +5743,7 @@ function show_short_today_timesheet(y) {
             TextColor(hero.subject[subj].passed ? 8 : 0xF);
             GotoXY(0x40, y + subj);
             write(ts.from);
-            write('-');
+            write("-");
             write(ts.to);
         }
 
@@ -5733,7 +5756,7 @@ function show_short_today_timesheet(y) {
             TextColor(0xE);
         }
         write(hero.subject[subj].tasks_done);
-        write('/');
+        write("/");
         write(subjects[subj].tasks);
     }
 
@@ -5793,12 +5816,12 @@ function inception_reinit_timesheet() {
 
 
 async function init_hero_interactive() {
-    const aViberiNacalNie = 'Выбери начальные параметры своего "героя":';
-    const aSlucainiiStude = 'Случайный студент';
-    const aSibkoUmnii = 'Шибко умный';
-    const aSibkoNaglii = 'Шибко наглый';
-    const aSibkoObsitelNi = 'Шибко общительный';
-    const aGodRejim = 'GOD-режим';
+    const aViberiNacalNie = "Выбери начальные параметры своего \"героя\":";
+    const aSlucainiiStude = "Случайный студент";
+    const aSibkoUmnii = "Шибко умный";
+    const aSibkoNaglii = "Шибко наглый";
+    const aSibkoObsitelNi = "Шибко общительный";
+    const aGodRejim = "GOD-режим";
 
     ClrScr();
     writeln(aViberiNacalNie);
@@ -5895,7 +5918,7 @@ async function init_hero() {
 
 
 async function check_exams_left_count() {
-    const aBad_cred_count = 'bad_cred_count';
+    const aBad_cred_count = "bad_cred_count";
     let exams_left = 6;
     for (let i = 0; i < 6; ++i) {
         if (hero.subject[i].passed) {
@@ -5938,7 +5961,7 @@ async function init_game() {
 
 
 async function wait_for_key() {
-    const aNajmiLubuuKlav = 'Нажми любую клавишу ...';
+    const aNajmiLubuuKlav = "Нажми любую клавишу ...";
     GotoXY(1, 24);
     current_color = 0x0E;
     write(aNajmiLubuuKlav);
@@ -5950,9 +5973,9 @@ async function wait_for_key() {
 
 
 async function bug_report(bug_str) {
-    const aVProgrammeBuga = 'В программе буга! Код : ';
-    const aSrocnoObratite = 'Срочно обратитесь к разработчику ;)';
-    const aRazdavlenBezja = 'Раздавлен безжалостной ошибкой в программе.';
+    const aVProgrammeBuga = "В программе буга! Код : ";
+    const aSrocnoObratite = "Срочно обратитесь к разработчику ;)";
+    const aRazdavlenBezja = "Раздавлен безжалостной ошибкой в программе.";
 
     ClrScr();
     current_color = 0x8F;
@@ -6015,6 +6038,4 @@ function dialog_show(x, y) {
     current_color = 7;
 } // end function 20B20
 
-
-Main();
 export default Main;
